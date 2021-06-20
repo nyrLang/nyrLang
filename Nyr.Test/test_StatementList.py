@@ -1,28 +1,6 @@
 from Nyr.Node import Node
 from Nyr.Parser import Parser
 
-"""
-{
-	"type": "Program",
-	"body": [
-		{
-			"type": "ExpressionStatement",
-			"expression": {
-				"type": "StringLiteral",
-				"value": "Hello"
-				}
-			},
-			{
-			"type": "ExpressionStatement",
-			"expression": {
-				"type": "NumericLiteral",
-				"value": 42
-			}
-		}
-	]
-}
-"""
-
 
 def testMultipleStrings():
 	parser = Parser()
