@@ -1,5 +1,9 @@
 class Node:
 	Program = "Program"
-	ExpressionStatement = "ExpressionStatement"
+
+	# Literals
 	NumericLiteral = "NumericLiteral"
 	StringLiteral = "StringLiteral"
+
+	# Expressions
+	ExpressionStatement = "ExpressionStatement"
