@@ -18,9 +18,9 @@ TokenizerSpec: list[tuple[re.Pattern[AnyStr], Token]] = [
 	# -------------------------
 	# Comments
 	# Single line
-	(re.compile(r"^\/\/.*"), Token.NoneToken),
+	(re.compile(r"^//.*"), Token.NoneToken),
 	# Multi line
-	(re.compile(r"\/\*[\s\S]*?\*\/"), Token.NoneToken),
+	(re.compile(r"/\*[\s\S]*?\*/"), Token.NoneToken),
 
 	# -------------------------
 	# Symbold, Delimiters
