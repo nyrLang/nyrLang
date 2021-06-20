@@ -5,193 +5,54 @@ from Nyr.Parser import Parser
 class TestParseNumber:
 	def testInteger(self):
 		parser = Parser()
-		ast = parser.parse("42;")
 
-		assert ast.get("type") == Node.Program
+		for test in ["42;", "   42;   ", "42  ;"]:
+			ast = parser.parse(test)
 
-		assert len(ast.get("body")) == 1
+			assert ast["type"] == Node.Program
 
-		assert ast.get("body")[0].get("type") == Node.ExpressionStatement
+			body = ast["body"]
 
-		assert ast.get("body")[0].get("expression").get("type") == Node.NumericLiteral
-		assert ast.get("body")[0].get("expression").get("value") == 42
+			assert len(body) == 1
 
-	def testIntegerWithPadding(self):
-		parser = Parser()
-		ast = parser.parse("   42;   ")
+			assert body[0]["type"] == Node.ExpressionStatement
 
-		assert ast.get("type") == Node.Program
-
-		assert len(ast.get("body")) == 1
-
-		assert ast.get("body")[0].get("type") == Node.ExpressionStatement
-
-		assert ast.get("body")[0].get("expression").get("type") == Node.NumericLiteral
-		assert ast.get("body")[0].get("expression").get("value") == 42
-
-	def testIntegerSpaceBeforeSemicolon(self):
-		parser = Parser()
-		ast = parser.parse("42   ;")
-
-		assert ast.get("type") == Node.Program
-
-		assert len(ast.get("body")) == 1
-
-		assert ast.get("body")[0].get("type") == Node.ExpressionStatement
-
-		assert ast.get("body")[0].get("expression").get("type") == Node.NumericLiteral
-		assert ast.get("body")[0].get("expression").get("value") == 42
+			assert body[0]["expression"]["type"] == Node.NumericLiteral
+			assert body[0]["expression"]["value"] == 42
 
 
 class TestParseString:
-	# Double Quotes ( " )
-	class TestDoubleQuote:
-		def test(self):
-			parser = Parser()
-			ast = parser.parse(r'"Hello";')
+	def testDoubleQuote(self):
+		parser = Parser()
 
-			assert ast.get("type") == Node.Program
+		for test in [r'"Hello";', r'    "Hello";    ', r'"Hello"  ;', r'"Hello, World";', r'   "Hello, World";   ', r'"Hello, World"   ;']:
+			ast = parser.parse(test)
 
-			assert len(ast.get("body")) == 1
+			assert ast["type"] == Node.Program
 
-			assert ast.get("body")[0].get("type") == Node.ExpressionStatement
-			assert ast.get("body")[0].get("expression").get("type") == Node.StringLiteral
-			assert ast.get("body")[0].get("expression").get("value") == "Hello"
+			body = ast["body"]
 
-		def testWithPadding(self):
-			parser = Parser()
-			ast = parser.parse(r'    "Hello";    ')
+			assert len(body) == 1
 
-			assert ast.get("type") == Node.Program
+			assert body[0]["type"] == Node.ExpressionStatement
+			assert body[0]["expression"]["type"] == Node.StringLiteral
+			assert body[0]["expression"]["value"] in ("Hello", "Hello, World")
 
-			assert len(ast.get("body")) == 1
+	def testSingleQuote(self):
+		parser = Parser()
 
-			assert ast.get("body")[0].get("type") == Node.ExpressionStatement
-			assert ast.get("body")[0].get("expression").get("type") == Node.StringLiteral
-			assert ast.get("body")[0].get("expression").get("value") == "Hello"
+		for test in [r"'Hello';", r"   'Hello';   ", r"'Hello'   ;", r"'Hello, World';", r"   'Hello, World';   ", r"'Hello, World'   ;"]:
+			ast = parser.parse(test)
 
-		def testWithSpaces(self):
-			parser = Parser()
-			ast = parser.parse(r'"Hello, World";')
+			assert ast["type"] == Node.Program
 
-			assert ast.get("type") == Node.Program
+			body = ast["body"]
 
-			assert len(ast.get("body")) == 1
+			assert len(body) == 1
 
-			assert ast.get("body")[0].get("type") == Node.ExpressionStatement
-			assert ast.get("body")[0].get("expression").get("type") == Node.StringLiteral
-			assert ast.get("body")[0].get("expression").get("value") == "Hello, World"
-
-		def testWithSpacesAndPadding(self):
-			parser = Parser()
-			ast = parser.parse(r'   "Hello, World";   ')
-
-			assert ast.get("type") == Node.Program
-
-			assert len(ast.get("body")) == 1
-
-			assert ast.get("body")[0].get("type") == Node.ExpressionStatement
-			assert ast.get("body")[0].get("expression").get("type") == Node.StringLiteral
-			assert ast.get("body")[0].get("expression").get("value") == "Hello, World"
-
-		def testWithSpaceBeforeSemicolon(self):
-			parser = Parser()
-			ast = parser.parse(r'"Hello"  ;')
-
-			assert ast.get("type") == Node.Program
-
-			assert len(ast.get("body")) == 1
-
-			assert ast.get("body")[0].get("type") == Node.ExpressionStatement
-			assert ast.get("body")[0].get("expression").get("type") == Node.StringLiteral
-			assert ast.get("body")[0].get("expression").get("value") == "Hello"
-
-		def testWithSpacesAndSpaceBeforeSemicolon(self):
-			parser = Parser()
-			ast = parser.parse(r'"Hello, World"   ;')
-
-			assert ast.get("type") == Node.Program
-
-			assert len(ast.get("body")) == 1
-
-			assert ast.get("body")[0].get("type") == Node.ExpressionStatement
-			assert ast.get("body")[0].get("expression").get("type") == Node.StringLiteral
-			assert ast.get("body")[0].get("expression").get("value") == "Hello, World"
-
-	# Singe Quotes ( ' )
-	class TestSingleQuote:
-		def test(self):
-			parser = Parser()
-			ast = parser.parse(r"'Hello';")
-
-			assert ast.get("type") == Node.Program
-
-			assert len(ast.get("body")) == 1
-
-			assert ast.get("body")[0].get("type") == Node.ExpressionStatement
-			assert ast.get("body")[0].get("expression").get("type") == Node.StringLiteral
-			assert ast.get("body")[0].get("expression").get("value") == "Hello"
-
-		def testWithPadding(self):
-			parser = Parser()
-			ast = parser.parse(r"   'Hello';   ")
-
-			assert ast.get("type") == Node.Program
-
-			assert len(ast.get("body")) == 1
-
-			assert ast.get("body")[0].get("type") == Node.ExpressionStatement
-			assert ast.get("body")[0].get("expression").get("type") == Node.StringLiteral
-			assert ast.get("body")[0].get("expression").get("value") == "Hello"
-
-		def testWithSpaces(self):
-			parser = Parser()
-			ast = parser.parse(r"'Hello, World';")
-
-			assert ast.get("type") == Node.Program
-
-			assert len(ast.get("body")) == 1
-
-			assert ast.get("body")[0].get("type") == Node.ExpressionStatement
-			assert ast.get("body")[0].get("expression").get("type") == Node.StringLiteral
-			assert ast.get("body")[0].get("expression").get("value") == "Hello, World"
-
-		def testSpacesAndPadding(self):
-			parser = Parser()
-			ast = parser.parse(r"   'Hello, World';   ")
-
-			assert ast.get("type") == Node.Program
-
-			assert len(ast.get("body")) == 1
-
-			assert ast.get("body")[0].get("type") == Node.ExpressionStatement
-			assert ast.get("body")[0].get("expression").get("type") == Node.StringLiteral
-			assert ast.get("body")[0].get("expression").get("value") == "Hello, World"
-
-		def testWithSpaceBeforeSemicolon(self):
-			parser = Parser()
-			ast = parser.parse(r"'Hello'   ;")
-
-			assert ast.get("type") == Node.Program
-
-			assert len(ast.get("body")) == 1
-
-			assert ast.get("body")[0].get("type") == Node.ExpressionStatement
-			assert ast.get("body")[0].get("expression").get("type") == Node.StringLiteral
-			assert ast.get("body")[0].get("expression").get("value") == "Hello"
-
-		def testWithSpacesAndSpaceBeforeSemicolon(self):
-			parser = Parser()
-			ast = parser.parse(r"'Hello, World'   ;")
-
-			assert ast.get("type") == Node.Program
-
-			assert len(ast.get("body")) == 1
-
-			assert ast.get("body")[0].get("type") == Node.ExpressionStatement
-			assert ast.get("body")[0].get("expression").get("type") == Node.StringLiteral
-			assert ast.get("body")[0].get("expression").get("value") == "Hello, World"
-
+			assert body[0]["type"] == Node.ExpressionStatement
+			assert body[0]["expression"]["type"] == Node.StringLiteral
+			assert body[0]["expression"]["value"] in ("Hello", "Hello, World")
 
 # TODO: Test throw error with "Missing ';'"
 # class TestParseComments:
