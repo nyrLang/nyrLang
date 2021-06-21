@@ -71,7 +71,7 @@ class TestParseString:
 			assert body[0]["expression"]["type"] == Node.StringLiteral
 			assert body[0]["expression"]["value"] in ("Hello", "Hello, World")
 
-# TODO: Test throw error with "Missing ';'"
+# TODO(#1): Test throw error with "Missing ';'"
 # class TestParseComments:
 # 	def testSingleLineComment(self):
 # 		parser = Parser()
