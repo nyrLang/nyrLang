@@ -5,7 +5,8 @@ from typing import Optional
 
 
 class Token(Enum):
-	Number = "NUMBER"
+	Integer = "INTEGER"
+	Float = "FLOAT"
 	String = "STRING"
 	Semicolon = ";"
 	NoneToken = None
@@ -28,7 +29,8 @@ TokenizerSpec: list[tuple[re.Pattern[AnyStr], Token]] = [
 
 	# -------------------------
 	# Numbers
-	(re.compile(r"^\d+(\.?\d+)?"), Token.Number),
+	(re.compile(r"^\d+\.\d+"), Token.Float),
+	(re.compile(r"^\d+"), Token.Integer),
 
 	# -------------------------
 	# Strings
@@ -77,11 +79,10 @@ class Tokenizer:
 				return self.getNextToken()
 			elif tokenType == Token.Semicolon:
 				tokenValue = str(tokenValue)
-			elif tokenType == Token.Number:
-				if '.' in tokenValue:
-					tokenValue = float(tokenValue)
-				else:
-					tokenValue = int(tokenValue)
+			elif tokenType == Token.Integer:
+				tokenValue = int(tokenValue)
+			elif tokenType == Token.Float:
+				tokenValue = float(tokenValue)
 			elif tokenType == Token.String:
 				tokenValue = str(tokenValue)
 

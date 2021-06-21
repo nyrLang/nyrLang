@@ -20,6 +20,23 @@ class TestParseNumber:
 			assert body[0]["expression"]["type"] == Node.NumericLiteral
 			assert body[0]["expression"]["value"] == 42
 
+	def testFloat(self):
+		parser = Parser()
+
+		for test in ["42.5;", "   42.5;   ", "42.5  ;"]:
+			ast = parser.parse(test)
+
+			assert ast["type"] == Node.Program
+
+			body = ast["body"]
+
+			assert len(body) == 1
+
+			assert body[0]["type"] == Node.ExpressionStatement
+
+			assert body[0]["expression"]["type"] == Node.NumericLiteral
+			assert body[0]["expression"]["value"] == 42.5
+
 
 class TestParseString:
 	def testDoubleQuote(self):

@@ -2,6 +2,6 @@
 
 ## Features
 Parses:
-- Integers
+- Numbers (Integers and Floats)
 - Strings
 - Comments
