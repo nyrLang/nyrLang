@@ -17,7 +17,7 @@ class TestParseNumber:
 
 			assert body[0]["type"] == Node.ExpressionStatement
 
-			assert body[0]["expression"]["type"] == Node.NumericLiteral
+			assert body[0]["expression"]["type"] == Node.IntegerLiteral
 			assert body[0]["expression"]["value"] == 42
 
 	def testFloat(self):
@@ -34,7 +34,7 @@ class TestParseNumber:
 
 			assert body[0]["type"] == Node.ExpressionStatement
 
-			assert body[0]["expression"]["type"] == Node.NumericLiteral
+			assert body[0]["expression"]["type"] == Node.FloatLiteral
 			assert body[0]["expression"]["value"] == 42.5
 
 

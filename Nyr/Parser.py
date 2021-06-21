@@ -25,8 +25,8 @@ class Parser:
 
 		if not token:
 			raise SyntaxError(f'Unexpected end of input, expected: "{tokenType}"')
-		elif token.get("type") != tokenType:
-			raise SyntaxError(f'Unexpected token: "{token.get("value")}", expected: "{tokenType}"')
+		elif token["type"] != tokenType:
+			raise SyntaxError(f'Unexpected token: "{token["value"]}", expected: "{tokenType}"')
 
 		self.lookahead = self.tokenizer.getNextToken()
 
@@ -78,13 +78,13 @@ class Parser:
 
 	def Expression(self):
 		""" Expression
-			: Literal
+			: LiteralExpression
 			;
 		"""
-		return self.Literal()
+		return self.LiteralExprerssion()
 
-	def Literal(self):
-		""" Literal
+	def LiteralExprerssion(self):
+		""" LiteralExpression
 			: NumericLiteral
 			| StringLiteral
 			;
@@ -92,11 +92,13 @@ class Parser:
 
 		if not self.lookahead:
 			return None
-		elif self.lookahead.get("type") == Token.NoneToken:
+		elif self.lookahead["type"] == Token.NoneToken:
 			return None
-		elif self.lookahead.get("type") == Token.Number:
+		elif self.lookahead["type"] == Token.Integer:
 			return self.NumericLiteral()
-		elif self.lookahead.get("type") == Token.String:
+		elif self.lookahead["type"] == Token.Float:
+			return self.NumericLiteral()
+		elif self.lookahead["type"] == Token.String:
 			return self.StringLiteral()
 		else:
 			raise SyntaxError("Literal: unexpected literal production")
@@ -109,16 +111,44 @@ class Parser:
 		token = self._eat(Token.String)
 		return {
 			"type": Node.StringLiteral,
-			"value": token.get("value")[1: -1],
+			"value": token["value"][1: -1],
 		}
 
 	def NumericLiteral(self):
 		""" NumericLiteral
-			: NUMBER
+			: IntegerLiteral
+			| FloatLiteral
 			;
 		"""
-		token = self._eat(Token.Number)
+		if self.lookahead["type"] == Token.Integer:
+			return self.IntegerLiteral()
+		elif self.lookahead["type"] == Token.Float:
+			return self.FloatLiteral()
+		else:
+			raise SyntaxError(f"Unknown NumericLiteral: {self.lookahead['type']}")
+
+	def IntegerLiteral(self):
+		""" IntegerLiteral
+			: INTEGER
+			;
+		"""
+
+		token = self._eat(Token.Integer)
+
 		return {
-			"type": Node.NumericLiteral,
-			"value": token.get("value"),
+			"type": Node.IntegerLiteral,
+			"value": token["value"],
+		}
+
+	def FloatLiteral(self):
+		""" FloatLiteral
+					: FLOAT
+					;
+				"""
+
+		token = self._eat(Token.Float)
+
+		return {
+			"type": Node.FloatLiteral,
+			"value": token["value"],
 		}

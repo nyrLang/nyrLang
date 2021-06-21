@@ -3,6 +3,8 @@ class Node:
 
 	# Literals
 	NumericLiteral = "NumericLiteral"
+	IntegerLiteral = "IntegerLiteral"
+	FloatLiteral = "FloatLiteral"
 	StringLiteral = "StringLiteral"
 
 	# Expressions
