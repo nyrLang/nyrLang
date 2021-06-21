@@ -28,7 +28,7 @@ TokenizerSpec: list[tuple[re.Pattern[AnyStr], Token]] = [
 
 	# -------------------------
 	# Numbers
-	(re.compile(r"^\d+"), Token.Number),
+	(re.compile(r"^\d+(\.?\d+)?"), Token.Number),
 
 	# -------------------------
 	# Strings
@@ -78,7 +78,10 @@ class Tokenizer:
 			elif tokenType == Token.Semicolon:
 				tokenValue = str(tokenValue)
 			elif tokenType == Token.Number:
-				tokenValue = int(tokenValue)
+				if '.' in tokenValue:
+					tokenValue = float(tokenValue)
+				else:
+					tokenValue = int(tokenValue)
 			elif tokenType == Token.String:
 				tokenValue = str(tokenValue)
 
