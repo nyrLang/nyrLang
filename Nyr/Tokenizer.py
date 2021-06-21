@@ -10,6 +10,7 @@ class Token(Enum):
 	String = "STRING"
 	Semicolon = ";"
 	NoneToken = None
+	IgnoreToken = "IGNORE"
 
 
 TokenizerSpec: list[tuple[re.Pattern[AnyStr], Token]] = [
@@ -19,9 +20,9 @@ TokenizerSpec: list[tuple[re.Pattern[AnyStr], Token]] = [
 	# -------------------------
 	# Comments
 	# Single line
-	(re.compile(r"^//.*"), Token.NoneToken),
+	(re.compile(r"^//.*"), Token.IgnoreToken),
 	# Multi line
-	(re.compile(r"/\*[\s\S]*?\*/"), Token.NoneToken),
+	(re.compile(r"/\*[\s\S]*?\*/"), Token.IgnoreToken),
 
 	# -------------------------
 	# Symbols, Delimiters
@@ -85,6 +86,11 @@ class Tokenizer:
 				tokenValue = float(tokenValue)
 			elif tokenType == Token.String:
 				tokenValue = str(tokenValue)
+			elif tokenType == Token.IgnoreToken:
+				return {
+					"type": Token.IgnoreToken,
+					"value": "IGNORE",
+				}
 
 			if not tokenValue or tokenValue == "":
 				raise Exception("Tokenizer::getNextToken : tokenValue is 'None'")

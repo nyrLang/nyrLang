@@ -25,6 +25,8 @@ class Parser:
 
 		if not token:
 			raise SyntaxError(f'Unexpected end of input, expected: "{tokenType}"')
+		elif token["type"] == Token.IgnoreToken:
+			pass
 		elif token["type"] != tokenType:
 			raise SyntaxError(f'Unexpected token: "{token["value"]}", expected: "{tokenType}"')
 
@@ -48,6 +50,12 @@ class Parser:
 			| StatementList Statement
 			;
 		"""
+
+		while self.lookahead and self.lookahead["type"] == Token.IgnoreToken:
+			self.lookahead = self.tokenizer.getNextToken()
+
+		if not self.lookahead: return []
+
 		statementList: list = [self.Statement()]
 
 		while self.lookahead:
@@ -100,6 +108,8 @@ class Parser:
 			return self.NumericLiteral()
 		elif self.lookahead["type"] == Token.String:
 			return self.StringLiteral()
+		elif self.lookahead["type"] == Token.IgnoreToken:
+			return None
 		else:
 			raise SyntaxError("Literal: unexpected literal production")
 
