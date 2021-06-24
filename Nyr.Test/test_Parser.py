@@ -1,5 +1,13 @@
-from Nyr.Node import Node
-from Nyr.Parser import Parser
+import Nyr.Parser.Node as Node
+from Nyr.Parser.Parser import Parser
+
+
+def testParseEmpty():
+	parser = Parser()
+
+	ast = parser.parse("")
+
+	assert len(ast.body) == 0
 
 
 class TestParseNumber:
@@ -9,33 +17,17 @@ class TestParseNumber:
 		for test in ["42;", "   42;   ", "42  ;"]:
 			ast = parser.parse(test)
 
-			assert ast["type"] == Node.Program
-
-			body = ast["body"]
-
-			assert len(body) == 1
-
-			assert body[0]["type"] == Node.ExpressionStatement
-
-			assert body[0]["expression"]["type"] == Node.IntegerLiteral
-			assert body[0]["expression"]["value"] == 42
-
-	def testFloat(self):
-		parser = Parser()
-
-		for test in ["42.5;", "   42.5;   ", "42.5  ;"]:
-			ast = parser.parse(test)
-
-			assert ast["type"] == Node.Program
-
-			body = ast["body"]
+			assert ast.type == "Program"
+			body = ast.body
 
 			assert len(body) == 1
 
-			assert body[0]["type"] == Node.ExpressionStatement
+			assert body[0].type == "ExpressionStatement"
 
-			assert body[0]["expression"]["type"] == Node.FloatLiteral
-			assert body[0]["expression"]["value"] == 42.5
+			expression: Node.Node = body[0].expression
+
+			assert expression.type == "NumericLiteral"
+			assert expression.value == 42
 
 
 class TestParseString:
@@ -45,15 +37,17 @@ class TestParseString:
 		for test in [r'"Hello";', r'    "Hello";    ', r'"Hello"  ;', r'"Hello, World";', r'   "Hello, World";   ', r'"Hello, World"   ;']:
 			ast = parser.parse(test)
 
-			assert ast["type"] == Node.Program
-
-			body = ast["body"]
+			assert ast.type == "Program"
+			body = ast.body
 
 			assert len(body) == 1
 
-			assert body[0]["type"] == Node.ExpressionStatement
-			assert body[0]["expression"]["type"] == Node.StringLiteral
-			assert body[0]["expression"]["value"] in ("Hello", "Hello, World")
+			assert body[0].type == "ExpressionStatement"
+
+			expression: Node.Node = body[0].expression
+
+			assert expression.type == "StringLiteral"
+			assert expression.value in ("Hello", "Hello, World")
 
 	def testSingleQuote(self):
 		parser = Parser()
@@ -61,15 +55,17 @@ class TestParseString:
 		for test in [r"'Hello';", r"   'Hello';   ", r"'Hello'   ;", r"'Hello, World';", r"   'Hello, World';   ", r"'Hello, World'   ;"]:
 			ast = parser.parse(test)
 
-			assert ast["type"] == Node.Program
-
-			body = ast["body"]
+			assert ast.type == "Program"
+			body = ast.body
 
 			assert len(body) == 1
 
-			assert body[0]["type"] == Node.ExpressionStatement
-			assert body[0]["expression"]["type"] == Node.StringLiteral
-			assert body[0]["expression"]["value"] in ("Hello", "Hello, World")
+			assert body[0].type == "ExpressionStatement"
+
+			expression: Node.Node = body[0].expression
+
+			assert expression.type == "StringLiteral"
+			assert expression.value in ("Hello", "Hello, World")
 
 
 class TestParseComments:
@@ -77,7 +73,7 @@ class TestParseComments:
 		parser = Parser()
 		ast = parser.parse("// Single line comment")
 
-		assert len(ast["body"]) == 0
+		assert len(ast.body) == 0
 
 	def testSingleLineCommentWithValue(self):
 		parser = Parser()
@@ -86,14 +82,16 @@ class TestParseComments:
 			"value here";
 		""")
 
-		body = ast["body"]
+		body = ast.body
 
 		assert len(body) == 1
 
-		assert body[0]["type"] == Node.ExpressionStatement
-		expression = body[0]["expression"]
-		assert expression["type"] == Node.StringLiteral
-		assert expression["value"] == "value here"
+		assert body[0].type == "ExpressionStatement"
+
+		expression: Node.Node = body[0].expression
+
+		assert expression.type == "StringLiteral"
+		assert expression.value == "value here"
 
 	def testMultiLineComment(self):
 		parser = Parser()
@@ -104,7 +102,7 @@ class TestParseComments:
 			*/
 		""")
 
-		assert len(ast["body"]) == 0
+		assert len(ast.body) == 0
 
 	def testMultiLineCommentWithValue(self):
 		parser = Parser()
@@ -113,14 +111,16 @@ class TestParseComments:
 				Multi-line
 				Comment
 			*/
-			3.141;
+			3141;
 		""")
 
-		body = ast["body"]
+		body = ast.body
 
 		assert len(body) == 1
 
-		assert body[0]["type"] == Node.ExpressionStatement
-		expression = body[0]["expression"]
-		assert expression["type"] == Node.FloatLiteral
-		assert expression["value"] == 3.141
+		assert body[0].type == "ExpressionStatement"
+
+		expression: Node.Node = body[0].expression
+
+		assert expression.type == "NumericLiteral"
+		assert expression.value == 3141
