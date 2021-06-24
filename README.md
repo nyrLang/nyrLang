@@ -3,7 +3,12 @@
 # Nyr: A soon-to-be programming language
 
 ## Features
-Parses:
+- CLI
+- File input (must end with `.nyr`)
+
+- - -
+
+Can parse:
 - Numbers (Integers)
 - Strings
 - Comments
