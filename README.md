@@ -9,6 +9,7 @@
 ### Flags
 - `-f [Path].nyr`, `--file [Path].nyr` reads from file
 - `-i (true|false)`, `--interpret (true|false)` wether to interpret the input (`true`, `false`)
+	- Note: Many statements/operations are not yet supported, and will raise a `RuntimeError` if one is encountered
 - `-o (true|false)`, `--output (true|false)` wether to dump the generated AST into an `ast.json` file (located at `./Nyr/ast.json`)
 
 - - -
@@ -29,3 +30,9 @@
 - If Statements (`if (x > 5) x = 0;`)
 	- Else Statements (`if (x > 5) x = 0; else { x += 1; }`)
 - Variable Statements (`let i = 0;`, `let j;`)
+
+- For-loops (init, test and update can each be empty)
+	- `for (let i=0; i < 10; i += 1) { x += i; }`
+	- `for (;;) { x += 1; }`
+- While-loops (`while (x < 5) { x += 1; }`)
+- Do-While-loops (`do { x += 1; } while (x < 10); `)

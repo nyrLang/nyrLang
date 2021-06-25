@@ -279,7 +279,7 @@ class TestForStatement:
 	def testMissingAll(self):
 		ast = Parser().parse("""
 			for ( ; ; ) {
-				x += i;
+				x += 1;
 			}
 		""")
 
