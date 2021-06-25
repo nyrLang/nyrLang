@@ -1,3 +1,4 @@
+import Nyr.Parser.Node as Node
 from Nyr.Parser.Parser import Parser
 
 
@@ -13,14 +14,26 @@ def test():
 
 	body = ast.body
 	assert len(body) == 1
-	assert body[0].type == "BlockStatement"
 
-	blockBody = body[0].body
+	block = body[0]
+	assert isinstance(block, Node.BlockStatement), f"{block.type} should be of type {Node.BlockStatement.type}"
+
+	blockBody = block.body
+
 	assert len(blockBody) == 2
-	assert blockBody[0].type == "ExpressionStatement"
-	assert blockBody[0].expression.type == "NumericLiteral"
-	assert blockBody[0].expression.value == 42
 
-	assert blockBody[1].type == "ExpressionStatement"
-	assert blockBody[1].expression.type == "StringLiteral"
-	assert blockBody[1].expression.value == "Hello"
+	node = blockBody[0]
+	assert isinstance(node, Node.ExpressionStatement)
+
+	expression = node.expression
+
+	assert isinstance(expression, Node.IntegerLiteral)
+	assert expression.value == 42
+
+	node = blockBody[1]
+	assert isinstance(node, Node.ExpressionStatement)
+
+	expression = node.expression
+
+	assert isinstance(expression, Node.StringLiteral)
+	assert expression.value == "Hello"

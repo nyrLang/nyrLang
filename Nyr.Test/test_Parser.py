@@ -10,6 +10,17 @@ def testParseEmpty():
 	assert len(ast.body) == 0
 
 
+def testEmptyStatement():
+	parser = Parser()
+
+	ast = parser.parse(";")
+
+	assert len(ast.body) == 1
+
+	assert isinstance(ast.body[0], Node.EmptyStatement)
+	assert ast.body[0].type == "EmptyStatement"
+
+
 class TestParseNumber:
 	def testInteger(self):
 		parser = Parser()
@@ -22,12 +33,40 @@ class TestParseNumber:
 
 			assert len(body) == 1
 
-			assert body[0].type == "ExpressionStatement"
+			node = body[0]
 
-			expression: Node.Node = body[0].expression
+			if not isinstance(node, Node.ExpressionStatement):
+				assert False, f"{node.type} should be of type {Node.ExpressionStatement.type}"
 
-			assert expression.type == "NumericLiteral"
+			assert node.type == "ExpressionStatement"
+
+			expression = node.expression
+
+			assert isinstance(expression, Node.IntegerLiteral)
+
 			assert expression.value == 42
+
+	def testFloat(self):
+		parser = Parser()
+
+		for test in ["3.141;", "   3.141;   ", "3.141  ;"]:
+			ast = parser.parse(test)
+
+			assert ast.type == "Program"
+			body = ast.body
+
+			assert len(body) == 1
+
+			node = body[0]
+
+			if not isinstance(node, Node.ExpressionStatement):
+				assert False, f"{node.type} should be of type {Node.ExpressionStatement.type}"
+
+			expression = node.expression
+
+			assert isinstance(expression, Node.FloatLiteral)
+
+			assert expression.value == 3.141
 
 
 class TestParseString:
@@ -42,11 +81,14 @@ class TestParseString:
 
 			assert len(body) == 1
 
-			assert body[0].type == "ExpressionStatement"
+			node = body[0]
 
-			expression: Node.Node = body[0].expression
+			if not isinstance(node, Node.ExpressionStatement):
+				assert False, f"{node.type} should be of type {Node.ExpressionStatement.type}"
 
-			assert expression.type == "StringLiteral"
+			expression = node.expression
+
+			assert isinstance(expression, Node.StringLiteral)
 			assert expression.value in ("Hello", "Hello, World")
 
 	def testSingleQuote(self):
@@ -60,11 +102,14 @@ class TestParseString:
 
 			assert len(body) == 1
 
-			assert body[0].type == "ExpressionStatement"
+			node = body[0]
 
-			expression: Node.Node = body[0].expression
+			if not isinstance(node, Node.ExpressionStatement):
+				assert False, f"{node.type} should be of type {Node.ExpressionStatement.type}"
 
-			assert expression.type == "StringLiteral"
+			expression = node.expression
+
+			assert isinstance(expression, Node.StringLiteral)
 			assert expression.value in ("Hello", "Hello, World")
 
 
@@ -86,11 +131,14 @@ class TestParseComments:
 
 		assert len(body) == 1
 
-		assert body[0].type == "ExpressionStatement"
+		node = body[0]
 
-		expression: Node.Node = body[0].expression
+		if not isinstance(node, Node.ExpressionStatement):
+			assert False, f"{node.type} should be of type {Node.ExpressionStatement.type}"
 
-		assert expression.type == "StringLiteral"
+		expression = node.expression
+
+		assert isinstance(expression, Node.StringLiteral)
 		assert expression.value == "value here"
 
 	def testMultiLineComment(self):
@@ -111,16 +159,19 @@ class TestParseComments:
 				Multi-line
 				Comment
 			*/
-			3141;
+			3.141;
 		""")
 
 		body = ast.body
 
 		assert len(body) == 1
 
-		assert body[0].type == "ExpressionStatement"
+		node = body[0]
 
-		expression: Node.Node = body[0].expression
+		if not isinstance(node, Node.ExpressionStatement):
+			assert False, f"{node.type} should be of type {Node.ExpressionStatement.type}"
 
-		assert expression.type == "NumericLiteral"
-		assert expression.value == 3141
+		expression = node.expression
+
+		assert isinstance(expression, Node.FloatLiteral)
+		assert expression.value == 3.141
