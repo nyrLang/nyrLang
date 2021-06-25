@@ -51,7 +51,64 @@ class Parser:
 			elif self.lookahead.type == "{": return self.BlockStatement()
 			elif self.lookahead.type == "let": return self.VariableStatement()
 			elif self.lookahead.type == "if": return self.IfStatement()
+			elif self.lookahead.type == "while": return self.IterationStatement()
+			elif self.lookahead.type == "do": return self.IterationStatement()
+			elif self.lookahead.type == "for": return self.IterationStatement()
 			else: return self.ExpressionStatement()
+
+	def IterationStatement(self) -> Node.Node:
+		if self.lookahead.type == "while":
+			return self.WhileStatement()
+		elif self.lookahead.type == "do":
+			return self.DoWhileStatement()
+		elif self.lookahead.type == "for":
+			return self.ForStatement()
+
+	def WhileStatement(self) -> Node.WhileStatement:
+		self._eat("while")
+
+		self._eat("(")
+		test = self.Expression()
+		self._eat(")")
+
+		body = self.Statement()
+
+		return Node.WhileStatement(test, body)
+
+	def DoWhileStatement(self) -> Node.DoWhileStatement:
+		self._eat("do")
+
+		body = self.Statement()
+
+		self._eat("while")
+		self._eat("(")
+		test = self.Expression()
+		self._eat(")")
+		self._eat(";")
+
+		return Node.DoWhileStatement(body, test)
+
+	def ForStatement(self) -> Node.ForStatement:
+		self._eat("for")
+		self._eat("(")
+
+		init = self.ForStatementInit() if self.lookahead.type != ";" else None
+		self._eat(";")
+
+		test = self.Expression() if self.lookahead.type != ";" else None
+		self._eat(";")
+
+		update = self.Expression() if self.lookahead.type != ")" else None
+		self._eat(")")
+
+		body = self.Statement()
+
+		return Node.ForStatement(init, test, update, body)
+
+	def ForStatementInit(self) -> Node.Node:
+		if self.lookahead.type == "let":
+			return self.VariableStatementInit()
+		return self.Expression()
 
 	def IfStatement(self) -> Node.IfStatement:
 		self._eat("if")
@@ -71,11 +128,16 @@ class Parser:
 
 		return Node.IfStatement(test, consequent, alternative)
 
-	def VariableStatement(self) -> Node.VariableStatement:
+	def VariableStatementInit(self) -> Node.VariableStatement:
 		self._eat("let")
 		declarations = self.VariableDeclarationList()
-		self._eat(";")
+
 		return Node.VariableStatement(declarations)
+
+	def VariableStatement(self) -> Node.VariableStatement:
+		variableStatement = self.VariableStatementInit()
+		self._eat(";")
+		return variableStatement
 
 	def VariableDeclarationList(self) -> list[Node.Node]:
 		declarations: list[Node.Node] = []

@@ -119,6 +119,47 @@ class VariableStatement(Node):
 		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
 
 
+class WhileStatement(Node):
+	def __init__(self, test: Node, body: Node):
+		self.type = self.__class__.__name__
+		self.test = test
+		self.body = body
+
+	def toJSON(self):
+		return dict(type=self.type, test=self.test, body=self.body)
+
+	def value(self):
+		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
+
+
+class DoWhileStatement(Node):
+	def __init__(self, body: Node, test: Node):
+		self.type = self.__class__.__name__
+		self.body = body
+		self.test = test
+
+	def toJSON(self):
+		return dict(type=self.type, body=self.body, test=self.test)
+
+	def value(self):
+		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
+
+
+class ForStatement(Node):
+	def __init__(self, init: Optional[Node], test: Optional[Node], update: Optional[Node], body: Node):
+		self.type = self.__class__.__name__
+		self.init = init
+		self.test = test
+		self.update = update
+		self.body = body
+
+	def toJSON(self):
+		return dict(type=self.type, init=self.init, test=self.test, update=self.update, body=self.body)
+
+	def value(self):
+		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
+
+
 # Expressions
 class BinaryExpression(Node):
 	def __init__(self, operator: str, left: Node, right: Node):

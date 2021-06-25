@@ -33,6 +33,9 @@ spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 	(re.compile(r"^\btrue\b"), "true"),
 	(re.compile(r"^\bfalse\b"), "false"),
 	(re.compile(r"^\bnull\b"), "null"),
+	(re.compile(r"^\bwhile\b"), "while"),
+	(re.compile(r"^\bdo\b"), "do"),
+	(re.compile(r"^\bfor\b"), "for"),
 
 	# -------------------------
 	# Numbers
