@@ -1,5 +1,6 @@
 import argparse
 import json
+from typing import Any
 
 from Nyr.Interpreter.Interpreter import Interpreter
 from Nyr.Parser.Node import ComplexEncoder
@@ -10,6 +11,7 @@ from Nyr.Parser.Parser import Parser
 class Args:
 	inputFile: str
 	output: bool
+	interpret: bool
 
 
 def getAst(string: str):
@@ -19,6 +21,14 @@ def getAst(string: str):
 def printAst(ast_: Node, print_: bool):
 	if print_:
 		json.dumps(ast_, cls=ComplexEncoder, indent=2)
+
+
+def interpret(ast_: Node, interpreter_: Interpreter = None):
+	if interpreter_ is None:
+		return None
+	else:
+		res: dict[str, Any] = interpreter_.interpret(ast_)
+		print(json.dumps(res, indent=2))
 
 
 def outputAST(ast_: Node, doOutput: bool):
@@ -38,6 +48,14 @@ if __name__ == "__main__":
 		dest="inputFile",
 	)
 	argparser.add_argument(
+		"-i", "--interpret",
+		required=False,
+		default=False,
+		type=bool,
+		help="Enable interpreter",
+		dest="interpret",
+	)
+	argparser.add_argument(
 		"-o", "--output",
 		required=False,
 		default=False,
@@ -51,6 +69,8 @@ if __name__ == "__main__":
 	argparser.parse_args(namespace=args)
 
 	parser = Parser()
+	interpreter = Interpreter() if args.interpret else None
+
 	printAST: bool = False
 
 	# CLI mode (read from stdin)
@@ -63,6 +83,7 @@ if __name__ == "__main__":
 
 			printAst(ast, printAST)
 			outputAST(ast, args.output)
+			interpret(ast, interpreter)
 
 	# File mode (read from file given via -f flag)
 	elif args.inputFile.endswith(".nyr"):
@@ -77,6 +98,7 @@ if __name__ == "__main__":
 
 			printAst(ast, printAST)
 			outputAST(ast, args.output)
+			interpret(ast, interpreter)
 
 	# Unknown mode
 	else:

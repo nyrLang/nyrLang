@@ -8,6 +8,7 @@
 
 ### Flags
 - `-f [Path].nyr`, `--file [Path].nyr` reads from file
+- `-i (true|false)`, `--interpret (true|false)` wether to interpret the input (`true`, `false`)
 - `-o (true|false)`, `--output (true|false)` wether to dump the generated AST into an `ast.json` file (located at `./Nyr/ast.json`)
 
 - - -
