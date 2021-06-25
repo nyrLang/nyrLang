@@ -1,12 +1,30 @@
 import argparse
 import json
 
+from Nyr.Interpreter.Interpreter import Interpreter
 from Nyr.Parser.Node import ComplexEncoder
+from Nyr.Parser.Node import Node
 from Nyr.Parser.Parser import Parser
 
 
 class Args:
 	inputFile: str
+	output: bool
+
+
+def getAst(string: str):
+	return Parser().parse(string)
+
+
+def printAst(ast_: Node, print_: bool):
+	if print_:
+		json.dumps(ast_, cls=ComplexEncoder, indent=2)
+
+
+def outputAST(ast_: Node, doOutput: bool):
+	if doOutput:
+		with open("./ast.json", "w") as o:
+			o.write(json.dumps(ast_, cls=ComplexEncoder, indent=2) + "\n")
 
 
 if __name__ == "__main__":
@@ -19,32 +37,46 @@ if __name__ == "__main__":
 		help="Input file (ending with .nyr)",
 		dest="inputFile",
 	)
+	argparser.add_argument(
+		"-o", "--output",
+		required=False,
+		default=False,
+		type=bool,
+		help="output AST to ast.json",
+		dest="output",
+	)
 
 	args = Args()
 
 	argparser.parse_args(namespace=args)
 
+	parser = Parser()
+	printAST: bool = False
+
 	# CLI mode (read from stdin)
 	if args.inputFile == "<stdin>":
-		parser = Parser()
 		while True:
 			cmd = input("nyr> ")
 			if cmd == "exit": exit(0)
-			ast = parser.parse(cmd)
-			print(json.dumps(ast, cls=ComplexEncoder, indent=2))
+
+			ast = getAst(cmd)
+
+			printAst(ast, printAST)
+			outputAST(ast, args.output)
 
 	# File mode (read from file given via -f flag)
 	elif args.inputFile.endswith(".nyr"):
 		with open(args.inputFile, "r") as f:
 			text = f.read()
 
-		parser = Parser()
 		if not text.strip():
-			print("Input file empty!\n")
+			print("\n[!] Input file empty!\n")
 			argparser.print_help()
 		else:
-			ast = parser.parse(text)
-			print(json.dumps(ast, cls=ComplexEncoder, indent=2))
+			ast = getAst(text)
+
+			printAst(ast, printAST)
+			outputAST(ast, args.output)
 
 	# Unknown mode
 	else:

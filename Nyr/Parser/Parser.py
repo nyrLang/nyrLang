@@ -154,11 +154,7 @@ class Parser:
 		return self._eat("COMPLEX_ASSIGN")
 
 	def _LogicalExpression(self, builderName, operatorToken) -> Node.Node:
-		if builderName == "LogicalANDExpression":
-			builder = self.LogicalANDExpression
-		elif builderName == "EqualityExpression":
-			builder = self.EqualityExpression
-		else: raise Exception(f"Unknown builderName: {builderName}")
+		builder = getattr(self, builderName)
 
 		left = builder()
 
@@ -198,17 +194,7 @@ class Parser:
 		return self.BinaryExpression("UnaryExpression", "MULTIPLICATIVE_OPERATOR")
 
 	def BinaryExpression(self, builderName, operatorToken) -> Node.Node:
-		if builderName == "RelationalExpression":
-			builder = self.RelationalExpression
-		elif builderName == "AdditiveExpression":
-			builder = self.AdditiveExpression
-		elif builderName == "MultiplicativeExpression":
-			builder = self.MultiplicativeExpression
-		elif builderName == "PrimaryExpression":
-			builder = self.PrimaryExpression
-		elif builderName == "UnaryExpression":
-			builder = self.UnaryExpression
-		else: raise Exception(f"Unknown builderName: {builderName}")
+		builder = getattr(self, builderName)
 
 		left = builder()
 

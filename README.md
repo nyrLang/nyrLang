@@ -6,6 +6,10 @@
 - CLI
 - File input (must end with `.nyr`)
 
+### Flags
+- `-f [Path].nyr`, `--file [Path].nyr` reads from file
+- `-o (true|false)`, `--output (true|false)` wether to dump the generated AST into an `ast.json` file (located at `./Nyr/ast.json`)
+
 - - -
 
 ### Can parse:
