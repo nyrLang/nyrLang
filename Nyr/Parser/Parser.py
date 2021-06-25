@@ -137,7 +137,7 @@ class Parser:
 			raise SyntaxError("Invalid left-hand side in assignment expression")
 
 	def AssignmentExpression(self) -> Node.Node:
-		left = self.EqualityExpression()
+		left = self.LogicalORExpression()
 
 		if not self._isAssignmentOperator(self.lookahead.type):
 			return left
@@ -152,6 +152,30 @@ class Parser:
 		if self.lookahead.type == "SIMPLE_ASSIGN":
 			return self._eat("SIMPLE_ASSIGN")
 		return self._eat("COMPLEX_ASSIGN")
+
+	def _LogicalExpression(self, builderName, operatorToken) -> Node.Node:
+		if builderName == "LogicalANDExpression":
+			builder = self.LogicalANDExpression
+		elif builderName == "EqualityExpression":
+			builder = self.EqualityExpression
+		else: raise Exception(f"Unknown builderName: {builderName}")
+
+		left = builder()
+
+		while self.lookahead.type == operatorToken:
+			operator = self._eat(operatorToken).value
+
+			right = builder()
+
+			left = Node.LogicalExpression(operator, left, right)
+
+		return left
+
+	def LogicalORExpression(self) -> Node.Node:
+		return self._LogicalExpression("LogicalANDExpression", "LOGICAL_OR")
+
+	def LogicalANDExpression(self) -> Node.Node:
+		return self._LogicalExpression("EqualityExpression", "LOGICAL_AND")
 
 	def LeftHandSideExpression(self) -> Node.Node:
 		return self.Identifier()

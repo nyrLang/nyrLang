@@ -32,32 +32,6 @@ class Program(Node):
 		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
 
 
-class IfStatement(Node):
-	def __init__(self, test: Node, consequent: Node, alternative: Optional[Node]):
-		self.type = self.__class__.__name__
-		self.test = test
-		self.consequent = consequent
-		self.alternative = alternative
-
-	def toJSON(self):
-		return dict(type=self.type, test=self.test, consequent=self.consequent, alternative=self.alternative)
-
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
-
-
-class VariableStatement(Node):
-	def __init__(self, declarations: list[Node]):
-		self.type = self.__class__.__name__
-		self.declarations = declarations
-
-	def toJSON(self):
-		return dict(type=self.type, declarations=self.declarations)
-
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
-
-
 class VariableDeclaration(Node):
 	def __init__(self, id_: Node, init: Optional[Node]):
 		self.type = self.__class__.__name__
@@ -66,6 +40,31 @@ class VariableDeclaration(Node):
 
 	def toJSON(self):
 		return dict(type=self.type, id=self.id, init=self.init)
+
+	def value(self):
+		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
+
+
+class Identifier(Node):
+	def __init__(self, name: str):
+		self.type = self.__class__.__name__
+		self.name = name
+
+	def toJSON(self):
+		return dict(type=self.type, name=self.name)
+
+	def value(self):
+		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
+
+
+# Statements
+class ExpressionStatement(Node):
+	def __init__(self, expression: Node):
+		self.type = self.__class__.__name__
+		self.expression = expression
+
+	def toJSON(self):
+		return dict(type=self.type, expression=self.expression)
 
 	def value(self):
 		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
@@ -94,13 +93,42 @@ class BlockStatement(Node):
 		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
 
 
-class ExpressionStatement(Node):
-	def __init__(self, expression: Node):
+class IfStatement(Node):
+	def __init__(self, test: Node, consequent: Node, alternative: Optional[Node]):
 		self.type = self.__class__.__name__
-		self.expression = expression
+		self.test = test
+		self.consequent = consequent
+		self.alternative = alternative
 
 	def toJSON(self):
-		return dict(type=self.type, expression=self.expression)
+		return dict(type=self.type, test=self.test, consequent=self.consequent, alternative=self.alternative)
+
+	def value(self):
+		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
+
+
+class VariableStatement(Node):
+	def __init__(self, declarations: list[Node]):
+		self.type = self.__class__.__name__
+		self.declarations = declarations
+
+	def toJSON(self):
+		return dict(type=self.type, declarations=self.declarations)
+
+	def value(self):
+		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
+
+
+# Expressions
+class BinaryExpression(Node):
+	def __init__(self, operator: str, left: Node, right: Node):
+		self.type = self.__class__.__name__
+		self.operator = operator
+		self.left = left
+		self.right = right
+
+	def toJSON(self):
+		return dict(type=self.type, operator=self.operator, left=self.left, right=self.right)
 
 	def value(self):
 		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
@@ -120,19 +148,7 @@ class AssignmentExpression(Node):
 		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
 
 
-class Identifier(Node):
-	def __init__(self, name: str):
-		self.type = self.__class__.__name__
-		self.name = name
-
-	def toJSON(self):
-		return dict(type=self.type, name=self.name)
-
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
-
-
-class BinaryExpression(Node):
+class LogicalExpression(Node):
 	def __init__(self, operator: str, left: Node, right: Node):
 		self.type = self.__class__.__name__
 		self.operator = operator
@@ -146,6 +162,7 @@ class BinaryExpression(Node):
 		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
 
 
+# Literals
 class NullLiteral(Node):
 	value: None
 

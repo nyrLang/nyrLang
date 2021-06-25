@@ -8,7 +8,19 @@
 
 - - -
 
-Can parse:
+### Can parse:
 - Numbers (Integers, Floats)
-- Strings
-- Comments
+- Strings (`"A string";`, `'Another string, but with single quotes';`)
+- Comments (`// A comment`, `/* A Multiline Comment */`)
+
+- Binary Expressions (`+`, `-`, `*`, `/`)
+- Assignment Expressions (`x = 5;`, `x = y = 7;`, `a += 2;`)
+
+- Equality Operators (`==`, `!=`)
+- Relational Operators (`>`, `<`, `>=`, `<=`)
+- Logical Operators (`&&`, `||`)
+
+- Block Statements (`{ x = 5; }`)
+- If Statements (`if (x > 5) x = 0;`)
+	- Else Statements (`if (x > 5) x = 0; else { x += 1; }`)
+- Variable Statements (`let i = 0;`, `let j;`)
