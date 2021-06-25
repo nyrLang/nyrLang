@@ -38,7 +38,7 @@ class Parser:
 
 	def StatementList(self, stopLookahead: Any = None) -> list[Node.Node]:
 		if not self.lookahead: return []
-		statementList: list[Node] = [self.Statement()]
+		statementList: list[Node.Node] = [self.Statement()]
 
 		while self.lookahead and self.lookahead.type != stopLookahead:
 			statementList.append(self.Statement())
