@@ -2,7 +2,7 @@ import Nyr.Parser.Node as Node
 from Nyr.Parser.Parser import Parser
 
 
-def test():
+def testBlockStatement():
 	parser = Parser()
 	ast = parser.parse("""{
 		42;
