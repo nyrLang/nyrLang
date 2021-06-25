@@ -36,7 +36,8 @@ spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 
 	# -------------------------
 	# Numbers
-	(re.compile(r"^\d+"), "NUMBER"),
+	(re.compile(r"^\d+\.\d+"), "FLOAT"),
+	(re.compile(r"^\d+"), "INTEGER"),
 
 	# -------------------------
 	# Identifiers

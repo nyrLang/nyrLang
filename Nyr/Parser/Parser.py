@@ -46,12 +46,12 @@ class Parser:
 		return statementList
 
 	def Statement(self) -> Node.Node:
-		lookahead: Node.Node = self.lookahead
-		if lookahead.type == ";": return self.EmptyStatement()
-		elif lookahead.type == "{": return self.BlockStatement()
-		elif lookahead.type == "let": return self.VariableStatement()
-		elif lookahead.type == "if": return self.IfStatement()
-		else: return self.ExpressionStatement()
+		if self.lookahead is not None:
+			if self.lookahead.type == ";": return self.EmptyStatement()
+			elif self.lookahead.type == "{": return self.BlockStatement()
+			elif self.lookahead.type == "let": return self.VariableStatement()
+			elif self.lookahead.type == "if": return self.IfStatement()
+			else: return self.ExpressionStatement()
 
 	def IfStatement(self) -> Node.IfStatement:
 		self._eat("if")
@@ -205,7 +205,7 @@ class Parser:
 			return self.LeftHandSideExpression()
 
 	def _isLiteral(self, tokenType) -> bool:
-		return tokenType in ["NUMBER", "STRING", "true", "false", "null"]
+		return tokenType in ["INTEGER", "FLOAT", "STRING", "true", "false", "null"]
 
 	def ParenthesizedExpression(self) -> Node.Node:
 		self._eat("(")
@@ -215,8 +215,10 @@ class Parser:
 		return expression
 
 	def Literal(self) -> Node.Node:
-		if self.lookahead.type == "NUMBER":
-			return self.NumericLiteral()
+		if self.lookahead.type == "INTEGER":
+			return self.IntegerLiteral()
+		elif self.lookahead.type == "FLOAT":
+			return self.FloatLiteral()
 		elif self.lookahead.type == "STRING":
 			return self.StringLiteral()
 		elif self.lookahead.type == "true":
@@ -238,10 +240,15 @@ class Parser:
 
 		return Node.BooleanLiteral(value)
 
-	def NumericLiteral(self) -> Node.NumericLiteral:
-		token = self._eat("NUMBER")
+	def IntegerLiteral(self) -> Node.IntegerLiteral:
+		token = self._eat("INTEGER")
 
-		return Node.NumericLiteral(int(token.value))
+		return Node.IntegerLiteral(int(token.value))
+
+	def FloatLiteral(self) -> Node.FloatLiteral:
+		token = self._eat("FLOAT")
+
+		return Node.FloatLiteral(float(token.value))
 
 	def StringLiteral(self) -> Node.StringLiteral:
 		token = self._eat("STRING")

@@ -9,6 +9,6 @@
 - - -
 
 Can parse:
-- Numbers (Integers)
+- Numbers (Integers, Floats)
 - Strings
 - Comments

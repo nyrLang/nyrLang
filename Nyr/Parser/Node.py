@@ -168,12 +168,29 @@ class BooleanLiteral(Node):
 		return dict(type=self.type, value=self.value)
 
 
-class NumericLiteral(Node):
+class IntegerLiteral(Node):
 	value: int
 
 	def __init__(self, value: int):
 		self.type = self.__class__.__name__
 		self.value = int(value)
+
+	def __repr__(self):
+		return f"{self.value}"
+
+	def toJSON(self):
+		return dict(type=self.type, value=self.value)
+
+
+class FloatLiteral(Node):
+	value: float
+
+	def __init__(self, value: float):
+		self.type = self.__class__.__name__
+		self.value = float(value)
+
+	def __repr__(self):
+		return f"{self.value}"
 
 	def toJSON(self):
 		return dict(type=self.type, value=self.value)
@@ -185,6 +202,9 @@ class StringLiteral(Node):
 	def __init__(self, value: str):
 		self.value = value
 		self.type = self.__class__.__name__
+
+	def __repr__(self):
+		return f"{self.value}"
 
 	def toJSON(self):
 		return dict(type=self.type, value=self.value)
