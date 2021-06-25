@@ -178,7 +178,7 @@ class Parser:
 		return self._LogicalExpression("EqualityExpression", "LOGICAL_AND")
 
 	def LeftHandSideExpression(self) -> Node.Node:
-		return self.Identifier()
+		return self.PrimaryExpression()
 
 	def Identifier(self) -> Node.Identifier:
 		name = self._eat("IDENTIFIER").value
@@ -195,7 +195,7 @@ class Parser:
 		return self.BinaryExpression("MultiplicativeExpression", "ADDITIVE_OPERATOR")
 
 	def MultiplicativeExpression(self) -> Node.Node:
-		return self.BinaryExpression("PrimaryExpression", "MULTIPLICATIVE_OPERATOR")
+		return self.BinaryExpression("UnaryExpression", "MULTIPLICATIVE_OPERATOR")
 
 	def BinaryExpression(self, builderName, operatorToken) -> Node.Node:
 		if builderName == "RelationalExpression":
@@ -206,6 +206,8 @@ class Parser:
 			builder = self.MultiplicativeExpression
 		elif builderName == "PrimaryExpression":
 			builder = self.PrimaryExpression
+		elif builderName == "UnaryExpression":
+			builder = self.UnaryExpression
 		else: raise Exception(f"Unknown builderName: {builderName}")
 
 		left = builder()
@@ -219,12 +221,27 @@ class Parser:
 
 		return left
 
+	def UnaryExpression(self) -> Node.Node:
+		operator = None
+
+		if self.lookahead.type == "ADDITIVE_OPERATOR":
+			operator = self._eat("ADDITIVE_OPERATOR").value
+		elif self.lookahead.type == "LOGICAL_NOT":
+			operator = self._eat("LOGICAL_NOT").value
+
+		if operator is not None:
+			return Node.UnaryExpression(operator, self.UnaryExpression())
+
+		return self.LeftHandSideExpression()
+
 	def PrimaryExpression(self) -> Node.Node:
 		if self._isLiteral(self.lookahead.type):
 			return self.Literal()
 
 		if self.lookahead.type == "(":
 			return self.ParenthesizedExpression()
+		elif self.lookahead.type == "IDENTIFIER":
+			return self.Identifier()
 		else:
 			return self.LeftHandSideExpression()
 

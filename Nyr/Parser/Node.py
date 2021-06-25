@@ -162,6 +162,19 @@ class LogicalExpression(Node):
 		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
 
 
+class UnaryExpression(Node):
+	def __init__(self, operator: str, argument: Node):
+		self.type = self.__class__.__name__
+		self.operator = operator
+		self.argument = argument
+
+	def toJSON(self):
+		return dict(type=self.type, operator=self.operator, argument=self.argument)
+
+	def value(self):
+		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
+
+
 # Literals
 class NullLiteral(Node):
 	value: None

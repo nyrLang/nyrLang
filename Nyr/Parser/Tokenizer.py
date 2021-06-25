@@ -61,6 +61,7 @@ spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 	# Logical Operators: &&, ||
 	(re.compile(r"^&&"), "LOGICAL_AND"),
 	(re.compile(r"^\|\|"), "LOGICAL_OR"),
+	(re.compile(r"^!"), "LOGICAL_NOT"),
 
 	# -------------------------
 	# Relational Operators: >, >=, <, <=
