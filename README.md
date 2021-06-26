@@ -2,6 +2,21 @@
 
 # Nyr: A soon-to-be programming language
 
+## TOC
+- [Features]
+- [Flags]
+- ["Types"]
+	- [Comments]
+	- [Numbers]
+	- [Strings]
+- [Operators]
+- [Variables]
+- [Conditionals]
+- [Loops]
+- [Functions]
+- [Classes]
+
+
 ## Features
 - CLI
 - File input (must end with `.nyr`)
@@ -14,35 +29,192 @@
 
 - - -
 
-### Can parse:
-- Numbers (Integers, Floats)
-- Strings (`"A string";`, `'Another string, but with single quotes';`)
-- Comments (`// A comment`, `/* A Multiline Comment */`)
+## "Types"
 
-- Binary Expressions (`+`, `-`, `*`, `/`)
-- Assignment Expressions (`x = 5;`, `x = y = 7;`, `a += 2;`)
+### Comments
+```
+// A single-line comment
+/*
+	A multiline
+	comment
+*/
+```
 
-- Equality Operators (`==`, `!=`)
-- Relational Operators (`>`, `<`, `>=`, `<=`)
-- Logical Operators (`&&`, `||`)
+### Numbers
+```
+// Integers
+42;
+-3;
 
-- Block Statements (`{ x = 5; }`)
-- If Statements (`if (x > 5) x = 0;`)
-	- Else Statements (`if (x > 5) x = 0; else { x += 1; }`)
-- Variable Statements (`let i = 0;`, `let j;`)
-- Variable members (`x.y;`)
-	- Computed members (`x[0];`)
+// Floats
+3.141;
+-2.718;
+```
 
-- For-loops (init, test and update can each be empty)
-	- `for (let i=0; i < 10; i += 1) { x += i; }`
-	- `for (;;) { x += 1; }`
-- While-loops (`while (x < 5) { x += 1; }`)
-- Do-While-loops (`do { x += 1; } while (x < 10); `)
+### Strings
+```
+// Double Quotes
+"A very nice string";
 
-- Functions (`def square(x) { return x * x; }`)
-- Function calls
-	- Simple calls (`foo();`)
-	- With arguments (`foo(x);`)
-	- Nested function calls (`square(square(2));`)
-	- Chained function calls (`callbackFunction()();`)
-	- Member function calls (`core.print("Hello, World!")`)
+// Single Quotes
+'Another nice string, but with single quotes instead';
+
+// Multi-line
+"A string
+can also be
+multi-line!";
+```
+
+- - -
+
+## Operators
+```
+/*
+	Binary operators:
+		+, -, *, /
+
+	Equality Operators:
+		==, !=
+
+	Relational Operators:
+		>, <, >=, <=
+
+	Logical Operators:
+		&&, ||, !
+*/
+```
+
+- - -
+
+## Variables
+```
+// Variable declaration
+let x = 0;
+
+// declaration without initial value
+let y;
+
+// multiple declarations
+let a, b = "word", c;
+
+// variable members
+// static members
+b.length;
+
+// computed members
+b[0];
+```
+
+- - -
+
+## Conditionals
+```
+// if, else-if, else
+if (x < 10) {
+	x += 1;
+} else if (x == 4) {
+	x = 4;
+} else {
+	x = 0;
+}
+
+// short if, else-if, else
+if (x >= 10) x = 0;
+else if (x != 4) += 1;
+else x = 6;
+```
+
+- - -
+
+## Loops
+```
+/* For-loop
+	for ('init'; 'test'; 'update') { }
+	any combination if init, test and update can be left empty
+	example for (; i < 10; ) { }
+*/
+for (let i = 0; i < 10; i += 1) {
+
+}
+
+// While-loop
+while(x < 10) {
+	x += 1;
+}
+
+// Do-While-loop
+do {
+	x += 1;
+} while (x < 10);
+```
+
+- - -
+
+## Functions
+```
+// square function
+def square(x) {
+	return x * x;
+}
+
+// call square(2)
+square(2);
+
+// nested calls
+super(super(2));
+
+// chaied functions
+callbackFuntion()();
+
+// member functions
+core.print("Hello, nyr!");
+```
+
+- - -
+
+## Classes
+```
+// A class definition
+class Point {
+	// This is how the default constructor will look like
+	def Point(x, y) {
+		this.x = x;
+		this.y = y;
+	}
+
+	// class method 'calc'
+	def calc() {
+		return this.x + this.y;
+	}
+}
+
+// Point3d inherits from Point
+class Point3D : Point {
+	def Point(x, y, z) {
+		// super call to initialize x and y
+		super(x, y);
+		this.z = z;
+	}
+
+	// override calc
+	def calc() {
+		// call super().calc()
+		return super() + this.z;
+	}
+}
+
+let p = new Point3D(10, 20, 30);
+```
+
+[Features]: #Features
+[Flags]: #Flags
+["Types"]: #"Types"
+[Comments]: #Comments
+[Numbers]: #Numbers
+[Strings]: #Strings
+[Operators]: #Operators
+[Variables]: #Variables
+[Conditionals]: #Conditionals
+[Loops]: #Loops
+[Functions]: #Functions
+[Classes]: #Classes
