@@ -79,6 +79,9 @@ if __name__ == "__main__":
 			cmd = input("nyr> ")
 			if cmd == "exit": exit(0)
 
+			if ";" not in cmd:
+				cmd += ";"
+
 			ast = getAst(cmd)
 
 			printAst(ast, printAST)

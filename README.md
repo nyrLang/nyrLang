@@ -19,13 +19,14 @@
 
 ## Features
 - CLI
+	- When using the CLI the trailing semicolon is optional (so it won't crash just because of that)
 - File input (must end with `.nyr`)
 
 ### Flags
 - `-f [Path].nyr`, `--file [Path].nyr` reads from file
 - `-i (true|false)`, `--interpret (true|false)` wether to interpret the input (`true`, `false`)
 	- Note: Many statements/operations are not yet supported, and will raise a `RuntimeError` if one is encountered
-- `-o (true|false)`, `--output (true|false)` wether to dump the generated AST into an `ast.json` file (located at `./Nyr/ast.json`)
+- `-o (true|false)`, `--output (true|false)` wether to dump the generated AST into an `ast.json` file (located at `./ast.json`)
 
 - - -
 
