@@ -22,7 +22,7 @@ class Parser:
 
 	@staticmethod
 	def _checkValidAssignmentTarget(node: Node.Node) -> Node.Node:
-		if node.type == "Identifier":
+		if node.type in ["Identifier", "MemberExpression"]:
 			return node
 		else:
 			raise SyntaxError("Invalid left-hand side in assignment expression")
@@ -69,7 +69,57 @@ class Parser:
 			elif self.lookahead.type == "while": return self.IterationStatement()
 			elif self.lookahead.type == "do": return self.IterationStatement()
 			elif self.lookahead.type == "for": return self.IterationStatement()
+			elif self.lookahead.type == "def": return self.FunctionDeclaration()
+			elif self.lookahead.type == "return": return self.ReturnStatement()
 			else: return self.ExpressionStatement()
+
+	def FunctionDeclaration(self) -> Node.FunctionDeclaration:
+		""" FunctionDeclaration
+			: 'def' Identifier '(' OptFormalParameterList ')' BlockStatement
+			;
+		"""
+		self._eat("def")
+		name = self.Identifier()
+
+		self._eat("(")
+		params: list[Node.Node] = self.FormalParameterList() if self.lookahead.type != ")" else []
+		self._eat(")")
+
+		body = self.BlockStatement()
+
+		return Node.FunctionDeclaration(name, params, body)
+
+	def FormalParameterList(self) -> list[Node.Node]:
+		""" FormalParameterList
+			: Identifier
+			| FormalParameterList ',' Identifier
+			;
+		"""
+		params: list[Node.Node] = []
+
+		while True:
+			params.append(self.Identifier())
+
+			if self.lookahead.type == ",":
+				self._eat(",")
+				continue
+			else:
+				break
+
+		return params
+
+	def ReturnStatement(self) -> Node.ReturnStatement:
+		""" ReturnStatement
+			: 'return' OptExpression ';'
+			;
+		"""
+		self._eat("return")
+
+		argument = self.Expression() if self.lookahead.type != ";" else None
+
+		self._eat(";")
+
+		return Node.ReturnStatement(argument)
 
 	def IterationStatement(self) -> Node.Node:
 		if self.lookahead.type == "while":
@@ -216,6 +266,11 @@ class Parser:
 		)
 
 	def AssignmentOperator(self) -> Node.Node:
+		""" AssignmentOperator
+			: SIMPLE_ASSIGN
+			| COMPLEX_ASSIGN
+			;
+		"""
 		if self.lookahead.type == "SIMPLE_ASSIGN":
 			return self._eat("SIMPLE_ASSIGN")
 		return self._eat("COMPLEX_ASSIGN")
@@ -246,7 +301,100 @@ class Parser:
 		return self.LogicalExpression("EqualityExpression", "LOGICAL_AND")
 
 	def LeftHandSideExpression(self) -> Node.Node:
-		return self.PrimaryExpression()
+		""" LeftHandSideExpression
+			: CallMemberExpression
+			;
+		"""
+		return self.CallMemberExpression()
+
+	def CallMemberExpression(self) -> Node.Node:
+		""" CallMemberExpression
+			: MemberExpression
+			| CallExpression
+			;
+		"""
+
+		member = self.MemberExpression()
+
+		if self.lookahead.type == "(":
+			return self.CallExpression(member)
+
+		return member
+
+	def CallExpression(self, callee: Node.Node) -> Node.Node:
+		""" CallExpression
+			: Callee Arguments
+			;
+
+			:argument callee
+			: MemberExpression
+			| CallExpresion
+			;
+		"""
+
+		callExpression = Node.CallExpression(callee, self.Arguments())
+
+		if self.lookahead.type == "(":
+			callExpression = self.CallExpression(callExpression)
+
+		return callExpression
+
+	def Arguments(self) -> list[Node.Node]:
+		""" Arguments
+			: '(' OptArgumentList ')'
+			;
+		"""
+
+		self._eat("(")
+		argumentList: list[Node.Node] = self.ArgumentList() if self.lookahead.type != ")" else []
+		self._eat(")")
+
+		return argumentList
+
+	def ArgumentList(self) -> list[Node.Node]:
+		""" ArgumentList
+			: AssignmentExpression
+			| ArgumentList ',' AssignmentExpression
+			;
+		"""
+
+		argumentList: list[Node.Node] = []
+
+		while True:
+			argumentList.append(self.AssignmentExpression())
+			if self.lookahead.type == ",":
+				self._eat(",")
+			else:
+				break
+
+		return argumentList
+
+	def MemberExpression(self) -> Node.Node:
+		""" MemberExpression
+			: PrimaryExpression
+			| MemberExpresssion '.' Identifier
+			| MemberExpression '[' Expression ']'
+			;
+		"""
+		object_ = self.PrimaryExpression()
+
+		while self.lookahead.type in [".", "["]:
+			# MemberExpression '.' Identifier
+			if self.lookahead.type == ".":
+				self._eat(".")
+				property_ = self.Identifier()
+
+				object_ = Node.MemberExpression(False, object_, property_)
+
+			# MemberExpression '[' Expression ']'
+			if self.lookahead.type == "[":
+				self._eat("[")
+				property_ = self.Expression()
+				self._eat("]")
+
+				object_ = Node.MemberExpression(True, object_, property_)
+
+		return object_
 
 	def Identifier(self) -> Node.Identifier:
 		name = self._eat("IDENTIFIER").value
@@ -298,6 +446,12 @@ class Parser:
 		return self.LeftHandSideExpression()
 
 	def PrimaryExpression(self) -> Node.Node:
+		""" PromaryExpression
+			: Literal
+			| ParenthesizedExpression
+			| Identifier
+			;
+		"""
 		if self._isLiteral(self.lookahead.type):
 			return self.Literal()
 

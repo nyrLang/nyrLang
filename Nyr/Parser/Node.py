@@ -18,7 +18,7 @@ NodeValue = Union[None, int, float, bool, str]
 
 class Node:
 	type: str
-	value: NodeValue
+	value: NodeValue = None
 
 	@abstractmethod
 	def toJSON(self): pass
@@ -150,6 +150,59 @@ class UnaryExpression(Node):
 
 	def toJSON(self):
 		return dict(type=self.type, operator=self.operator, argument=self.argument)
+
+
+class MemberExpression(Node):
+	computed: bool
+	object: Node
+	property: Node
+
+	def __init__(self, computed: bool, object_: Node, property_: Node):
+		self.type = "MemberExpression"
+		self.computed = computed
+		self.object = object_
+		self.property = property_
+
+	def toJSON(self):
+		return dict(type=self.type, computed=self.computed, object=self.object, property=self.property)
+
+
+# Functions
+class FunctionDeclaration(Node):
+	name: Identifier
+	params: list[Node]
+	body: Node
+
+	def __init__(self, name: Identifier, parameters: list[Node], body: Node):
+		self.type = self.__class__.__name__
+		self.name = name
+		self.params = parameters
+		self.body = body
+
+	def toJSON(self):
+		return dict(type=self.type, name=self.name, params=self.params, body=self.body)
+
+
+class ReturnStatement(Node):
+	def __init__(self, argument: Optional[Node]):
+		self.type = self.__class__.__name__
+		self.argument = argument
+
+	def toJSON(self):
+		return dict(type=self.type, argument=self.argument)
+
+
+class CallExpression(Node):
+	callee: Node
+	arguments: list[Node]
+
+	def __init__(self, callee: Node, arguments: list[Node]):
+		self.type = self.__class__.__name__
+		self.callee = callee
+		self.arguments = arguments
+
+	def toJSON(self):
+		return dict(type=self.type, callee=self.callee, arguments=self.arguments)
 
 
 # Literals

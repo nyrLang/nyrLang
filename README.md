@@ -30,9 +30,19 @@
 - If Statements (`if (x > 5) x = 0;`)
 	- Else Statements (`if (x > 5) x = 0; else { x += 1; }`)
 - Variable Statements (`let i = 0;`, `let j;`)
+- Variable members (`x.y;`)
+	- Computed members (`x[0];`)
 
 - For-loops (init, test and update can each be empty)
 	- `for (let i=0; i < 10; i += 1) { x += i; }`
 	- `for (;;) { x += 1; }`
 - While-loops (`while (x < 5) { x += 1; }`)
 - Do-While-loops (`do { x += 1; } while (x < 10); `)
+
+- Functions (`def square(x) { return x * x; }`)
+- Function calls
+	- Simple calls (`foo();`)
+	- With arguments (`foo(x);`)
+	- Nested function calls (`square(square(2));`)
+	- Chained function calls (`callbackFunction()();`)
+	- Member function calls (`core.print("Hello, World!")`)

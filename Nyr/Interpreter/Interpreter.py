@@ -15,7 +15,23 @@ class Interpreter:
 			for child in node.body:
 				self.interpret(child)
 			return self.globalObj
+		elif isinstance(node, Node.VariableDeclaration):
+			assert isinstance(node.id, Node.Identifier)
+			if node.id.name not in self.globalObj:
+				self.globalObj[node.id.name] = None
+
+			if node.init is not None:
+				self.globalObj[node.id.name] = self.interpret(node.init)
+		elif isinstance(node, Node.Identifier): pass
+
+		# Statements
 		elif isinstance(node, Node.ExpressionStatement): return self.interpret(node.expression)
+		elif isinstance(node, Node.EmptyStatement): pass
+		elif isinstance(node, Node.VariableStatement):
+			for declaration in node.declarations:
+				self.interpret(declaration)
+
+		# ComplexExpressions
 		elif isinstance(node, Node.ComplexExpression):
 			if node.type == "BinaryExpression":
 				left = self.interpret(node.left)
@@ -42,17 +58,6 @@ class Interpreter:
 					raise RuntimeError(f"Variable {node.left.name} has not bee initialized")
 				self.globalObj[node.left.name] = self.interpret(node.right)
 			else: raise RuntimeError(f"ComplexExpression of type '{node.type}' has not been implemented")
-		elif isinstance(node, Node.VariableStatement):
-			for declaration in node.declarations:
-				self.interpret(declaration)
-		elif isinstance(node, Node.VariableDeclaration):
-			assert isinstance(node.id, Node.Identifier)
-			if node.id.name not in self.globalObj:
-				self.globalObj[node.id.name] = None
-
-			if node.init is not None:
-				self.globalObj[node.id.name] = self.interpret(node.init)
-		elif isinstance(node, Node.Identifier): pass
-		elif isinstance(node, Node.EmptyStatement): pass
 		elif isinstance(node, Node.Literal): return node.value
+
 		else: raise RuntimeError(f"{node.type} is not yet implemented.")

@@ -19,11 +19,14 @@ spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 	# -------------------------
 	# Symbols, Delimiters
 	(re.compile(r"^;"), ";"),
+	(re.compile(r"^,"), ","),
+	(re.compile(r"^\."), "."),
 	(re.compile(r"^\{"), "{"),
 	(re.compile(r"^\}"), "}"),
 	(re.compile(r"^\("), "("),
 	(re.compile(r"^\)"), ")"),
-	(re.compile(r"^,"), ","),
+	(re.compile(r"^\["), "["),
+	(re.compile(r"^\]"), "]"),
 
 	# -------------------------
 	# Keywords
@@ -36,6 +39,8 @@ spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 	(re.compile(r"^\bwhile\b"), "while"),
 	(re.compile(r"^\bdo\b"), "do"),
 	(re.compile(r"^\bfor\b"), "for"),
+	(re.compile(r"^\bdef\b"), "def"),
+	(re.compile(r"^\breturn\b"), "return"),
 
 	# -------------------------
 	# Numbers
