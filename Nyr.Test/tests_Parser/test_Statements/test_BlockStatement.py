@@ -27,7 +27,8 @@ def testBlockStatement():
 
 	expression = node.expression
 
-	assert isinstance(expression, Node.IntegerLiteral)
+	assert isinstance(expression, Node.Literal)
+	assert expression.type == "IntegerLiteral"
 	assert expression.value == 42
 
 	node = blockBody[1]
@@ -35,5 +36,6 @@ def testBlockStatement():
 
 	expression = node.expression
 
-	assert isinstance(expression, Node.StringLiteral)
+	assert isinstance(expression, Node.Literal)
+	assert expression.type == "StringLiteral"
 	assert expression.value == "Hello"

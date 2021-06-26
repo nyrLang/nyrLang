@@ -26,7 +26,8 @@ def testSingleLineCommentWithValue():
 
 	expression = node.expression
 
-	assert isinstance(expression, Node.StringLiteral)
+	assert isinstance(expression, Node.Literal)
+	assert expression.type == "StringLiteral"
 	assert expression.value == "value here"
 
 
@@ -62,5 +63,6 @@ def testMultiLineCommentWithValue():
 
 	expression = node.expression
 
-	assert isinstance(expression, Node.FloatLiteral)
+	assert isinstance(expression, Node.Literal)
+	assert expression.type == "FloatLiteral"
 	assert expression.value == 3.141

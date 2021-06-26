@@ -19,7 +19,8 @@ def testDoubleQuote():
 
 		expression = node.expression
 
-		assert isinstance(expression, Node.StringLiteral)
+		assert isinstance(expression, Node.Literal)
+		assert expression.type == "StringLiteral"
 		assert expression.value in ("Hello", "Hello, World")
 
 
@@ -40,5 +41,6 @@ def testSingleQuote():
 
 		expression = node.expression
 
-		assert isinstance(expression, Node.StringLiteral)
+		assert isinstance(expression, Node.Literal)
+		assert expression.type == "StringLiteral"
 		assert expression.value in ("Hello", "Hello, World")

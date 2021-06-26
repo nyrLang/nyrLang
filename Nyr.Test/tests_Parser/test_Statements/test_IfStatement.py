@@ -23,7 +23,7 @@ def testSimpleIfStatement():
 	assert isinstance(consequent, Node.ExpressionStatement)
 
 	expression = consequent.expression
-	assert isinstance(expression, Node.AssignmentExpression)
+	assert isinstance(expression, Node.ComplexExpression)
 	assert expression.operator == "="
 
 	left = expression.left
@@ -31,7 +31,8 @@ def testSimpleIfStatement():
 	assert left.name == "x"
 
 	right = expression.right
-	assert isinstance(right, Node.IntegerLiteral)
+	assert isinstance(right, Node.Literal)
+	assert right.type == "IntegerLiteral"
 	assert right.value == 1
 
 	assert node.alternative is None
@@ -52,7 +53,7 @@ def testIfStatementWithoutBlock():
 
 	expression = node.consequent.expression
 
-	assert isinstance(expression, Node.AssignmentExpression)
+	assert isinstance(expression, Node.ComplexExpression)
 	assert expression.operator == "="
 
 	left = expression.left
@@ -60,7 +61,8 @@ def testIfStatementWithoutBlock():
 	assert left.name == "x"
 
 	right = expression.right
-	assert isinstance(right, Node.IntegerLiteral)
+	assert isinstance(right, Node.Literal)
+	assert right.type == "IntegerLiteral"
 	assert right.value == 1
 
 	assert node.alternative is None
@@ -118,7 +120,7 @@ def testIfElseStatement():
 	assert isinstance(consequent, Node.ExpressionStatement)
 
 	expression0 = consequent.expression
-	assert isinstance(expression0, Node.AssignmentExpression)
+	assert isinstance(expression0, Node.ComplexExpression)
 	assert expression0.operator == "="
 
 	left0 = expression0.left
@@ -126,7 +128,8 @@ def testIfElseStatement():
 	assert left0.name == "x"
 
 	right0 = expression0.right
-	assert isinstance(right0, Node.IntegerLiteral)
+	assert isinstance(right0, Node.Literal)
+	assert right0.type == "IntegerLiteral"
 	assert right0.value == 1
 
 	assert isinstance(node.alternative, Node.BlockStatement)
@@ -135,7 +138,7 @@ def testIfElseStatement():
 	assert isinstance(alternative, Node.ExpressionStatement)
 
 	expression1 = alternative.expression
-	assert isinstance(expression1, Node.AssignmentExpression)
+	assert isinstance(expression1, Node.ComplexExpression)
 	assert expression1.operator == "="
 
 	left1 = expression1.left
@@ -143,5 +146,6 @@ def testIfElseStatement():
 	assert left1.name == "x"
 
 	right1 = expression1.right
-	assert isinstance(right1, Node.IntegerLiteral)
+	assert isinstance(right1, Node.Literal)
+	assert right1.type == "IntegerLiteral"
 	assert right1.value == 2

@@ -11,15 +11,16 @@ def testEquals():
 	assert isinstance(node, Node.ExpressionStatement)
 
 	expression = node.expression
-	assert isinstance(expression, Node.BinaryExpression)
+	assert isinstance(expression, Node.ComplexExpression)
 	assert expression.operator == "=="
 
 	left0 = expression.left
-	assert isinstance(left0, Node.BinaryExpression)
+	assert isinstance(left0, Node.ComplexExpression)
 	assert left0.operator == ">"
 
 	right0 = expression.right
-	assert isinstance(right0, Node.BooleanLiteral)
+	assert isinstance(right0, Node.Literal)
+	assert right0.type == "BooleanLiteral"
 	assert right0.value is True
 
 	left1 = left0.left
@@ -27,7 +28,8 @@ def testEquals():
 	assert left1.name == "x"
 
 	right1 = left0.right
-	assert isinstance(right1, Node.IntegerLiteral)
+	assert isinstance(right1, Node.Literal)
+	assert right1.type == "IntegerLiteral"
 	assert right1.value == 0
 
 
@@ -40,15 +42,16 @@ def testInEquals():
 	assert isinstance(node, Node.ExpressionStatement)
 
 	expression = node.expression
-	assert isinstance(expression, Node.BinaryExpression)
+	assert isinstance(expression, Node.ComplexExpression)
 	assert expression.operator == "!="
 
 	left0 = expression.left
-	assert isinstance(left0, Node.BinaryExpression)
+	assert isinstance(left0, Node.ComplexExpression)
 	assert left0.operator == ">="
 
 	right0 = expression.right
-	assert isinstance(right0, Node.BooleanLiteral)
+	assert isinstance(right0, Node.Literal)
+	assert right0.type == "BooleanLiteral"
 	assert right0.value is False
 
 	left1 = left0.left
@@ -56,5 +59,6 @@ def testInEquals():
 	assert left1.name == "x"
 
 	right1 = left0.right
-	assert isinstance(right1, Node.IntegerLiteral)
+	assert isinstance(right1, Node.Literal)
+	assert right1.type == "IntegerLiteral"
 	assert right1.value == 0

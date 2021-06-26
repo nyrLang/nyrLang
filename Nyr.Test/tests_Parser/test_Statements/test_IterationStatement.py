@@ -17,13 +17,14 @@ def testWhileStatement():
 
 	# DoWhile.test
 	test = node.test
-	assert isinstance(test, Node.BinaryExpression)
+	assert isinstance(test, Node.ComplexExpression)
 	assert test.operator == ">"
 
 	assert isinstance(test.left, Node.Identifier)
 	assert test.left.name == "x"
 
-	assert isinstance(test.right, Node.IntegerLiteral)
+	assert isinstance(test.right, Node.Literal)
+	assert test.right.type == "IntegerLiteral"
 	assert test.right.value == 10
 
 	# DoWhile.body
@@ -36,13 +37,14 @@ def testWhileStatement():
 
 	expression = blockBody.expression
 
-	assert isinstance(expression, Node.AssignmentExpression)
+	assert isinstance(expression, Node.ComplexExpression)
 	assert expression.operator == "-="
 
 	assert isinstance(expression.left, Node.Identifier)
 	assert expression.left.name == "x"
 
-	assert isinstance(expression.right, Node.IntegerLiteral)
+	assert isinstance(expression.right, Node.Literal)
+	assert expression.right.type == "IntegerLiteral"
 	assert expression.right.value == 1
 
 
@@ -69,24 +71,26 @@ def testDoWhileStatement():
 
 	expression = blockBody.expression
 
-	assert isinstance(expression, Node.AssignmentExpression)
+	assert isinstance(expression, Node.ComplexExpression)
 	assert expression.operator == "-="
 
 	assert isinstance(expression.left, Node.Identifier)
 	assert expression.left.name == "x"
 
-	assert isinstance(expression.right, Node.IntegerLiteral)
+	assert isinstance(expression.right, Node.Literal)
+	assert expression.right.type == "IntegerLiteral"
 	assert expression.right.value == 1
 
 	# DoWhile.test
 	test = node.test
-	assert isinstance(test, Node.BinaryExpression)
+	assert isinstance(test, Node.ComplexExpression)
 	assert test.operator == ">"
 
 	assert isinstance(test.left, Node.Identifier)
 	assert test.left.name == "x"
 
-	assert isinstance(test.right, Node.IntegerLiteral)
+	assert isinstance(test.right, Node.Literal)
+	assert test.right.type == "IntegerLiteral"
 	assert test.right.value == 10
 
 
@@ -115,29 +119,32 @@ class TestForStatement:
 		assert isinstance(declaration.id, Node.Identifier)
 		assert declaration.id.name == "i"
 
-		assert isinstance(declaration.init, Node.IntegerLiteral)
+		assert isinstance(declaration.init, Node.Literal)
+		assert declaration.init.type == "IntegerLiteral"
 		assert declaration.init.value == 0
 
 		# ForStatement.test
 		test = node.test
-		assert isinstance(test, Node.BinaryExpression)
+		assert isinstance(test, Node.ComplexExpression)
 		assert test.operator == "<"
 
 		assert isinstance(test.left, Node.Identifier)
 		assert test.left.name == "i"
 
-		assert isinstance(test.right, Node.IntegerLiteral)
+		assert isinstance(test.right, Node.Literal)
+		assert test.right.type == "IntegerLiteral"
 		assert test.right.value == 10
 
 		# ForStatement.update
 		update = node.update
-		assert isinstance(update, Node.AssignmentExpression)
+		assert isinstance(update, Node.ComplexExpression)
 		assert update.operator == "+="
 
 		assert isinstance(update.left, Node.Identifier)
 		assert update.left.name == "i"
 
-		assert isinstance(update.right, Node.IntegerLiteral)
+		assert isinstance(update.right, Node.Literal)
+		assert update.right.type == "IntegerLiteral"
 		assert update.right.value == 1
 
 		# ForStatement.body
@@ -162,24 +169,26 @@ class TestForStatement:
 
 		# ForStatement.test
 		test = node.test
-		assert isinstance(test, Node.BinaryExpression)
+		assert isinstance(test, Node.ComplexExpression)
 		assert test.operator == "<"
 
 		assert isinstance(test.left, Node.Identifier)
 		assert test.left.name == "i"
 
-		assert isinstance(test.right, Node.IntegerLiteral)
+		assert isinstance(test.right, Node.Literal)
+		assert test.right.type == "IntegerLiteral"
 		assert test.right.value == 10
 
 		# ForStatement.update
 		update = node.update
-		assert isinstance(update, Node.AssignmentExpression)
+		assert isinstance(update, Node.ComplexExpression)
 		assert update.operator == "+="
 
 		assert isinstance(update.left, Node.Identifier)
 		assert update.left.name == "i"
 
-		assert isinstance(update.right, Node.IntegerLiteral)
+		assert isinstance(update.right, Node.Literal)
+		assert update.right.type == "IntegerLiteral"
 		assert update.right.value == 1
 
 		# ForStatement.body
@@ -210,7 +219,8 @@ class TestForStatement:
 		assert isinstance(declaration.id, Node.Identifier)
 		assert declaration.id.name == "i"
 
-		assert isinstance(declaration.init, Node.IntegerLiteral)
+		assert isinstance(declaration.init, Node.Literal)
+		assert declaration.init.type == "IntegerLiteral"
 		assert declaration.init.value == 0
 
 		# ForStatement.test
@@ -218,13 +228,14 @@ class TestForStatement:
 
 		# ForStatement.update
 		update = node.update
-		assert isinstance(update, Node.AssignmentExpression)
+		assert isinstance(update, Node.ComplexExpression)
 		assert update.operator == "+="
 
 		assert isinstance(update.left, Node.Identifier)
 		assert update.left.name == "i"
 
-		assert isinstance(update.right, Node.IntegerLiteral)
+		assert isinstance(update.right, Node.Literal)
+		assert update.right.type == "IntegerLiteral"
 		assert update.right.value == 1
 
 		# ForStatement.body
@@ -255,18 +266,20 @@ class TestForStatement:
 		assert isinstance(declaration.id, Node.Identifier)
 		assert declaration.id.name == "i"
 
-		assert isinstance(declaration.init, Node.IntegerLiteral)
+		assert isinstance(declaration.init, Node.Literal)
+		assert declaration.init.type == "IntegerLiteral"
 		assert declaration.init.value == 0
 
 		# ForStatement.test
 		test = node.test
-		assert isinstance(test, Node.BinaryExpression)
+		assert isinstance(test, Node.ComplexExpression)
 		assert test.operator == "<"
 
 		assert isinstance(test.left, Node.Identifier)
 		assert test.left.name == "i"
 
-		assert isinstance(test.right, Node.IntegerLiteral)
+		assert isinstance(test.right, Node.Literal)
+		assert test.right.type == "IntegerLiteral"
 		assert test.right.value == 10
 
 		# ForStatement.update

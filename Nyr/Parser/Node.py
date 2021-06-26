@@ -2,6 +2,7 @@ import json
 from abc import abstractmethod
 from typing import Any
 from typing import Optional
+from typing import Union
 
 
 class ComplexEncoder(json.JSONEncoder):
@@ -12,9 +13,12 @@ class ComplexEncoder(json.JSONEncoder):
 			return json.JSONEncoder.default(self, o)
 
 
+NodeValue = Union[None, int, float, bool, str]
+
+
 class Node:
 	type: str
-	value: Any
+	value: NodeValue
 
 	@abstractmethod
 	def toJSON(self): pass
@@ -28,9 +32,6 @@ class Program(Node):
 	def toJSON(self):
 		return dict(type=self.type, body=self.body)
 
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
-
 
 class VariableDeclaration(Node):
 	def __init__(self, id_: Node, init: Optional[Node]):
@@ -41,9 +42,6 @@ class VariableDeclaration(Node):
 	def toJSON(self):
 		return dict(type=self.type, id=self.id, init=self.init)
 
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
-
 
 class Identifier(Node):
 	def __init__(self, name: str):
@@ -52,9 +50,6 @@ class Identifier(Node):
 
 	def toJSON(self):
 		return dict(type=self.type, name=self.name)
-
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
 
 
 # Statements
@@ -66,9 +61,6 @@ class ExpressionStatement(Node):
 	def toJSON(self):
 		return dict(type=self.type, expression=self.expression)
 
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
-
 
 class EmptyStatement(Node):
 	def __init__(self):
@@ -76,9 +68,6 @@ class EmptyStatement(Node):
 
 	def toJSON(self):
 		return dict(type=self.type)
-
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
 
 
 class BlockStatement(Node):
@@ -88,9 +77,6 @@ class BlockStatement(Node):
 
 	def toJSON(self):
 		return dict(type=self.type, body=self.body)
-
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
 
 
 class IfStatement(Node):
@@ -103,9 +89,6 @@ class IfStatement(Node):
 	def toJSON(self):
 		return dict(type=self.type, test=self.test, consequent=self.consequent, alternative=self.alternative)
 
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
-
 
 class VariableStatement(Node):
 	def __init__(self, declarations: list[Node]):
@@ -114,9 +97,6 @@ class VariableStatement(Node):
 
 	def toJSON(self):
 		return dict(type=self.type, declarations=self.declarations)
-
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
 
 
 class WhileStatement(Node):
@@ -128,9 +108,6 @@ class WhileStatement(Node):
 	def toJSON(self):
 		return dict(type=self.type, test=self.test, body=self.body)
 
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
-
 
 class DoWhileStatement(Node):
 	def __init__(self, body: Node, test: Node):
@@ -140,9 +117,6 @@ class DoWhileStatement(Node):
 
 	def toJSON(self):
 		return dict(type=self.type, body=self.body, test=self.test)
-
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
 
 
 class ForStatement(Node):
@@ -156,51 +130,22 @@ class ForStatement(Node):
 	def toJSON(self):
 		return dict(type=self.type, init=self.init, test=self.test, update=self.update, body=self.body)
 
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
-
 
 # Expressions
-class BinaryExpression(Node):
-	def __init__(self, operator: str, left: Node, right: Node):
-		self.type = self.__class__.__name__
+class ComplexExpression(Node):
+	type: str
+	operator: str
+	left: Node
+	right: Node
+
+	def __init__(self, type_: str, operator: str, left: Node, right: Node):
+		self.type = type_
 		self.operator = operator
 		self.left = left
 		self.right = right
 
 	def toJSON(self):
 		return dict(type=self.type, operator=self.operator, left=self.left, right=self.right)
-
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
-
-
-class AssignmentExpression(Node):
-	def __init__(self, operator: str, left: Node, right: Node):
-		self.type = self.__class__.__name__
-		self.operator = operator
-		self.left = left
-		self.right = right
-
-	def toJSON(self):
-		return dict(type=self.type, operator=self.operator, left=self.left, right=self.right)
-
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
-
-
-class LogicalExpression(Node):
-	def __init__(self, operator: str, left: Node, right: Node):
-		self.type = self.__class__.__name__
-		self.operator = operator
-		self.left = left
-		self.right = right
-
-	def toJSON(self):
-		return dict(type=self.type, operator=self.operator, left=self.left, right=self.right)
-
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
 
 
 class UnaryExpression(Node):
@@ -212,70 +157,14 @@ class UnaryExpression(Node):
 	def toJSON(self):
 		return dict(type=self.type, operator=self.operator, argument=self.argument)
 
-	def value(self):
-		raise ValueError(f"{self.__class__.__name__}.value should not be accessed")
-
 
 # Literals
-class NullLiteral(Node):
-	value: None
+class Literal(Node):
+	value: NodeValue
 
-	def __init__(self):
-		self.type = self.__class__.__name__
-		self.value = None
-
-	def toJSON(self):
-		return dict(type=self.type, value=self.value)
-
-
-class BooleanLiteral(Node):
-	value: bool
-
-	def __init__(self, value: bool):
-		self.type = self.__class__.__name__
+	def __init__(self, type_: str, value: NodeValue):
+		self.type = type_
 		self.value = value
-
-	def toJSON(self):
-		return dict(type=self.type, value=self.value)
-
-
-class IntegerLiteral(Node):
-	value: int
-
-	def __init__(self, value: int):
-		self.type = self.__class__.__name__
-		self.value = int(value)
-
-	def __repr__(self):
-		return f"{self.value}"
-
-	def toJSON(self):
-		return dict(type=self.type, value=self.value)
-
-
-class FloatLiteral(Node):
-	value: float
-
-	def __init__(self, value: float):
-		self.type = self.__class__.__name__
-		self.value = float(value)
-
-	def __repr__(self):
-		return f"{self.value}"
-
-	def toJSON(self):
-		return dict(type=self.type, value=self.value)
-
-
-class StringLiteral(Node):
-	value: str
-
-	def __init__(self, value: str):
-		self.value = value
-		self.type = self.__class__.__name__
-
-	def __repr__(self):
-		return f"{self.value}"
 
 	def toJSON(self):
 		return dict(type=self.type, value=self.value)

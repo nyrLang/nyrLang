@@ -13,7 +13,7 @@ def testSimpleAssignment():
 
 	expression = node.expression
 
-	assert isinstance(expression, Node.AssignmentExpression)
+	assert isinstance(expression, Node.ComplexExpression)
 	assert expression.operator == "="
 
 	left = expression.left
@@ -21,7 +21,8 @@ def testSimpleAssignment():
 	assert left.name == "x"
 
 	right = expression.right
-	assert isinstance(right, Node.IntegerLiteral)
+	assert isinstance(right, Node.Literal)
+	assert right.type == "IntegerLiteral"
 	assert right.value == 42
 
 
@@ -34,7 +35,7 @@ def testChainedSimpleAssignment():
 	assert isinstance(node, Node.ExpressionStatement)
 
 	expression = node.expression
-	assert isinstance(expression, Node.AssignmentExpression)
+	assert isinstance(expression, Node.ComplexExpression)
 	assert expression.operator == "="
 
 	left0 = expression.left
@@ -42,7 +43,7 @@ def testChainedSimpleAssignment():
 	assert left0.name == "x"
 
 	right0 = expression.right
-	assert isinstance(right0, Node.AssignmentExpression)
+	assert isinstance(right0, Node.ComplexExpression)
 	assert right0.operator == "="
 
 	left1 = right0.left
@@ -50,7 +51,8 @@ def testChainedSimpleAssignment():
 	assert left1.name == "y"
 
 	right1 = right0.right
-	assert isinstance(right1, Node.IntegerLiteral)
+	assert isinstance(right1, Node.Literal)
+	assert right1.type == "IntegerLiteral"
 	assert right1.value == 42
 
 
@@ -65,7 +67,7 @@ def testComplexAssignment():
 
 	expression = node.expression
 
-	assert isinstance(expression, Node.AssignmentExpression)
+	assert isinstance(expression, Node.ComplexExpression)
 	assert expression.operator == "+="
 
 	left = expression.left
@@ -73,5 +75,6 @@ def testComplexAssignment():
 	assert left.name == "x"
 
 	right = expression.right
-	assert isinstance(right, Node.IntegerLiteral)
+	assert isinstance(right, Node.Literal)
+	assert right.type == "IntegerLiteral"
 	assert right.value == 3

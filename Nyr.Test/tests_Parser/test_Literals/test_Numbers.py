@@ -21,8 +21,8 @@ def testInteger():
 
 		expression = node.expression
 
-		assert isinstance(expression, Node.IntegerLiteral)
-
+		assert isinstance(expression, Node.Literal)
+		assert expression.type == "IntegerLiteral"
 		assert expression.value == 42
 
 
@@ -43,6 +43,6 @@ def testFloat():
 
 		expression = node.expression
 
-		assert isinstance(expression, Node.FloatLiteral)
-
+		assert isinstance(expression, Node.Literal)
+		assert expression.type == "FloatLiteral"
 		assert expression.value == 3.141

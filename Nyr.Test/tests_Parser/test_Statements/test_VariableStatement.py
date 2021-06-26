@@ -17,7 +17,8 @@ def testDeclarationWithAssign():
 	assert isinstance(declaration.id, Node.Identifier)
 	assert declaration.id.name == "x"
 
-	assert isinstance(declaration.init, Node.IntegerLiteral)
+	assert isinstance(declaration.init, Node.Literal)
+	assert declaration.init.type == "IntegerLiteral"
 	assert declaration.init.value == 42
 
 
@@ -88,5 +89,6 @@ def testMultipleDeclarationsWithPartialAssign():
 	assert isinstance(declaration2.id, Node.Identifier)
 	assert declaration2.id.name == "y"
 
-	assert isinstance(declaration2.init, Node.IntegerLiteral)
+	assert isinstance(declaration2.init, Node.Literal)
+	assert declaration2.init.type == "IntegerLiteral"
 	assert declaration2.init.value == 42

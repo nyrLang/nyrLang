@@ -12,6 +12,21 @@ class Parser:
 	def __init__(self):
 		self.tokenizer = Tokenizer()
 
+	@staticmethod
+	def _isLiteral(tokenType) -> bool:
+		return tokenType in ["INTEGER", "FLOAT", "STRING", "true", "false", "null"]
+
+	@staticmethod
+	def _isAssignmentOperator(tokenType):
+		return tokenType in ["SIMPLE_ASSIGN", "COMPLEX_ASSIGN"]
+
+	@staticmethod
+	def _checkValidAssignmentTarget(node: Node.Node) -> Node.Node:
+		if node.type == "Identifier":
+			return node
+		else:
+			raise SyntaxError("Invalid left-hand side in assignment expression")
+
 	def parse(self, string: str) -> Node.Program:
 		self.string = string
 		self.tokenizer.init(string)
@@ -187,24 +202,14 @@ class Parser:
 	def Expression(self) -> Node.Node:
 		return self.AssignmentExpression()
 
-	@staticmethod
-	def _isAssignmentOperator(tokenType):
-		return tokenType in ["SIMPLE_ASSIGN", "COMPLEX_ASSIGN"]
-
-	@staticmethod
-	def _checkValidAssignmentTarget(node: Node.Node) -> Node.Node:
-		if node.type == "Identifier":
-			return node
-		else:
-			raise SyntaxError("Invalid left-hand side in assignment expression")
-
 	def AssignmentExpression(self) -> Node.Node:
 		left = self.LogicalORExpression()
 
 		if not self._isAssignmentOperator(self.lookahead.type):
 			return left
 
-		return Node.AssignmentExpression(
+		return Node.ComplexExpression(
+			"AssignmentExpression",
 			self.AssignmentOperator().value,
 			self._checkValidAssignmentTarget(left),
 			self.AssignmentExpression(),
@@ -215,7 +220,7 @@ class Parser:
 			return self._eat("SIMPLE_ASSIGN")
 		return self._eat("COMPLEX_ASSIGN")
 
-	def _LogicalExpression(self, builderName, operatorToken) -> Node.Node:
+	def LogicalExpression(self, builderName, operatorToken) -> Node.Node:
 		builder = getattr(self, builderName)
 
 		left = builder()
@@ -225,15 +230,20 @@ class Parser:
 
 			right = builder()
 
-			left = Node.LogicalExpression(operator, left, right)
+			left = Node.ComplexExpression(
+				"LogicalExpression",
+				operator,
+				left,
+				right,
+			)
 
 		return left
 
 	def LogicalORExpression(self) -> Node.Node:
-		return self._LogicalExpression("LogicalANDExpression", "LOGICAL_OR")
+		return self.LogicalExpression("LogicalANDExpression", "LOGICAL_OR")
 
 	def LogicalANDExpression(self) -> Node.Node:
-		return self._LogicalExpression("EqualityExpression", "LOGICAL_AND")
+		return self.LogicalExpression("EqualityExpression", "LOGICAL_AND")
 
 	def LeftHandSideExpression(self) -> Node.Node:
 		return self.PrimaryExpression()
@@ -265,7 +275,12 @@ class Parser:
 
 			right = builder()
 
-			left = Node.BinaryExpression(operator, left, right)
+			left = Node.ComplexExpression(
+				"BinaryExpression",
+				operator,
+				left,
+				right,
+			)
 
 		return left
 
@@ -293,9 +308,6 @@ class Parser:
 		else:
 			return self.LeftHandSideExpression()
 
-	def _isLiteral(self, tokenType) -> bool:
-		return tokenType in ["INTEGER", "FLOAT", "STRING", "true", "false", "null"]
-
 	def ParenthesizedExpression(self) -> Node.Node:
 		self._eat("(")
 		expression = self.Expression()
@@ -303,43 +315,24 @@ class Parser:
 
 		return expression
 
-	def Literal(self) -> Node.Node:
+	def Literal(self) -> Node.Literal:
 		if self.lookahead.type == "INTEGER":
-			return self.IntegerLiteral()
+			token = self._eat("INTEGER")
+			return Node.Literal("IntegerLiteral", int(token.value))
 		elif self.lookahead.type == "FLOAT":
-			return self.FloatLiteral()
+			token = self._eat("FLOAT")
+			return Node.Literal("FloatLiteral", float(token.value))
 		elif self.lookahead.type == "STRING":
-			return self.StringLiteral()
+			token = self._eat("STRING")
+			return Node.Literal("StringLiteral", str(token.value)[1: -1])
 		elif self.lookahead.type == "true":
-			return self.BooleanLiteral(True)
+			self._eat("true")
+			return Node.Literal("BooleanLiteral", True)
 		elif self.lookahead.type == "false":
-			return self.BooleanLiteral(False)
+			self._eat("false")
+			return Node.Literal("BooleanLiteral", False)
 		elif self.lookahead.type == "null":
-			return self.NullLiteral()
+			self._eat("null")
+			return Node.Literal("NullLiteral", None)
 		else:
 			raise SyntaxError("Literal: unexpected literal production")
-
-	def NullLiteral(self) -> Node.NullLiteral:
-		self._eat("null")
-
-		return Node.NullLiteral()
-
-	def BooleanLiteral(self, value: bool) -> Node.BooleanLiteral:
-		self._eat("true" if value else "false")
-
-		return Node.BooleanLiteral(value)
-
-	def IntegerLiteral(self) -> Node.IntegerLiteral:
-		token = self._eat("INTEGER")
-
-		return Node.IntegerLiteral(int(token.value))
-
-	def FloatLiteral(self) -> Node.FloatLiteral:
-		token = self._eat("FLOAT")
-
-		return Node.FloatLiteral(float(token.value))
-
-	def StringLiteral(self) -> Node.StringLiteral:
-		token = self._eat("STRING")
-
-		return Node.StringLiteral(str(token.value)[1: -1])

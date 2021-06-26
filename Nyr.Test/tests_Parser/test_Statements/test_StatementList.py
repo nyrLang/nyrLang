@@ -16,7 +16,8 @@ def testMultipleStrings():
 
 	expression = node.expression
 
-	assert isinstance(expression, Node.StringLiteral)
+	assert isinstance(expression, Node.Literal)
+	assert expression.type == "StringLiteral"
 	assert expression.value == "Hello"
 
 	# Check '42'
@@ -25,7 +26,8 @@ def testMultipleStrings():
 
 	expression = node.expression
 
-	assert isinstance(expression, Node.StringLiteral)
+	assert isinstance(expression, Node.Literal)
+	assert expression.type == "StringLiteral"
 	assert expression.value == "42"
 
 
@@ -43,7 +45,8 @@ def testMutlipleNumbers():
 
 	expression = node.expression
 
-	assert isinstance(expression, Node.IntegerLiteral)
+	assert isinstance(expression, Node.Literal)
+	assert expression.type == "IntegerLiteral"
 	assert expression.value == 1
 
 	# Check 163543516
@@ -53,7 +56,8 @@ def testMutlipleNumbers():
 
 	expression = node.expression
 
-	assert isinstance(expression, Node.IntegerLiteral)
+	assert isinstance(expression, Node.Literal)
+	assert expression.type == "IntegerLiteral"
 	assert expression.value == 163543516
 
 
@@ -71,7 +75,8 @@ def testMutlipleFloats():
 
 	expression = node.expression
 
-	assert isinstance(expression, Node.FloatLiteral)
+	assert isinstance(expression, Node.Literal)
+	assert expression.type == "FloatLiteral"
 	assert expression.value == 3.141
 
 	# Check 2.718
@@ -81,7 +86,8 @@ def testMutlipleFloats():
 
 	expression = node.expression
 
-	assert isinstance(expression, Node.FloatLiteral)
+	assert isinstance(expression, Node.Literal)
+	assert expression.type == "FloatLiteral"
 	assert expression.value == 2.718
 
 
@@ -98,7 +104,8 @@ def testMixed():
 	assert isinstance(node, Node.ExpressionStatement), f"{node.type} should be of type {Node.ExpressionStatement.type}"
 
 	expression = node.expression
-	assert isinstance(expression, Node.StringLiteral)
+	assert isinstance(expression, Node.Literal)
+	assert expression.type == "StringLiteral"
 	assert expression.value == "Hello"
 
 	# Check 42
@@ -107,7 +114,8 @@ def testMixed():
 	assert isinstance(node, Node.ExpressionStatement), f"{node.type} should be of type {Node.ExpressionStatement.type}"
 
 	expression = node.expression
-	assert isinstance(expression, Node.IntegerLiteral)
+	assert isinstance(expression, Node.Literal)
+	assert expression.type == "IntegerLiteral"
 	assert expression.value == 42
 
 	# Check 3.141
@@ -116,5 +124,6 @@ def testMixed():
 	assert isinstance(node, Node.ExpressionStatement), f"{node.type} should be of type {Node.ExpressionStatement.type}"
 
 	expression = node.expression
-	assert isinstance(expression, Node.FloatLiteral)
+	assert isinstance(expression, Node.Literal)
+	assert expression.type == "FloatLiteral"
 	assert expression.value == 3.141

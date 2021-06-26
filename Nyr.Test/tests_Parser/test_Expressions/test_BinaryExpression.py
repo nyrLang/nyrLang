@@ -13,16 +13,18 @@ def testBinaryExpressionAdd():
 
 	expression = node.expression
 
-	assert isinstance(expression, Node.BinaryExpression)
+	assert isinstance(expression, Node.ComplexExpression)
 
 	assert expression.operator == "+"
 
 	left = expression.left
-	assert isinstance(left, Node.IntegerLiteral)
+	assert isinstance(left, Node.Literal)
+	assert left.type == "IntegerLiteral"
 	assert left.value == 1
 
 	right = expression.right
-	assert isinstance(right, Node.IntegerLiteral)
+	assert isinstance(right, Node.Literal)
+	assert left.type == "IntegerLiteral"
 	assert right.value == 2
 
 
@@ -35,24 +37,27 @@ def testBinaryExpressionNested():
 	assert isinstance(node, Node.ExpressionStatement)
 
 	expression = node.expression
-	assert isinstance(expression, Node.BinaryExpression)
+	assert isinstance(expression, Node.ComplexExpression)
 
 	assert expression.operator == "-"
 
 	left0 = expression.left
-	assert isinstance(left0, Node.BinaryExpression)
+	assert isinstance(left0, Node.ComplexExpression)
 	assert left0.operator == "+"
 
 	left1 = left0.left
-	assert isinstance(left1, Node.IntegerLiteral)
+	assert isinstance(left1, Node.Literal)
+	assert left1.type == "IntegerLiteral"
 	assert left1.value == 3
 
 	right1 = left0.right
-	assert isinstance(right1, Node.IntegerLiteral)
+	assert isinstance(right1, Node.Literal)
+	assert right1.type == "IntegerLiteral"
 	assert right1.value == 2
 
 	right0 = expression.right
-	assert isinstance(right0, Node.IntegerLiteral)
+	assert isinstance(right0, Node.Literal)
+	assert right0.type == "IntegerLiteral"
 	assert right0.value == 2
 
 
@@ -65,24 +70,27 @@ def testBinaryExpressionMixed():
 	assert isinstance(node, Node.ExpressionStatement)
 
 	expression = node.expression
-	assert isinstance(expression, Node.BinaryExpression)
+	assert isinstance(expression, Node.ComplexExpression)
 
 	assert expression.operator == "+"
 
 	left0 = expression.left
-	assert isinstance(left0, Node.IntegerLiteral)
+	assert isinstance(left0, Node.Literal)
+	assert left0.type == "IntegerLiteral"
 	assert left0.value == 1
 
 	right0 = expression.right
-	assert isinstance(right0, Node.BinaryExpression)
+	assert isinstance(right0, Node.ComplexExpression)
 	assert right0.operator == "*"
 
 	left1 = right0.left
-	assert isinstance(left1, Node.IntegerLiteral)
+	assert isinstance(left1, Node.Literal)
+	assert left1.type == "IntegerLiteral"
 	assert left1.value == 2
 
 	right1 = right0.right
-	assert isinstance(right1, Node.IntegerLiteral)
+	assert isinstance(right1, Node.Literal)
+	assert right1.type == "IntegerLiteral"
 	assert right1.value == 3
 
 
@@ -96,15 +104,17 @@ def testBinaryExpressionMultiply():
 
 	expression = node.expression
 
-	assert isinstance(expression, Node.BinaryExpression)
+	assert isinstance(expression, Node.ComplexExpression)
 	assert expression.operator == "*"
 
 	left = expression.left
-	assert isinstance(left, Node.IntegerLiteral)
+	assert isinstance(left, Node.Literal)
+	assert left.type == "IntegerLiteral"
 	assert left.value == 2
 
 	right = expression.right
-	assert isinstance(right, Node.IntegerLiteral)
+	assert isinstance(right, Node.Literal)
+	assert left.type == "IntegerLiteral"
 	assert right.value == 3
 
 
@@ -117,24 +127,27 @@ def testBinaryExpressionNestedMultiply():
 	assert isinstance(node, Node.ExpressionStatement)
 
 	expression = node.expression
-	assert isinstance(expression, Node.BinaryExpression)
+	assert isinstance(expression, Node.ComplexExpression)
 
 	assert expression.operator == "*"
 
 	left0 = expression.left
-	assert isinstance(left0, Node.BinaryExpression)
+	assert isinstance(left0, Node.ComplexExpression)
 	assert left0.operator == "*"
 
 	left1 = left0.left
-	assert isinstance(left1, Node.IntegerLiteral)
+	assert isinstance(left1, Node.Literal)
+	assert left1.type == "IntegerLiteral"
 	assert left1.value == 1
 
 	right1 = left0.right
-	assert isinstance(right1, Node.IntegerLiteral)
+	assert isinstance(right1, Node.Literal)
+	assert right1.type == "IntegerLiteral"
 	assert right1.value == 2
 
 	right0 = expression.right
-	assert isinstance(right0, Node.IntegerLiteral)
+	assert isinstance(right0, Node.Literal)
+	assert right0.type == "IntegerLiteral"
 	assert right0.value == 3
 
 
@@ -147,22 +160,25 @@ def testBinaryExpressionParenthesisPriority():
 	assert isinstance(node, Node.ExpressionStatement)
 
 	expression = node.expression
-	assert isinstance(expression, Node.BinaryExpression)
+	assert isinstance(expression, Node.ComplexExpression)
 
 	assert expression.operator == "*"
 
 	left0 = expression.left
-	assert isinstance(left0, Node.BinaryExpression)
+	assert isinstance(left0, Node.ComplexExpression)
 	assert left0.operator == "+"
 
 	left1 = left0.left
-	assert isinstance(left1, Node.IntegerLiteral)
+	assert isinstance(left1, Node.Literal)
+	assert left1.type == "IntegerLiteral"
 	assert left1.value == 1
 
 	right1 = left0.right
-	assert isinstance(right1, Node.IntegerLiteral)
+	assert isinstance(right1, Node.Literal)
+	assert right1.type == "IntegerLiteral"
 	assert right1.value == 2
 
 	right0 = expression.right
-	assert isinstance(right0, Node.IntegerLiteral)
+	assert isinstance(right0, Node.Literal)
+	assert right0.type == "IntegerLiteral"
 	assert right0.value == 3

@@ -15,7 +15,7 @@ def testAll():
 		assert isinstance(node, Node.ExpressionStatement)
 
 		expression = node.expression
-		assert isinstance(expression, Node.BinaryExpression)
+		assert isinstance(expression, Node.ComplexExpression)
 		assert expression.operator == operator
 
 		left = expression.left
@@ -23,5 +23,6 @@ def testAll():
 		assert left.name == "x"
 
 		right = expression.right
-		assert isinstance(right, Node.IntegerLiteral)
+		assert isinstance(right, Node.Literal)
+		assert right.type == "IntegerLiteral"
 		assert right.value == 0

@@ -16,22 +16,32 @@ class Interpreter:
 				self.interpret(child)
 			return self.globalObj
 		elif isinstance(node, Node.ExpressionStatement): return self.interpret(node.expression)
-		elif isinstance(node, Node.BinaryExpression):
-			left = self.interpret(node.left)
-			right = self.interpret(node.right)
-			if isinstance(node.left, Node.Identifier):
-				left = self.globalObj[node.left.name]
-			if isinstance(node.right, Node.Identifier):
-				right = self.globalObj[node.right.name]
+		elif isinstance(node, Node.ComplexExpression):
+			if node.type == "BinaryExpression":
+				left = self.interpret(node.left)
+				right = self.interpret(node.right)
+				if isinstance(node.left, Node.Identifier):
+					left = self.globalObj[node.left.name]
+				if isinstance(node.right, Node.Identifier):
+					right = self.globalObj[node.right.name]
 
-			try:
-				return eval(f"{left} {node.operator} {right}")
-			except TypeError:
-				if left is None:
-					print(f"Variable {node.left.name} is uninitialized")
-				if right is None:
-					print(f"Variable {node.left.name} is uninitialized")
-				return
+				try:
+					return eval(f"{left} {node.operator} {right}")
+				except TypeError:
+					if left is None:
+						print(f"Variable '{node.left.name}' is uninitialized")
+					if right is None:
+						print(f"Variable '{node.right.name}' is uninitialized")
+					return
+				except Exception as e:
+					raise e
+			elif node.type == "AssignmentExpression":
+				if not isinstance(node.left, Node.Identifier):
+					raise RuntimeError(f"Cannot assign to {node.left.type}")
+				if node.left.name not in self.globalObj:
+					raise RuntimeError(f"Variable {node.left.name} has not bee initialized")
+				self.globalObj[node.left.name] = self.interpret(node.right)
+			else: raise RuntimeError(f"ComplexExpression of type '{node.type}' has not been implemented")
 		elif isinstance(node, Node.VariableStatement):
 			for declaration in node.declarations:
 				self.interpret(declaration)
@@ -42,17 +52,7 @@ class Interpreter:
 
 			if node.init is not None:
 				self.globalObj[node.id.name] = self.interpret(node.init)
-		elif isinstance(node, Node.AssignmentExpression):
-			if isinstance(node.left, Node.Identifier):
-				if node.left.name not in self.globalObj:
-					raise RuntimeError(f"Variable {node.left.name} has not bee initialized")
-				self.globalObj[node.left.name] = self.interpret(node.right)
-			else: raise RuntimeError(f"Cannot assign to {node.left.type}")
 		elif isinstance(node, Node.Identifier): pass
 		elif isinstance(node, Node.EmptyStatement): pass
-		elif isinstance(node, Node.NullLiteral): pass
-		elif isinstance(node, Node.BooleanLiteral): return node.value
-		elif isinstance(node, Node.IntegerLiteral): return node.value
-		elif isinstance(node, Node.FloatLiteral): return node.value
-		elif isinstance(node, Node.StringLiteral): return node.value
+		elif isinstance(node, Node.Literal): return node.value
 		else: raise RuntimeError(f"{node.type} is not yet implemented.")
