@@ -20,6 +20,7 @@ spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 	# Symbols, Delimiters
 	(re.compile(r"^;"), ";"),
 	(re.compile(r"^,"), ","),
+	(re.compile(r"^:"), ":"),
 	(re.compile(r"^\."), "."),
 	(re.compile(r"^\{"), "{"),
 	(re.compile(r"^\}"), "}"),
@@ -41,6 +42,10 @@ spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 	(re.compile(r"^\bfor\b"), "for"),
 	(re.compile(r"^\bdef\b"), "def"),
 	(re.compile(r"^\breturn\b"), "return"),
+	(re.compile(r"^\bclass\b"), "class"),
+	(re.compile(r"^\bthis\b"), "this"),
+	(re.compile(r"^\bsuper\b"), "super"),
+	(re.compile(r"^\bnew\b"), "new"),
 
 	# -------------------------
 	# Numbers

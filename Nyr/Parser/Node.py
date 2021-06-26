@@ -158,7 +158,7 @@ class MemberExpression(Node):
 	property: Node
 
 	def __init__(self, computed: bool, object_: Node, property_: Node):
-		self.type = "MemberExpression"
+		self.type = self.__class__.__name__
 		self.computed = computed
 		self.object = object_
 		self.property = property_
@@ -193,6 +193,51 @@ class ReturnStatement(Node):
 
 
 class CallExpression(Node):
+	callee: Node
+	arguments: list[Node]
+
+	def __init__(self, callee: Node, arguments: list[Node]):
+		self.type = self.__class__.__name__
+		self.callee = callee
+		self.arguments = arguments
+
+	def toJSON(self):
+		return dict(type=self.type, callee=self.callee, arguments=self.arguments)
+
+
+# Classes
+class ClassDeclaration(Node):
+	id: Node
+	superClass: Optional[Node]
+	body: Node
+
+	def __init__(self, id_: Node, superClass: Optional[Node], body: Node):
+		self.type = self.__class__.__name__
+		self.id = id_
+		self.superClass = superClass
+		self.body = body
+
+	def toJSON(self):
+		return dict(type=self.type, id=self.id, superClass=self.superClass, body=self.body)
+
+
+class Super(Node):
+	def __init__(self):
+		self.type = self.__class__.__name__
+
+	def toJSON(self):
+		return dict(type=self.type)
+
+
+class ThisExpression(Node):
+	def __init__(self):
+		self.type = self.__class__.__name__
+
+	def toJSON(self):
+		return dict(type=self.type)
+
+
+class NewExpression(Node):
 	callee: Node
 	arguments: list[Node]
 

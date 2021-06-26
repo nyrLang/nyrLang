@@ -61,17 +61,86 @@ class Parser:
 		return statementList
 
 	def Statement(self) -> Node.Node:
-		if self.lookahead is not None:
-			if self.lookahead.type == ";": return self.EmptyStatement()
-			elif self.lookahead.type == "{": return self.BlockStatement()
-			elif self.lookahead.type == "let": return self.VariableStatement()
-			elif self.lookahead.type == "if": return self.IfStatement()
-			elif self.lookahead.type == "while": return self.IterationStatement()
-			elif self.lookahead.type == "do": return self.IterationStatement()
-			elif self.lookahead.type == "for": return self.IterationStatement()
-			elif self.lookahead.type == "def": return self.FunctionDeclaration()
-			elif self.lookahead.type == "return": return self.ReturnStatement()
-			else: return self.ExpressionStatement()
+		""" Statement
+			: ExpressionStatement
+			| BlockStatement
+			| EmptyStatement
+			| VariableStatement
+			| IfStatement
+			| IterationStatement
+			| FunctionDeclaration
+			| ReturnStatement
+			| ClassDeclaration
+			;
+		"""
+		assert self.lookahead is not None
+
+		if self.lookahead.type == ";": return self.EmptyStatement()
+		elif self.lookahead.type == "{": return self.BlockStatement()
+		elif self.lookahead.type == "let": return self.VariableStatement()
+		elif self.lookahead.type == "if": return self.IfStatement()
+		elif self.lookahead.type == "while": return self.IterationStatement()
+		elif self.lookahead.type == "do": return self.IterationStatement()
+		elif self.lookahead.type == "for": return self.IterationStatement()
+		elif self.lookahead.type == "def": return self.FunctionDeclaration()
+		elif self.lookahead.type == "return": return self.ReturnStatement()
+		elif self.lookahead.type == "class": return self.ClassDeclaration()
+		else: return self.ExpressionStatement()
+
+	def NewExpression(self) -> Node.NewExpression:
+		""" NewExpression
+			: 'new' MemberExpression Arguments
+			;
+		"""
+		self._eat("new")
+
+		return Node.NewExpression(
+			callee=self.MemberExpression(),
+			arguments=self.Arguments(),
+		)
+
+	def Super(self) -> Node.Super:
+		""" Super
+			: 'super'
+			;
+		"""
+		self._eat("super")
+
+		return Node.Super()
+
+	def ThisExpression(self) -> Node.ThisExpression:
+		""" ThisExpression
+			: 'this'
+			;
+		"""
+		self._eat("this")
+
+		return Node.ThisExpression()
+
+	def ClassDeclaration(self) -> Node.ClassDeclaration:
+		""" ClassDeclaration
+			: 'class' Identifier OptClassExtends BlockStatement
+		"""
+
+		self._eat("class")
+		id_ = self.Identifier()
+
+		superClass = self.ClassExtends() if self.lookahead.type == ":" else None
+
+		body = self.BlockStatement()
+
+		return Node.ClassDeclaration(id_, superClass, body)
+
+	def ClassExtends(self) -> Node.Identifier:
+		""" ClassExtends
+			: ':' Identifier
+			;
+		"""
+		self._eat(":")
+
+		name = self.Identifier()
+
+		return name
 
 	def FunctionDeclaration(self) -> Node.FunctionDeclaration:
 		""" FunctionDeclaration
@@ -314,6 +383,9 @@ class Parser:
 			;
 		"""
 
+		if self.lookahead.type == "super":
+			return self.CallExpression(self.Super())
+
 		member = self.MemberExpression()
 
 		if self.lookahead.type == "(":
@@ -450,6 +522,7 @@ class Parser:
 			: Literal
 			| ParenthesizedExpression
 			| Identifier
+			| ThisExpression
 			;
 		"""
 		if self._isLiteral(self.lookahead.type):
@@ -459,6 +532,10 @@ class Parser:
 			return self.ParenthesizedExpression()
 		elif self.lookahead.type == "IDENTIFIER":
 			return self.Identifier()
+		elif self.lookahead.type == "this":
+			return self.ThisExpression()
+		elif self.lookahead.type == "new":
+			return self.NewExpression()
 		else:
 			return self.LeftHandSideExpression()
 
