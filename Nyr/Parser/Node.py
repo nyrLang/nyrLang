@@ -100,23 +100,17 @@ class VariableStatement(Node):
 
 
 class WhileStatement(Node):
-	def __init__(self, test: Node, body: Node):
-		self.type = self.__class__.__name__
+	def __init__(self, type_: str, test: Node, body: Node):
+		self.type = type_
 		self.test = test
 		self.body = body
 
 	def toJSON(self):
-		return dict(type=self.type, test=self.test, body=self.body)
-
-
-class DoWhileStatement(Node):
-	def __init__(self, body: Node, test: Node):
-		self.type = self.__class__.__name__
-		self.body = body
-		self.test = test
-
-	def toJSON(self):
-		return dict(type=self.type, body=self.body, test=self.test)
+		if self.type == "WhileStatement":
+			return dict(type=self.type, test=self.test, body=self.body)
+		elif self.type == "DoWhileStatement":
+			return dict(type=self.type, body=self.body, test=self.test)
+		else: raise Exception(f"Unknown While loop: {self.type}")
 
 
 class ForStatement(Node):

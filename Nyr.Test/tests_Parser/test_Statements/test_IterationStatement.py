@@ -14,6 +14,7 @@ def testWhileStatement():
 	node = ast.body[0]
 
 	assert isinstance(node, Node.WhileStatement)
+	assert node.type == "WhileStatement"
 
 	# DoWhile.test
 	test = node.test
@@ -59,7 +60,8 @@ def testDoWhileStatement():
 
 	node = ast.body[0]
 
-	assert isinstance(node, Node.DoWhileStatement)
+	assert isinstance(node, Node.WhileStatement)
+	assert node.type == "DoWhileStatement"
 
 	# DoWhile.body
 	body = node.body
