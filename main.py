@@ -1,5 +1,6 @@
 import argparse
 import json
+from pprint import pprint
 from typing import Any
 
 from Nyr.Interpreter.Interpreter import Interpreter
@@ -12,6 +13,7 @@ class Args:
 	inputFile: str
 	output: bool
 	interpret: bool
+	toSExpr: bool
 
 
 def getAst(string: str):
@@ -35,6 +37,12 @@ def outputAST(ast_: Node, doOutput: bool):
 	if doOutput:
 		with open("./ast.json", "w") as o:
 			o.write(json.dumps(ast_, cls=ComplexEncoder, indent=2) + "\n")
+
+
+def toSExpression(ast_: Node, print_: bool):
+	if print_:
+		_ast: list = ast_.toSExpression()
+		pprint(_ast)
 
 
 if __name__ == "__main__":
@@ -63,6 +71,14 @@ if __name__ == "__main__":
 		help="output AST to ast.json",
 		dest="output",
 	)
+	argparser.add_argument(
+		"-s", "--s-expr",
+		required=False,
+		default=False,
+		type=bool,
+		help="Enable S-Expression interpreter",
+		dest="toSExpr",
+	)
 
 	args = Args()
 
@@ -87,6 +103,7 @@ if __name__ == "__main__":
 			printAst(ast, printAST)
 			outputAST(ast, args.output)
 			interpret(ast, interpreter)
+			toSExpression(ast, args.toSExpr)
 
 	# File mode (read from file given via -f flag)
 	elif args.inputFile.endswith(".nyr"):
@@ -102,6 +119,7 @@ if __name__ == "__main__":
 			printAst(ast, printAST)
 			outputAST(ast, args.output)
 			interpret(ast, interpreter)
+			toSExpression(ast, args.toSExpr)
 
 	# Unknown mode
 	else:
