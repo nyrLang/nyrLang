@@ -2,9 +2,12 @@
 
 # Nyr: A soon-to-be programming language
 
+- - -
+
 ## TOC
 - [Features]
 - [Flags]
+- [Requirements]
 - ["Types"]
 	- [Comments]
 	- [Numbers]
@@ -16,6 +19,7 @@
 - [Functions]
 - [Classes]
 
+- - -
 
 ## Features
 - CLI
@@ -28,6 +32,11 @@
 	- Note: Many statements/operations are not yet supported, and will raise a `RuntimeError` if one is encountered
 - `-o (true|false)`, `--output (true|false)` wether to dump the generated AST into an `ast.json` file (located at `./ast.json`) (Default: `false`)
 - `-s (true|false)`, `--s-expr (true|false)` wether to convert the generated AST to S-Expression format (Default: `false`)
+
+- - -
+
+## Requirements
+- Python 3.9 or later
 
 - - -
 
@@ -211,6 +220,7 @@ let p = new Point3D(10, 20, 30);
 
 [Features]: #Features
 [Flags]: #Flags
+[Requirements]: #Requirements
 ["Types"]: #"Types"
 [Comments]: #Comments
 [Numbers]: #Numbers
