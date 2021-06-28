@@ -30,7 +30,7 @@ class Interpreter:
 					raise RuntimeError(f"Unknown right-hand-side of variable declaration ({id_})")
 
 			if id_ in self.globalObj.keys():
-				raise RuntimeError(f"Variable '{id_}' already initialized")
+				raise RuntimeError(f"Variable '{id_}' already declared")
 			self.globalObj[id_] = value
 		elif isinstance(node, Node.Identifier): return node.name
 		elif isinstance(node, Node.ExpressionStatement): return self.interpret(node.expression)

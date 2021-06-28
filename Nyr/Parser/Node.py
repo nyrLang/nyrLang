@@ -202,7 +202,12 @@ class UnaryExpression(Node):
 		return dict(type=self.type, operator=self.operator, argument=self.argument)
 
 	def toSExpression(self):
-		return f"{self.operator}{self.argument.toSExpression()}"
+		if self.argument.type == "IntegerLiteral":
+			return int(f"{self.operator}{self.argument.toSExpression()}")
+		elif self.argument.type == "FloatLiteral":
+			return float(f"{self.operator}{self.argument.toSExpression()}")
+		else:
+			raise Exception(f"Unknown right hand side of UnaryExpression: {self.argument.type}")
 
 
 class MemberExpression(Node):
