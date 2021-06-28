@@ -1,8 +1,8 @@
 import argparse
 import json
 from pprint import pprint
-from typing import Any
 
+from Nyr.Interpreter.Env import Env
 from Nyr.Interpreter.Interpreter import Interpreter
 from Nyr.Parser.Node import ComplexEncoder
 from Nyr.Parser.Node import Node
@@ -29,8 +29,8 @@ def interpret(ast_: Node, interpreter_: Interpreter = None):
 	if interpreter_ is None:
 		return None
 	else:
-		res: dict[str, Any] = interpreter_.interpret(ast_)
-		print(json.dumps(res, indent=2))
+		env: Env = interpreter_.interpret(ast_, Env())
+		print(f"Env = {json.dumps(env, indent=2)}")
 
 
 def outputAST(ast_: Node, doOutput: bool):
