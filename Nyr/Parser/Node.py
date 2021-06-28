@@ -279,7 +279,7 @@ class CallExpression(Node):
 		args = []
 		for arg in self.arguments:
 			args.append(arg.toSExpression())
-		return ["call", self.callee.toSExpression()]
+		return ["call", self.callee.toSExpression(), args]
 
 
 # Classes

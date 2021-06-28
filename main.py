@@ -40,8 +40,8 @@ def outputAST(ast_: Node, doOutput: bool):
 
 
 def toSExpression(ast_: Node, print_: bool):
+	_ast = ast_.toSExpression()
 	if print_:
-		_ast: list = ast_.toSExpression()
 		pprint(_ast)
 
 
