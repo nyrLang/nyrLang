@@ -1,3 +1,4 @@
+import math
 from typing import Any
 
 import Nyr.Parser.Node as Node
@@ -7,12 +8,10 @@ from Nyr.Interpreter.Env import Env
 class Interpreter:
 	blockId: int = 0
 
-	def interpret(self, node: Node.Node, env: Env, blockName=None) -> Any:
-		if blockName is None:
-			blockName = f"__block_{self.blockId}"
-			self.blockId += 1
+	def interpret(self, node: Node.Node, env: Env) -> Any:
 
-		if isinstance(node, Node.Program):
+		if node is None: return None
+		elif isinstance(node, Node.Program):
 			for child in node.body:
 				self.interpret(child, env)
 			return env
@@ -21,23 +20,9 @@ class Interpreter:
 			if node.init is None:
 				value = None
 			else:
-				if isinstance(node.init, Node.Literal):
-					value = node.init.value
-				elif isinstance(node.init, Node.UnaryExpression):
-					value = self.interpret(node.init, env)
-				elif isinstance(node.init, Node.ComplexExpression):
-					raise RuntimeError(f"Assigning from {node.init.type} is not yet implemented")
-				else:
-					raise RuntimeError(f"Unknown right-hand-side of variable declaration ({id_})")
+				value = self.interpret(node.init, env)
 
-			try:
-				if id_ in env.find(id_):
-					env.find(id_)[id_] = value
-			except AttributeError:
-				env[id_] = value
-			except Exception as e:
-				raise e
-			return
+			env.addVar(id_, value)
 		elif isinstance(node, Node.Identifier): return node.name
 		elif isinstance(node, Node.ExpressionStatement): return self.interpret(node.expression, env)
 		elif isinstance(node, Node.EmptyStatement): return
@@ -47,52 +32,42 @@ class Interpreter:
 			for part in node.body:
 				self.interpret(part, e)
 
-			return env.addChild(blockName, e)
-		elif isinstance(node, Node.IfStatement): pass
+			return env.addChildEnv(f"__block_{self.blockId}", e)
+		# elif isinstance(node, Node.IfStatement):
 		elif isinstance(node, Node.VariableStatement):
 			for decl in node.declarations:
 				self.interpret(decl, env)
-			return
-		elif isinstance(node, Node.WhileStatement): pass
-		elif isinstance(node, Node.ForStatement): pass
+		# elif isinstance(node, Node.WhileStatement):
+		# elif isinstance(node, Node.ForStatement):
 		elif isinstance(node, Node.ComplexExpression):
 			if node.type == "AssignmentExpression":
 				left = self.interpret(node.left, env)
 				right = self.interpret(node.right, env)
 
-				try:
-					env.find(left)[left] = right
-					return
-				except AttributeError:
-					raise RuntimeError(f"Variable '{left}' has not been defined")
-				except Exception as e:
-					raise e
+				env.setVar(left, right)
 			elif node.type in ["BinaryExpression", "LogicalExpression"]:
 				operator = node.operator
-				if isinstance(node.left, Node.Identifier):
-					try:
-						left = env.find(node.left.name)
-					except AttributeError:
-						raise RuntimeError(f"'{node.left.name}' accessed before defined")
-					except Exception as e:
-						raise e
-					if left is None:
-						raise RuntimeError(f"'{node.left.name}' has no value")
-				else: left = self.interpret(node.left, env)
 
-				if isinstance(node.right, Node.Identifier):
-					try:
-						right = env.find(node.right.name)
-					except AttributeError:
-						raise RuntimeError(f"'{node.right.name}' accessed before defined")
-					except Exception as e:
-						raise e
-					if right is None:
-						raise RuntimeError(f"'{node.right.name}' has no value")
-				else: right = self.interpret(node.right, env)
+				left = self.interpret(node.left, env)
+				if not isinstance(node.left, Node.Literal):
+					if node.left.type in [int, float]:
+						left = node.left.value
+					else:
+						left = env.getVar(left)
+
+				right = self.interpret(node.right, env)
+				if not isinstance(node.right, Node.Literal):
+					if node.right.type in [int, float]:
+						right = node.right.value
+					else:
+						right = env.getVar(right)
 
 				try:
-					return eval(f"{left} {operator} {right}")
+					e = eval(f"{left} {operator} {right}")
+					if int(e) == e:
+						return int(e)
+					else:
+						return float(e)
 				except TypeError:
 					raise RuntimeError(f"BinaryExpression '{operator}' with '{left}' and '{right}' was not possible")
 				except Exception as e:
@@ -109,16 +84,17 @@ class Interpreter:
 				return eval(f"{operator}{value}")
 			except Exception as e:
 				raise e
-		elif isinstance(node, Node.FunctionDeclaration): pass
-		elif isinstance(node, Node.ReturnStatement): pass
-		elif isinstance(node, Node.CallExpression): pass
-		elif isinstance(node, Node.ClassDeclaration): pass
-		elif isinstance(node, Node.Super): pass
-		elif isinstance(node, Node.ThisExpression): pass
-		elif isinstance(node, Node.NewExpression): pass
+		# elif isinstance(node, Node.FunctionDeclaration):
+		# elif isinstance(node, Node.ReturnStatement):
+		# elif isinstance(node, Node.CallExpression):
+		# elif isinstance(node, Node.ClassDeclaration):
+		# elif isinstance(node, Node.Super):
+		# elif isinstance(node, Node.ThisExpression):
+		# elif isinstance(node, Node.NewExpression):
 		elif isinstance(node, Node.Literal): return node.value
+		else: raise RuntimeError(f"{node.type} is not yet implemented.")
 
-		raise RuntimeError(f"{node.type} is not yet implemented.")
+		self.blockId += 1
 
 
 class SExprInterpreter:
