@@ -2,8 +2,6 @@
 
 # Nyr: A soon-to-be programming language
 
-- - -
-
 ## TOC
 - [Features]
 - [Flags]
