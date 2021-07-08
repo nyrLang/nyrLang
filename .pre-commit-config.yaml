@@ -1,5 +1,6 @@
 ci:
-  skip: [ reorder-python-imports ]
+  # Currently skipping due to missing Python 3.10 support
+  skip: [ reorder-python-imports, mypy, dead ]
 
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
