@@ -4,6 +4,8 @@ from typing import Any
 from typing import Optional
 from typing import Union
 
+from Nyr.Interpreter.Env import Env
+
 
 class ComplexEncoder(json.JSONEncoder):
 	def default(self, o: Any) -> Any:
@@ -20,11 +22,14 @@ class Node:
 	type: str
 	value: NodeValue = None
 
-	@abstractmethod
-	def toJSON(self): pass
+	def toJSON(self):
+		raise NotImplementedError(f"{self.__class__.__name__}.toJSON() has not been implemented")
 
-	@abstractmethod
-	def toSExpression(self): pass
+	def toSExpression(self):
+		raise NotImplementedError(f"{self.__class__.__name__}.toSExpression() has not been implemented")
+
+	def exec(self, env: Env):
+		raise NotImplementedError(f"{self.__class__.__name__}.exec() has not been implemented")
 
 
 class Program(Node):
@@ -65,6 +70,9 @@ class Identifier(Node):
 		return dict(type=self.type, name=self.name)
 
 	def toSExpression(self):
+		return self.name
+
+	def exec(self, env: Env):
 		return self.name
 
 
@@ -355,4 +363,7 @@ class Literal(Node):
 		return dict(type=self.type, value=self.value)
 
 	def toSExpression(self):
+		return self.value
+
+	def exec(self, env: Env):
 		return self.value
