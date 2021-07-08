@@ -65,9 +65,6 @@
 // Double Quotes
 "A very nice string";
 
-// Single Quotes
-'Another nice string, but with single quotes instead';
-
 // Multi-line
 "A string
 can also be

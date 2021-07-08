@@ -126,7 +126,7 @@ def testChainedAndMixedPropertyAccess():
 		]
 	}
 	"""
-	ast = Parser().parse("a.b.c['d'];")
+	ast = Parser().parse('a.b.c["d"];')
 
 	assert len(ast.body) == 1
 

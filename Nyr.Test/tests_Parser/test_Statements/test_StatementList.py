@@ -4,7 +4,7 @@ from Nyr.Parser.Parser import Parser
 
 def testMultipleStrings():
 	parser = Parser()
-	ast = parser.parse("'Hello'; '42';")
+	ast = parser.parse('"Hello"; "42";')
 
 	body = ast.body
 	assert len(body) == 2
@@ -93,7 +93,7 @@ def testMutlipleFloats():
 
 def testMixed():
 	parser = Parser()
-	ast = parser.parse("'Hello'; 42; 3.141;")
+	ast = parser.parse('"Hello"; 42; 3.141;')
 
 	body = ast.body
 	assert len(body) == 3
