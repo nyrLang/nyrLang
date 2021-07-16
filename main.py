@@ -29,8 +29,11 @@ def interpret(ast_: Node, interpreter_: Interpreter = None):
 	if interpreter_ is None:
 		return None
 	else:
-		env: Env = interpreter_.interpret(ast_, Env())
-		print(f"Env = {json.dumps(env, indent=2)}")
+		env = interpreter_.interpret(ast_, Env())
+		if env is None:
+			print(f"Failed to interpret code.")
+		else:
+			print(f"Env = {json.dumps(env, indent=2)}")
 
 
 def outputAST(ast_: Node, doOutput: bool):
