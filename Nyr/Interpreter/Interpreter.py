@@ -34,8 +34,9 @@ class Interpreter:
 			case Node.ExpressionStatement:
 				assert isinstance(node, Node.ExpressionStatement)
 				self.interpret(node.expression, env)
-			# case Node.EmptyStatement:
-			# 	assert isinstance(node, Node.EmptyStatement)
+			case Node.EmptyStatement:
+				assert isinstance(node, Node.EmptyStatement)
+				pass
 			# case Node.BlockStatement:
 			# 	assert isinstance(node, Node.BlockStatement)
 			# case Node.IfStatement:
