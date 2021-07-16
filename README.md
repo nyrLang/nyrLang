@@ -1,4 +1,5 @@
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/niyrme/NyrLang/senpai.svg)](https://results.pre-commit.ci/latest/github/niyrme/NyrLang/senpai)
+[![pytest](https://github.com/niyrme/NyrLang/actions/workflows/pytest.yml/badge.svg?branch=senpai)](https://github.com/niyrme/NyrLang/actions/workflows/pytest.yml)
 
 # Nyr: A soon-to-be programming language
 
