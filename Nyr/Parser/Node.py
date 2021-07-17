@@ -152,11 +152,20 @@ class WhileStatement(Node):
 		self.body = body
 
 	def toJSON(self):
-		if self.type == "WhileStatement":
-			return dict(type=self.type, test=self.test, body=self.body)
-		elif self.type == "DoWhileStatement":
-			return dict(type=self.type, body=self.body, test=self.test)
-		else: raise Exception(f"Unknown While loop: {self.type}")
+		return dict(type=self.type, test=self.test, body=self.body)
+
+	def toSExpression(self):
+		return ["while", self.test.toSExpression(), self.body.toSExpression()]
+
+
+class DoWhileStatement(Node):
+	def __init__(self, type_: str, test: Node, body: Node):
+		self.type = type_
+		self.test = test
+		self.body = body
+
+	def toJSON(self):
+		return dict(type=self.type, body=self.body, test=self.test)
 
 	def toSExpression(self):
 		return ["while", self.test.toSExpression(), self.body.toSExpression()]
