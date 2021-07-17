@@ -17,7 +17,7 @@ spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 	# Single-line
 	(re.compile(r"^\/\/.*"), None),
 	# Multi-line
-	(re.compile(r"^\/\*[\s\S]*?\*\/.*"), None),
+	(re.compile(r"^/\*[\s\S]*?\*/.*"), "BLOCK_COMMENT"),
 
 	# -------------------------
 	# Symbols, Delimiters
@@ -127,10 +127,15 @@ class Tokenizer:
 			if not tokenValue:
 				continue
 
-			if not tokenType:
+			if tokenType is None:
 				return self.getNextToken()
 			elif tokenType == "NEWLINE":
 				self.pos.line += 1
+				self.pos.col = 0
+				return self.getNextToken()
+			elif tokenType == "BLOCK_COMMENT":
+				tokenValue = tokenValue.replace(r"\\n", "_")
+				self.pos.line += tokenValue.count("\n")
 				self.pos.col = 0
 				return self.getNextToken()
 
