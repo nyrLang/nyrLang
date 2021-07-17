@@ -15,7 +15,7 @@ spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 	# -------------------------
 	# Comments
 	# Single-line
-	(re.compile(r"^\/\/.*"), None),
+	(re.compile(r"^//.*"), None),
 	# Multi-line
 	(re.compile(r"^/\*[\s\S]*?\*/.*"), "BLOCK_COMMENT"),
 
@@ -25,8 +25,8 @@ spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 	(re.compile(r"^,"), ","),
 	(re.compile(r"^:"), ":"),
 	(re.compile(r"^\."), "."),
-	(re.compile(r"^\{"), "{"),
-	(re.compile(r"^\}"), "}"),
+	(re.compile(r"^{"), "{"),
+	(re.compile(r"^}"), "}"),
 	(re.compile(r"^\("), "("),
 	(re.compile(r"^\)"), ")"),
 	(re.compile(r"^\["), "["),
@@ -61,17 +61,17 @@ spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 
 	# -------------------------
 	# Equality Operators: ==, !=
-	(re.compile(r"^[\=\!]\="), "EQUALITY_OPERATOR"),
+	(re.compile(r"^[=!]="), "EQUALITY_OPERATOR"),
 
 	# -------------------------
 	# Assignment Operators: =, +=, -=, *=, /=
-	(re.compile(r"^\="), "SIMPLE_ASSIGN"),
-	(re.compile(r"^[\+\-\*\/]\="), "COMPLEX_ASSIGN"),
+	(re.compile(r"^="), "SIMPLE_ASSIGN"),
+	(re.compile(r"^[+\-*/]="), "COMPLEX_ASSIGN"),
 
 	# -------------------------
 	# Math Operators: +, -, *, /
-	(re.compile(r"^[\+\-]"), "ADDITIVE_OPERATOR"),
-	(re.compile(r"^[\*\/]"), "MULTIPLICATIVE_OPERATOR"),
+	(re.compile(r"^[+\-]"), "ADDITIVE_OPERATOR"),
+	(re.compile(r"^[*/]"), "MULTIPLICATIVE_OPERATOR"),
 
 	# -------------------------
 	# Logical Operators: &&, ||, !
