@@ -1,3 +1,5 @@
+import pytest
+
 import Nyr.Parser.Node as Node
 from Nyr.Parser.Parser import Parser
 
@@ -46,3 +48,8 @@ def testFloat():
 		assert isinstance(expression, Node.Literal)
 		assert expression.type == "FloatLiteral"
 		assert expression.value == 3.141
+
+
+def testFloatTooManyDots():
+	with pytest.raises(Exception):
+		Parser().parse("3.141.59")
