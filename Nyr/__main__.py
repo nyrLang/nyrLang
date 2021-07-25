@@ -14,6 +14,7 @@ class Args:
 	output: bool
 	interpret: bool
 	toSExpr: bool
+	printAST: bool
 
 
 def getAst(string: str):
@@ -21,8 +22,8 @@ def getAst(string: str):
 
 
 def printAst(ast_: Node, print_: bool):
-	if print_:
-		json.dumps(ast_, cls=ComplexEncoder, indent=2)
+	if print_ is True:
+		print(json.dumps(ast_, cls=ComplexEncoder, indent=2))
 
 
 def interpret(ast_: Node, interpreter_: Interpreter = None):
@@ -79,6 +80,14 @@ if __name__ == "__main__":
 		help="Enable S-Expression interpreter",
 		dest="toSExpr",
 	)
+	argparser.add_argument(
+		"-p", "--print",
+		required=False,
+		default=False,
+		type=bool,
+		help="Wether tp print the AST to terminal",
+		dest="printAST",
+	)
 
 	args = Args()
 
@@ -87,7 +96,7 @@ if __name__ == "__main__":
 	parser = Parser()
 	interpreter = Interpreter() if args.interpret else None
 
-	printAST: bool = False
+	printAST: bool = args.printAST
 
 	# CLI mode (read from stdin)
 	if args.inputFile == "<stdin>":
