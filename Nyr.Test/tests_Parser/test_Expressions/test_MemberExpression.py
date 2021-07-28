@@ -1,7 +1,11 @@
+import pytest
+from _pytest import assertion
+
 import Nyr.Parser.Node as Node
 from Nyr.Parser.Parser import Parser
 
 
+@pytest.mark.dependency()
 def testSimplePropertyAccess():
 	ast = Parser().parse("x.y;")
 
@@ -23,7 +27,8 @@ def testSimplePropertyAccess():
 	assert expression.property.name == "y"
 
 
-def testPropertyAssign():
+@pytest.mark.dependency(depends=["testSimplePropertyAccess"])
+def testSimplePropertyAssign():
 	ast = Parser().parse("x.y = 1;")
 
 	assert len(ast.body) == 1
@@ -55,7 +60,32 @@ def testPropertyAssign():
 	assert right.value == 1
 
 
+@pytest.mark.dependency()
 def testComputedPropertyAccess():
+	ast = Parser().parse("x[0];")
+
+	assert len(ast.body) == 1
+
+	node = ast.body[0]
+
+	assert isinstance(node, Node.ExpressionStatement)
+
+	expression = node.expression
+
+	assert isinstance(expression, Node.MemberExpression)
+
+	assert expression.computed is True
+
+	assert isinstance(expression.object, Node.Identifier)
+	assert expression.object.name == "x"
+
+	assert isinstance(expression.property, Node.Literal)
+	assert expression.property.type == "IntegerLiteral"
+	assert expression.property.value == 0
+
+
+@pytest.mark.dependency(depends=["testComputedPropertyAccess"])
+def testComputedPropertyAssign():
 	ast = Parser().parse("x[0] = 1;")
 
 	assert len(ast.body) == 1
@@ -88,45 +118,46 @@ def testComputedPropertyAccess():
 	assert right.value == 1
 
 
+@pytest.mark.dependency()
+@pytest.mark.dependency(depends=["testSimplePropertyAccess", "testComputedPropertyAccess"])
 def testChainedAndMixedPropertyAccess():
-	""" AST as json:
-	{
-		type: "Program"
-		body: [
-			{
-				type: "ExpressionStatement"
-				expression: {
-					type: "MemberExpression"
-					computed: true
-					object: {
-						type: "MemberExpression"
-						computed: false
-						object: {
-							type: "MemberExpression"
-							computed: false
-							object: {
-								type: "Identifier"
-								name: "a"
-							}
-							property: {
-								type: "Identifier"
-								name: "b"
-							}
-						}
-						property: {
-							type: "Identifier"
-							name: "c"
-					}
-					property: {
-						type: "StringLiteral"
-						name: "d"
-					}
-				}
-			}
-		]
-	}
-	"""
 	ast = Parser().parse('a.b.c["d"];')
+
+	assert len(ast.body) == 1
+
+	node = ast.body[0]
+
+	assert isinstance(node, Node.ExpressionStatement)
+
+	expression_c = node.expression
+	assert isinstance(expression_c, Node.MemberExpression)
+	assert expression_c.computed is True
+
+	expression_b = expression_c.object
+	assert isinstance(expression_b, Node.MemberExpression)
+	assert expression_b.computed is False
+
+	expression_a = expression_b.object
+	assert isinstance(expression_a, Node.MemberExpression)
+	assert expression_a.computed is False
+
+	assert isinstance(expression_a.object, Node.Identifier)
+	assert expression_a.object.name == "a"
+
+	assert isinstance(expression_a.property, Node.Identifier)
+	assert expression_a.property.name == "b"
+
+	assert isinstance(expression_b.property, Node.Identifier)
+	assert expression_b.property.name == "c"
+
+	assert isinstance(expression_c.property, Node.Literal)
+	assert expression_c.property.type == "StringLiteral"
+	assert expression_c.property.value == "d"
+
+
+@pytest.mark.dependency(depends=["testSimplePropertyAssign", "testComputedPropertyAssign", "testChainedAndMixedPropertyAccess"])
+def testChainedAndMixedPropertyAssign():
+	ast = Parser().parse('a.b.c["d"] = 1;')
 
 	assert len(ast.body) == 1
 
