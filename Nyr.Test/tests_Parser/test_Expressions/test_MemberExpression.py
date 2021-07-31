@@ -1,5 +1,4 @@
 import pytest
-from _pytest import assertion
 
 import Nyr.Parser.Node as Node
 from Nyr.Parser.Parser import Parser
@@ -165,7 +164,16 @@ def testChainedAndMixedPropertyAssign():
 
 	assert isinstance(node, Node.ExpressionStatement)
 
-	expression_c = node.expression
+	expression = node.expression
+	assert isinstance(expression, Node.ComplexExpression)
+	assert expression.type == "AssignmentExpression"
+	assert expression.operator == "="
+
+	assert isinstance(expression.right, Node.Literal)
+	assert expression.right.type == "IntegerLiteral"
+	assert expression.right.value == 1
+
+	expression_c = expression.left
 	assert isinstance(expression_c, Node.MemberExpression)
 	assert expression_c.computed is True
 
