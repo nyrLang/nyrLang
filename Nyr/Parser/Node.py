@@ -145,8 +145,7 @@ class VariableStatement(Node):
 
 
 class WhileStatement(Node):
-	def __init__(self, type_: str, test: Node, body: Node):
-		self.type = type_
+	def __init__(self, test: Node, body: Node):
 		self.test = test
 		self.body = body
 
@@ -158,8 +157,7 @@ class WhileStatement(Node):
 
 
 class DoWhileStatement(Node):
-	def __init__(self, type_: str, test: Node, body: Node):
-		self.type = type_
+	def __init__(self, body: Node, test: Node):
 		self.test = test
 		self.body = body
 

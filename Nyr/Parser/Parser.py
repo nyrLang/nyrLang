@@ -205,9 +205,9 @@ class Parser:
 
 		body = self.Statement()
 
-		return Node.WhileStatement("WhileStatement", test=test, body=body)
+		return Node.WhileStatement(test=test, body=body)
 
-	def DoWhileStatement(self) -> Node.WhileStatement:
+	def DoWhileStatement(self) -> Node.DoWhileStatement:
 		self._eat("do")
 
 		body = self.Statement()
@@ -218,7 +218,7 @@ class Parser:
 		self._eat(")")
 		self._eat(";")
 
-		return Node.WhileStatement("DoWhileStatement", body=body, test=test)
+		return Node.DoWhileStatement(body=body, test=test)
 
 	def ForStatement(self) -> Node.ForStatement:
 		self._eat("for")
