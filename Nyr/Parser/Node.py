@@ -21,6 +21,9 @@ class Node:
 	type: str
 	value: NodeValue = None
 
+	def __init__(self, type_: str):
+		self.type = type_
+
 	def toJSON(self):
 		raise NotImplementedError(f"{self.__class__.__name__}.toJSON() has not been implemented")
 
@@ -33,7 +36,7 @@ class Node:
 
 class Program(Node):
 	def __init__(self, body: list[Node]):
-		self.type = self.__class__.__name__
+		super(Program, self).__init__(self.__class__.__name__)
 		self.body = body
 
 	def toJSON(self):
@@ -48,7 +51,7 @@ class Program(Node):
 
 class VariableDeclaration(Node):
 	def __init__(self, id_: Node, init: Optional[Node]):
-		self.type = self.__class__.__name__
+		super().__init__(self.__class__.__name__)
 		self.id = id_
 		self.init = init
 
@@ -62,7 +65,7 @@ class VariableDeclaration(Node):
 
 class Identifier(Node):
 	def __init__(self, name: str):
-		self.type = self.__class__.__name__
+		super().__init__(self.__class__.__name__)
 		self.name = name
 
 	def toJSON(self):
@@ -78,7 +81,7 @@ class Identifier(Node):
 # Statements
 class ExpressionStatement(Node):
 	def __init__(self, expression: Node):
-		self.type = self.__class__.__name__
+		super().__init__(self.__class__.__name__)
 		self.expression = expression
 
 	def toJSON(self):
@@ -90,7 +93,7 @@ class ExpressionStatement(Node):
 
 class EmptyStatement(Node):
 	def __init__(self):
-		self.type = self.__class__.__name__
+		super().__init__(self.__class__.__name__)
 
 	def toJSON(self):
 		return dict(type=self.type)
@@ -101,7 +104,7 @@ class EmptyStatement(Node):
 
 class BlockStatement(Node):
 	def __init__(self, body: list[Node]):
-		self.type = self.__class__.__name__
+		super().__init__(self.__class__.__name__)
 		self.body = body
 
 	def toJSON(self):
@@ -116,7 +119,7 @@ class BlockStatement(Node):
 
 class IfStatement(Node):
 	def __init__(self, test: Node, consequent: Node, alternative: Optional[Node]):
-		self.type = self.__class__.__name__
+		super().__init__(self.__class__.__name__)
 		self.test = test
 		self.consequent = consequent
 		self.alternative = alternative
@@ -131,7 +134,7 @@ class IfStatement(Node):
 
 class VariableStatement(Node):
 	def __init__(self, declarations: list[Node]):
-		self.type = self.__class__.__name__
+		super().__init__(self.__class__.__name__)
 		self.declarations = declarations
 
 	def toJSON(self):
@@ -146,6 +149,7 @@ class VariableStatement(Node):
 
 class WhileStatement(Node):
 	def __init__(self, test: Node, body: Node):
+		super().__init__(self.__class__.__name__)
 		self.test = test
 		self.body = body
 
@@ -158,6 +162,7 @@ class WhileStatement(Node):
 
 class DoWhileStatement(Node):
 	def __init__(self, body: Node, test: Node):
+		super().__init__(self.__class__.__name__)
 		self.test = test
 		self.body = body
 
@@ -170,7 +175,7 @@ class DoWhileStatement(Node):
 
 class ForStatement(Node):
 	def __init__(self, init: Optional[Node], test: Optional[Node], update: Optional[Node], body: Node):
-		self.type = self.__class__.__name__
+		super().__init__(self.__class__.__name__)
 		self.init = init
 		self.test = test
 		self.update = update
@@ -208,7 +213,7 @@ class ComplexExpression(Node):
 
 class UnaryExpression(Node):
 	def __init__(self, operator: str, argument: Node):
-		self.type = self.__class__.__name__
+		super().__init__(self.__class__.__name__)
 		self.operator = operator
 		self.argument = argument
 
@@ -230,7 +235,7 @@ class MemberExpression(Node):
 	property: Node
 
 	def __init__(self, computed: bool, object_: Node, property_: Node):
-		self.type = self.__class__.__name__
+		super().__init__(self.__class__.__name__)
 		self.computed = computed
 		self.object = object_
 		self.property = property_
@@ -249,7 +254,7 @@ class FunctionDeclaration(Node):
 	body: Node
 
 	def __init__(self, name: Identifier, parameters: list[Node], body: Node):
-		self.type = self.__class__.__name__
+		super().__init__(self.__class__.__name__)
 		self.name = name
 		self.params = parameters
 		self.body = body
@@ -266,7 +271,7 @@ class FunctionDeclaration(Node):
 
 class ReturnStatement(Node):
 	def __init__(self, argument: Optional[Node]):
-		self.type = self.__class__.__name__
+		super().__init__(self.__class__.__name__)
 		self.argument = argument
 
 	def toJSON(self):
@@ -282,7 +287,7 @@ class CallExpression(Node):
 	arguments: list[Node]
 
 	def __init__(self, callee: Node, arguments: list[Node]):
-		self.type = self.__class__.__name__
+		super().__init__(self.__class__.__name__)
 		self.callee = callee
 		self.arguments = arguments
 
@@ -303,7 +308,7 @@ class ClassDeclaration(Node):
 	body: Node
 
 	def __init__(self, id_: Node, superClass: Optional[Node], body: Node):
-		self.type = self.__class__.__name__
+		super().__init__(self.__class__.__name__)
 		self.id = id_
 		self.superClass = superClass
 		self.body = body
@@ -318,7 +323,7 @@ class ClassDeclaration(Node):
 
 class Super(Node):
 	def __init__(self):
-		self.type = self.__class__.__name__
+		super().__init__(self.__class__.__name__)
 
 	def toJSON(self):
 		return dict(type=self.type)
@@ -329,7 +334,7 @@ class Super(Node):
 
 class ThisExpression(Node):
 	def __init__(self):
-		self.type = self.__class__.__name__
+		super().__init__(self.__class__.__name__)
 
 	def toJSON(self):
 		return dict(type=self.type)
@@ -343,7 +348,7 @@ class NewExpression(Node):
 	arguments: list[Node]
 
 	def __init__(self, callee: Node, arguments: list[Node]):
-		self.type = self.__class__.__name__
+		super().__init__(self.__class__.__name__)
 		self.callee = callee
 		self.arguments = arguments
 

@@ -139,8 +139,7 @@ class Tokenizer:
 				self.pos.col = 0
 				return self.getNextToken()
 
-			node = Node()
-			node.type = tokenType
+			node = Node(tokenType)
 			node.value = tokenValue
 			return node
 
