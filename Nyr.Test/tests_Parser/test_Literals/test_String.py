@@ -5,8 +5,7 @@ from Nyr.Parser.Parser import Parser
 
 
 def testEmptyString():
-	parser = Parser()
-	ast = parser.parse(r'"";')
+	ast = Parser().parse(r'"";')
 
 	assert ast.type == "Program"
 

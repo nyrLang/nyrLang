@@ -3,8 +3,7 @@ from Nyr.Parser.Parser import Parser
 
 
 def testMultipleStrings():
-	parser = Parser()
-	ast = parser.parse('"Hello"; "42";')
+	ast = Parser().parse('"Hello"; "42";')
 
 	body = ast.body
 	assert len(body) == 2
@@ -32,8 +31,7 @@ def testMultipleStrings():
 
 
 def testMutlipleNumbers():
-	parser = Parser()
-	ast = parser.parse("1; 163543516;")
+	ast = Parser().parse("1; 163543516;")
 
 	body = ast.body
 	assert len(body) == 2
@@ -62,8 +60,7 @@ def testMutlipleNumbers():
 
 
 def testMutlipleFloats():
-	parser = Parser()
-	ast = parser.parse("3.141; 2.718;")
+	ast = Parser().parse("3.141; 2.718;")
 
 	body = ast.body
 	assert len(body) == 2
@@ -92,8 +89,7 @@ def testMutlipleFloats():
 
 
 def testMixed():
-	parser = Parser()
-	ast = parser.parse('"Hello"; 42; 3.141;')
+	ast = Parser().parse('"Hello"; 42; 3.141;')
 
 	body = ast.body
 	assert len(body) == 3

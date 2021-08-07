@@ -3,15 +3,13 @@ from Nyr.Parser.Parser import Parser
 
 
 def testSingleLineComment():
-	parser = Parser()
-	ast = parser.parse("// Single line comment")
+	ast = Parser().parse("// Single line comment")
 
 	assert len(ast.body) == 0
 
 
 def testSingleLineCommentWithValue():
-	parser = Parser()
-	ast = parser.parse("""
+	ast = Parser().parse("""
 		// Comment
 		"value here";
 	""")
@@ -32,8 +30,7 @@ def testSingleLineCommentWithValue():
 
 
 def testMultiLineComment():
-	parser = Parser()
-	ast = parser.parse("""
+	ast = Parser().parse("""
 		/*
 			Multi-line
 			Comment
@@ -44,8 +41,7 @@ def testMultiLineComment():
 
 
 def testMultiLineCommentWithValue():
-	parser = Parser()
-	ast = parser.parse("""
+	ast = Parser().parse("""
 		/*
 			Multi-line
 			Comment

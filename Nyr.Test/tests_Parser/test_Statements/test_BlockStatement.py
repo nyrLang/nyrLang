@@ -3,8 +3,7 @@ from Nyr.Parser.Parser import Parser
 
 
 def testBlockStatement():
-	parser = Parser()
-	ast = parser.parse("""{
+	ast = Parser().parse("""{
 		42;
 
 		"Hello";

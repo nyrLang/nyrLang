@@ -2,8 +2,6 @@ from Nyr.Parser.Parser import Parser
 
 
 def testParseEmpty():
-	parser = Parser()
-
-	ast = parser.parse("")
+	ast = Parser().parse("")
 
 	assert len(ast.body) == 0
