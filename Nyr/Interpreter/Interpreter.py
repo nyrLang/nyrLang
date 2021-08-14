@@ -8,81 +8,75 @@ class Interpreter:
 	def interpret(self, node: Node.Node, env: Env) -> Any:
 		if node is None: return None
 
-		match type(node):
-			case Node.Program:
-				assert isinstance(node, Node.Program)
-				for b in node.body:
-					self.interpret(b, env)
-				return env
-			case Node.VariableDeclaration:
-				assert isinstance(node, Node.VariableDeclaration)
-				assert isinstance(node.id, Node.Identifier)
-				varName = self.interpret(node.id, env)
+		if isinstance(node, Node.Program):
+			for n in node.body:
+				self.interpret(n, env)
+			if "__builtins__" in env.keys():
+				del env["__builtins__"]
+			return env
+		elif isinstance(node, Node.VariableDeclaration):
+			name = self.interpret(node.id, env)
 
-				varValue = node.init
-				if varValue is not None:
-					if isinstance(varValue, Node.Identifier):
-						varValue = env.findOwner(varValue.name)[varValue.name]
-					elif isinstance(varValue, Node.Literal):
-						varValue = self.interpret(varValue, env)
-					else:
-						raise Exception(f"Unknow right-hand-side of {node.type}")
-				env.update({varName: varValue})
-			case Node.Identifier:
-				assert isinstance(node, Node.Identifier)
-				return node.name
-			case Node.ExpressionStatement:
-				assert isinstance(node, Node.ExpressionStatement)
-				self.interpret(node.expression, env)
-			case Node.EmptyStatement:
-				assert isinstance(node, Node.EmptyStatement)
-				pass
-			# case Node.BlockStatement:
-			# 	assert isinstance(node, Node.BlockStatement)
-			# case Node.IfStatement:
-			# 	assert isinstance(node, Node.IfStatement)
-			case Node.VariableStatement:
-				assert isinstance(node, Node.VariableStatement)
-				for decl in node.declarations:
-					self.interpret(decl, env)
-			# case Node.WhileStatement:
-			# 	assert isinstance(node, Node.WhileStatement)
-			# case Node.ForStatement:
-			# 	assert isinstance(node, Node.ForStatement)
-			case Node.ComplexExpression:
-				assert isinstance(node, Node.ComplexExpression)
-				match node.type:
-					case "AssignmentExpression":
-						assert isinstance(node.left, Node.Identifier)
-						assert type(node.right) in [Node.Identifier, Node.Literal]
+			if name in env.keys():
+				raise Exception(f"Variable '{name}' has already been declared")
+			val = None
+			if node.init is not None:
+				val = self.interpret(node.init, env)
 
-						if isinstance(node.right, Node.Identifier):
-							if node.right.name not in env:
-								raise Exception(f"Variable {node.right.name} does not exist")
-							value = env.findOwner(node.right.name)[node.right.name]
-						else:
-							assert isinstance(node.right, Node.Literal)
-							value = self.interpret(node.right, env)
+			env[name] = val
+		elif isinstance(node, Node.Identifier):
+			return node.name
+		elif isinstance(node, Node.ExpressionStatement):
+			self.interpret(node.expression, env)
+		elif isinstance(node, Node.BlockStatement):
+			for n in node.body:
+				self.interpret(n, env)
+		elif isinstance(node, Node.IfStatement):
+			test = self.interpret(node.test, env)
+			assert isinstance(test, bool)
+			if test is True:
+				self.interpret(node.consequent, env)
+			else:
+				self.interpret(node.alternative, env)
+			pass
+		elif isinstance(node, Node.VariableStatement):
+			for decl in node.declarations:
+				self.interpret(decl, env)
+		# elif isinstance(node, Node.WhileStatement):pass
+		# elif isinstance(node, Node.ForStatement):pass
+		elif isinstance(node, Node.ComplexExpression):
+			if node.type == "BinaryExpression":
+				left = self.interpret(node.left, env)
+				right = self.interpret(node.right, env)
 
-						env.update({node.left.name: value})
-					case _: raise Exception(f"Unknown ComplexExpression: {node.type}")
-			# case Node.UnaryExpression:
-			# 	assert isinstance(node, Node.UnaryExpression)
-			# case Node.FunctionDeclaration:
-			# 	assert isinstance(node, Node.FunctionDeclaration)
-			# case Node.ReturnStatement:
-			# 	assert isinstance(node, Node.ReturnStatement)
-			# case Node.CallExpression:
-			# 	assert isinstance(node, Node.CallExpression)
-			# case Node.ClassDeclaration:
-			# 	assert isinstance(node, Node.ClassDeclaration)
-			# case Node.Super:
-			# 	assert isinstance(node, Node.Super)
-			# case Node.ThisExpression:
-			# 	assert isinstance(node, Node.ThisExpression)
-			# case Node.NewExpression:
-			# 	assert isinstance(node, Node.NewExpression)
-			case Node.Literal:
-				assert isinstance(node, Node.Literal)
-				return node.value
-			case _: raise NotImplementedError(f"{str(type(node)).split('.')[-1][:-2]} ({node.type}) is not yet implemented.")
+				if left is None:
+					raise Exception(f"Unknown left-hand side of AssignmentExpression")
+				if right is None:
+					raise Exception(f"Unknown right-hand side of AssignmentExpression")
+
+				return eval(f"{left} {node.operator} {right}", env)
+			elif node.type == "AssignmentExpression":
+				left = self.interpret(node.left, env)
+				right = self.interpret(node.right, env)
+
+				if left is None:
+					raise Exception(f"Unknown left-hand side of AssignmentExpression")
+				if right is None:
+					raise Exception(f"Unknown right-hand side of AssignmentExpression")
+
+				exec(f"{left} {node.operator} {right}", env)
+			else: raise Exception(f"Unknown ComplexExpression: {node.type}")
+		elif isinstance(node, Node.UnaryExpression):
+			val = self.interpret(node.argument, env)
+			return eval(f"{node.operator}{val}", env)
+		# elif isinstance(node, Node.FunctionDeclaration):pass
+		# elif isinstance(node, Node.ReturnStatement):pass
+		# elif isinstance(node, Node.CallExpression):pass
+		# elif isinstance(node, Node.ClassDeclaration):pass
+		# elif isinstance(node, Node.Super):pass
+		# elif isinstance(node, Node.ThisExpression):pass
+		# elif isinstance(node, Node.NewExpression):pass
+		elif isinstance(node, Node.Literal):
+			return node.value
+		else:
+			raise NotImplementedError(f"{str(type(node)).split('.')[-1][:-2]} ({node.type}) is not yet implemented.")

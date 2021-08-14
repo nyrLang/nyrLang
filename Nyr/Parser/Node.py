@@ -44,7 +44,7 @@ class Program(Node):
 
 
 class VariableDeclaration(Node):
-	def __init__(self, id_: Node, init: Optional[Union[Identifier, Literal]]):
+	def __init__(self, id_: Identifier, init: Optional[Union[Identifier, Literal]]):
 		self.type = self.__class__.__name__
 		self.id = id_
 		self.init = init
