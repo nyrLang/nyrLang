@@ -38,33 +38,36 @@ class Interpreter:
 				self.interpret(node.consequent, env)
 			else:
 				self.interpret(node.alternative, env)
-			pass
 		elif isinstance(node, Node.VariableStatement):
 			for decl in node.declarations:
 				self.interpret(decl, env)
 		# elif isinstance(node, Node.WhileStatement):pass
 		# elif isinstance(node, Node.ForStatement):pass
 		elif isinstance(node, Node.ComplexExpression):
+			left = self.interpret(node.left, env)
+			right = self.interpret(node.right, env)
+
+			if left is None: raise Exception(f"Unknown left-hand side of AssignmentExpression")
+			if right is None: raise Exception(f"Unknown right-hand side of AssignmentExpression")
+
 			if node.type == "BinaryExpression":
-				left = self.interpret(node.left, env)
-				right = self.interpret(node.right, env)
-
-				if left is None:
-					raise Exception(f"Unknown left-hand side of AssignmentExpression")
-				if right is None:
-					raise Exception(f"Unknown right-hand side of AssignmentExpression")
-
 				return eval(f"{left} {node.operator} {right}", env)
 			elif node.type == "AssignmentExpression":
-				left = self.interpret(node.left, env)
-				right = self.interpret(node.right, env)
+				if node.operator == "=":
+					left = self.interpret(node.left, env)
+					right = self.interpret(node.right, env)
 
-				if left is None:
-					raise Exception(f"Unknown left-hand side of AssignmentExpression")
-				if right is None:
-					raise Exception(f"Unknown right-hand side of AssignmentExpression")
+					if left is None:
+						raise Exception(f"Unknown left-hand side of AssignmentExpression")
+					if right is None:
+						raise Exception(f"Unknown right-hand side of AssignmentExpression")
 
-				exec(f"{left} {node.operator} {right}", env)
+					if left not in env.keys():
+						raise Exception(f"Variable {left} accessed before declaration")
+					env[left] = right
+				else:
+					op = node.operator[0]
+					exec(f"{left} = {left} {op} {right}", env)
 			else: raise Exception(f"Unknown ComplexExpression: {node.type}")
 		elif isinstance(node, Node.UnaryExpression):
 			val = self.interpret(node.argument, env)
