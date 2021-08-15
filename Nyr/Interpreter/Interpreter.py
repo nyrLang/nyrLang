@@ -28,6 +28,8 @@ class Interpreter:
 			return node.name
 		elif isinstance(node, Node.ExpressionStatement):
 			self.interpret(node.expression, env)
+		elif isinstance(node, Node.EmptyStatement):
+			pass
 		elif isinstance(node, Node.BlockStatement):
 			for n in node.body:
 				self.interpret(n, env)
