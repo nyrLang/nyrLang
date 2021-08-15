@@ -1,3 +1,4 @@
+import math
 from typing import Any
 
 from Nyr.Interpreter.Env import Env
@@ -53,7 +54,14 @@ class Interpreter:
 			if right is None: raise Exception(f"Unknown right-hand side of AssignmentExpression")
 
 			if node.type == "BinaryExpression":
-				return eval(f"{left} {node.operator} {right}", env)
+				if node.operator == "/":
+					res = eval(f"{left} / {right}", env)
+					if math.floor(res) == math.ceil(res):
+						return int(res)
+					else:
+						return float(res)
+				else:
+					return eval(f"{left} {node.operator} {right}", env)
 			elif node.type == "AssignmentExpression":
 				if node.operator == "=":
 					left = self.interpret(node.left, env)
