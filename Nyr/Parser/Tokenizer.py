@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 from typing import AnyStr
 from typing import Optional
@@ -7,14 +9,15 @@ from Nyr.Parser.Node import Node
 spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 	# -------------------------
 	# Whitespace
+	(re.compile(r"^\n"), "NEWLINE"),
 	(re.compile(r"^\s+"), None),
 
 	# -------------------------
 	# Comments
 	# Single-line
-	(re.compile(r"^\/\/.*"), None),
+	(re.compile(r"^//.*"), None),
 	# Multi-line
-	(re.compile(r"^\/\*[\s\S]*?\*\/.*"), None),
+	(re.compile(r"^/\*[\s\S]*?\*/.*"), "BLOCK_COMMENT"),
 
 	# -------------------------
 	# Symbols, Delimiters
@@ -22,8 +25,8 @@ spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 	(re.compile(r"^,"), ","),
 	(re.compile(r"^:"), ":"),
 	(re.compile(r"^\."), "."),
-	(re.compile(r"^\{"), "{"),
-	(re.compile(r"^\}"), "}"),
+	(re.compile(r"^{"), "{"),
+	(re.compile(r"^}"), "}"),
 	(re.compile(r"^\("), "("),
 	(re.compile(r"^\)"), ")"),
 	(re.compile(r"^\["), "["),
@@ -88,18 +91,18 @@ spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 
 class Tokenizer:
 	string: str = ""
-	cursor: int = 0
+	pos: Position
 
 	def __init__(self):
 		pass
 
 	def init(self, string: str):
 		self.string = string
-		self.cursor = 0
+		self.pos = Position()
 
-	def hasMoreTokens(self) -> bool: return self.cursor < len(self.string)
+	def hasMoreTokens(self) -> bool: return self.pos.cursor < len(self.string)
 
-	def isEOF(self) -> bool: return self.cursor == len(self.string)
+	def isEOF(self) -> bool: return self.pos.col == len(self.string)
 
 	def _match(self, regex: re.Pattern, string: str):
 		matched = regex.match(string)
@@ -107,14 +110,16 @@ class Tokenizer:
 		if not matched:
 			return None
 		else:
-			self.cursor += len(matched[0])
+			lm = len(matched[0])
+			self.pos.cursor += lm
+			self.pos.col += lm
 			return matched[0]
 
 	def getNextToken(self) -> Optional[Node]:
 		if not self.hasMoreTokens():
 			return None
 
-		string: str = self.string[self.cursor:]
+		string: str = self.string[self.pos.cursor:]
 
 		for (regex, tokenType) in spec:
 			tokenValue = self._match(regex, string)
@@ -122,10 +127,33 @@ class Tokenizer:
 			if not tokenValue:
 				continue
 
-			if not tokenType:
+			if tokenType is None:
+				return self.getNextToken()
+			elif tokenType == "NEWLINE":
+				self.pos.line += 1
+				self.pos.col = 0
+				return self.getNextToken()
+			elif tokenType == "BLOCK_COMMENT":
+				tokenValue = tokenValue.replace(r"\\n", "_")
+				self.pos.line += tokenValue.count("\n")
+				self.pos.col = 0
 				return self.getNextToken()
 
-			node = Node()
-			node.type = tokenType
+			node = Node(tokenType)
 			node.value = tokenValue
 			return node
+
+		string = string.replace("\n", " ")
+
+		raise Exception(f"Could not parse input correctly. starting here ({self.pos.line}:{self.pos.col}):\n\t{string}")
+
+
+class Position:
+	cursor: int
+	line: int
+	col: int
+
+	def __init__(self):
+		self.cursor = 0
+		self.line = 1
+		self.col = 0

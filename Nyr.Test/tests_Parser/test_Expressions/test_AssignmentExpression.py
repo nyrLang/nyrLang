@@ -1,7 +1,10 @@
+import pytest
+
 import Nyr.Parser.Node as Node
 from Nyr.Parser.Parser import Parser
 
 
+@pytest.mark.dependency()
 def testSimpleAssignment():
 	ast = Parser().parse("x = 42;")
 
@@ -26,6 +29,7 @@ def testSimpleAssignment():
 	assert right.value == 42
 
 
+@pytest.mark.dependency(depends=["testSimpleAssignment"])
 def testChainedSimpleAssignment():
 	ast = Parser().parse("x = y = 42;")
 

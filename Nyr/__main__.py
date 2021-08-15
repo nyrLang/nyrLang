@@ -1,5 +1,6 @@
 import argparse
 import json
+from pprint import pprint
 
 from Nyr.Interpreter.Env import Env
 from Nyr.Interpreter.Interpreter import Interpreter
@@ -41,6 +42,11 @@ def outputAST(ast_: Node, doOutput: bool):
 			o.write(json.dumps(ast_, cls=ComplexEncoder, indent=2) + "\n")
 
 
+def toSExpression(ast_: Node, print_: bool):
+	_ast = ast_.toSExpression()
+	if print_:
+		pprint(_ast)
+
 if __name__ == "__main__":
 	argparser = argparse.ArgumentParser()
 	argparser.add_argument(
@@ -66,6 +72,14 @@ if __name__ == "__main__":
 		type=bool,
 		help="output AST to ast.json",
 		dest="output",
+	)
+	argparser.add_argument(
+		"-s", "--s-expr",
+		required=False,
+		default=False,
+		type=bool,
+		help="Enable S-Expression interpreter",
+		dest="toSExpr",
 	)
 	argparser.add_argument(
 		"-p", "--print",
@@ -100,6 +114,7 @@ if __name__ == "__main__":
 			printAst(ast, printAST)
 			outputAST(ast, args.output)
 			interpret(ast, interpreter, env)
+			toSExpression(ast, args.toSExpr)
 
 	# File mode (read from file given via -f flag)
 	elif args.inputFile.endswith(".nyr"):
@@ -115,6 +130,7 @@ if __name__ == "__main__":
 			printAst(ast, printAST)
 			outputAST(ast, args.output)
 			interpret(ast, interpreter)
+			toSExpression(ast, args.toSExpr)
 
 	# Unknown mode
 	else:
