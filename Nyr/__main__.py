@@ -1,6 +1,5 @@
 import argparse
 import json
-from pprint import pprint
 
 from Nyr.Interpreter.Env import Env
 from Nyr.Interpreter.Interpreter import Interpreter
@@ -14,6 +13,7 @@ class Args:
 	output: bool
 	interpret: bool
 	toSExpr: bool
+	printAST: bool
 
 
 def getAst(string: str):
@@ -21,20 +21,18 @@ def getAst(string: str):
 
 
 def printAst(ast_: Node, print_: bool):
-	if print_:
-		json.dumps(ast_, cls=ComplexEncoder, indent=2)
+	if print_ is True:
+		print(json.dumps(ast_, cls=ComplexEncoder, indent=2))
 
 
-def interpret(ast_: Node, interpreter_: Interpreter = None):
+def interpret(ast_: Node, interpreter_: Interpreter = None, env_: Env = None):
+	if env_ is None:
+		env_ = Env()
 	if interpreter_ is None:
 		return None
 	else:
-		env = interpreter_.interpret(ast_, Env())
-		if env is None:
-			print(f"Failed to interpret code.")
-		else:
-			# pprint(env)
-			print(f"Env = {json.dumps(env, indent=2)}")
+		_env: Env = interpreter_.interpret(ast_, env_)
+		print(f"Env = {json.dumps(_env, indent=2)}")
 
 
 def outputAST(ast_: Node, doOutput: bool):
@@ -69,6 +67,14 @@ if __name__ == "__main__":
 		help="output AST to ast.json",
 		dest="output",
 	)
+	argparser.add_argument(
+		"-p", "--print",
+		required=False,
+		default=False,
+		type=bool,
+		help="Wether tp print the AST to terminal",
+		dest="printAST",
+	)
 
 	args = Args()
 
@@ -77,10 +83,11 @@ if __name__ == "__main__":
 	parser = Parser()
 	interpreter = Interpreter() if args.interpret else None
 
-	printAST: bool = False
+	printAST: bool = args.printAST
 
 	# CLI mode (read from stdin)
 	if args.inputFile == "<stdin>":
+		env = Env()
 		while True:
 			cmd = input("nyr> ")
 			if cmd == "exit": exit(0)
@@ -92,7 +99,7 @@ if __name__ == "__main__":
 
 			printAst(ast, printAST)
 			outputAST(ast, args.output)
-			interpret(ast, interpreter)
+			interpret(ast, interpreter, env)
 
 	# File mode (read from file given via -f flag)
 	elif args.inputFile.endswith(".nyr"):
