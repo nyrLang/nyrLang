@@ -75,16 +75,24 @@ class Parser:
 		"""
 		assert self.lookahead is not None
 
-		match self.lookahead.type:
-			case ";": return self.EmptyStatement()
-			case "{": return self.BlockStatement()
-			case "let": return self.VariableStatement()
-			case "if": return self.IfStatement()
-			case "while" | "do" | "for": return self.IterationStatement()
-			case "def": return self.FunctionDeclaration()
-			case "return": return self.ReturnStatement()
-			case "class": return self.ClassDeclaration()
-			case _: return self.ExpressionStatement()
+		if self.lookahead.type == ";":
+			return self.EmptyStatement()
+		elif self.lookahead.type == "{":
+			return self.BlockStatement()
+		elif self.lookahead.type == "let":
+			return self.VariableStatement()
+		elif self.lookahead.type == "if":
+			return self.IfStatement()
+		elif self.lookahead.type in ["while", "do", "for"]:
+			return self.IterationStatement()
+		elif self.lookahead.type == "def":
+			return self.FunctionDeclaration()
+		elif self.lookahead.type == "return":
+			return self.ReturnStatement()
+		elif self.lookahead.type == "class":
+			return self.ClassDeclaration()
+		else:
+			return self.ExpressionStatement()
 
 	def NewExpression(self) -> Node.NewExpression:
 		""" NewExpression
@@ -190,11 +198,10 @@ class Parser:
 		return Node.ReturnStatement(argument)
 
 	def IterationStatement(self) -> Node.Node:
-		match self.lookahead.type:
-			case "while": return self.WhileStatement()
-			case "do": return self.DoWhileStatement()
-			case "for": return self.ForStatement()
-			case _: raise Exception(f"Unknown IterationStatement {self.lookahead.type}")
+		if self.lookahead.type == "while": return self.WhileStatement()
+		elif self.lookahead.type == "do": return self.DoWhileStatement()
+		elif self.lookahead.type == "for": return self.ForStatement()
+		else: raise Exception(f"Unknown IterationStatement {self.lookahead.type}")
 
 	def WhileStatement(self) -> Node.WhileStatement:
 		self._eat("while")
@@ -503,10 +510,12 @@ class Parser:
 		return left
 
 	def UnaryExpression(self) -> Node.Node:
-		match self.lookahead.type:
-			case "ADDITIVE_OPERATOR": operator = self._eat("ADDITIVE_OPERATOR").value
-			case "LOGICAL_NOT": operator = self._eat("LOGICAL_NOT").value
-			case _: operator = None
+		if self.lookahead.type == "ADDITIVE_OPERATOR":
+			operator = self._eat("ADDITIVE_OPERATOR").value
+		elif self.lookahead.type == "LOGICAL_NOT":
+			operator = self._eat("LOGICAL_NOT").value
+		else:
+			operator = None
 
 		if operator is not None:
 			return Node.UnaryExpression(operator, self.UnaryExpression())
@@ -524,12 +533,16 @@ class Parser:
 		if self._isLiteral(self.lookahead.type):
 			return self.Literal()
 
-		match self.lookahead.type:
-			case "(": return self.ParenthesizedExpression()
-			case "IDENTIFIER": return self.Identifier()
-			case "this": return self.ThisExpression()
-			case "new": return self.NewExpression()
-			case _: return self.LeftHandSideExpression()
+		if self.lookahead.type == "(":
+			return self.ParenthesizedExpression()
+		elif self.lookahead.type == "IDENTIFIER":
+			return self.Identifier()
+		elif self.lookahead.type == "this":
+			return self.ThisExpression()
+		elif self.lookahead.type == "new":
+			return self.NewExpression()
+		else:
+			return self.LeftHandSideExpression()
 
 	def ParenthesizedExpression(self) -> Node.Node:
 		self._eat("(")
@@ -539,23 +552,23 @@ class Parser:
 		return expression
 
 	def Literal(self) -> Node.Literal:
-		match self.lookahead.type:
-			case "INTEGER":
-				token = self._eat("INTEGER")
-				return Node.Literal("IntegerLiteral", int(token.value))
-			case "FLOAT":
-				token = self._eat("FLOAT")
-				return Node.Literal("FloatLiteral", float(token.value))
-			case "STRING":
-				token = self._eat("STRING")
-				return Node.Literal("StringLiteral", str(token.value)[1: -1])
-			case "true":
-				self._eat("true")
-				return Node.Literal("BooleanLiteral", True)
-			case "false":
-				self._eat("false")
-				return Node.Literal("BooleanLiteral", False)
-			case "null":
-				self._eat("null")
-				return Node.Literal("NullLiteral", None)
-			case _: raise SyntaxError("Literal: unexpected literal production")
+		if self.lookahead.type == "INTEGER":
+			token = self._eat("INTEGER")
+			return Node.Literal("IntegerLiteral", int(token.value))
+		elif self.lookahead.type == "FLOAT":
+			token = self._eat("FLOAT")
+			return Node.Literal("FloatLiteral", float(token.value))
+		elif self.lookahead.type == "STRING":
+			token = self._eat("STRING")
+			return Node.Literal("StringLiteral", str(token.value)[1: -1])
+		elif self.lookahead.type == "true":
+			self._eat("true")
+			return Node.Literal("BooleanLiteral", True)
+		elif self.lookahead.type == "false":
+			self._eat("false")
+			return Node.Literal("BooleanLiteral", False)
+		elif self.lookahead.type == "null":
+			self._eat("null")
+			return Node.Literal("NullLiteral", None)
+		else:
+			raise SyntaxError("Literal: unexpected literal production")

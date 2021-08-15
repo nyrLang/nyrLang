@@ -1,5 +1,6 @@
 import argparse
 import json
+import sys
 from pprint import pprint
 
 from Nyr.Interpreter.Env import Env
@@ -48,6 +49,9 @@ def toSExpression(ast_: Node, print_: bool):
 		pprint(_ast)
 
 if __name__ == "__main__":
+	if (sys.version_info.major, sys.version_info.minor) < (3, 9):
+		print(f"At least python 3.9 is required to run this code. Your version is: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+		exit(1)
 	argparser = argparse.ArgumentParser()
 	argparser.add_argument(
 		"-f", "--file",
