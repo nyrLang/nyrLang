@@ -1,5 +1,6 @@
 import argparse
 import json
+import sys
 from pprint import pprint
 
 from Nyr.Interpreter.Env import Env
@@ -26,12 +27,14 @@ def printAst(ast_: Node, print_: bool):
 		print(json.dumps(ast_, cls=ComplexEncoder, indent=2))
 
 
-def interpret(ast_: Node, interpreter_: Interpreter = None):
+def interpret(ast_: Node, interpreter_: Interpreter = None, env_: Env = None):
+	if env_ is None:
+		env_ = Env()
 	if interpreter_ is None:
 		return None
 	else:
-		env: Env = interpreter_.interpret(ast_, Env())
-		print(f"Env = {json.dumps(env, indent=2)}")
+		_env: Env = interpreter_.interpret(ast_, env_)
+		print(f"Env = {json.dumps(_env, indent=2)}")
 
 
 def outputAST(ast_: Node, doOutput: bool):
@@ -45,8 +48,10 @@ def toSExpression(ast_: Node, print_: bool):
 	if print_:
 		pprint(_ast)
 
-
 if __name__ == "__main__":
+	if (sys.version_info.major, sys.version_info.minor) < (3, 9):
+		print(f"At least python 3.9 is required to run this code. Your version is: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+		exit(1)
 	argparser = argparse.ArgumentParser()
 	argparser.add_argument(
 		"-f", "--file",
@@ -100,6 +105,7 @@ if __name__ == "__main__":
 
 	# CLI mode (read from stdin)
 	if args.inputFile == "<stdin>":
+		env = Env()
 		while True:
 			cmd = input("nyr> ")
 			if cmd == "exit": exit(0)
@@ -111,7 +117,7 @@ if __name__ == "__main__":
 
 			printAst(ast, printAST)
 			outputAST(ast, args.output)
-			interpret(ast, interpreter)
+			interpret(ast, interpreter, env)
 			toSExpression(ast, args.toSExpr)
 
 	# File mode (read from file given via -f flag)

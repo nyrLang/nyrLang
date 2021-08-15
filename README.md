@@ -35,7 +35,7 @@
 - - -
 
 ## Requirements
-- Python 3.10
+- Python 3.9
 
 - - -
 
