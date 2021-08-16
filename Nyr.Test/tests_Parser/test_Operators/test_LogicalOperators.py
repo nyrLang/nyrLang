@@ -1,68 +1,100 @@
+import json
+
 import Nyr.Parser.Node as Node
 from Nyr.Parser.Parser import Parser
 
 
 def testAnd():
-	ast = Parser().parse("x >= 5 && y <= 20;")
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("x >= 5 && y <= 20;"),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	assert len(ast.body) == 1
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "ExpressionStatement",
+				"expression": {
+					"type": "LogicalExpression",
+					"operator": "&&",
+					"left": {
+						"type": "BinaryExpression",
+						"operator": ">=",
+						"left": {
+							"type": "Identifier",
+							"name": "x",
+						},
+						"right": {
+							"type": "IntegerLiteral",
+							"value": 5,
+						},
+					},
+					"right": {
+						"type": "BinaryExpression",
+						"operator": "<=",
+						"left": {
+							"type": "Identifier",
+							"name": "y",
+						},
+						"right": {
+							"type": "IntegerLiteral",
+							"value": 20,
+						},
+					},
+				},
+			},
+		],
+	}
 
-	node = ast.body[0]
-
-	assert isinstance(node, Node.ExpressionStatement)
-
-	expression = node.expression
-	assert isinstance(expression, Node.ComplexExpression)
-
-	assert expression.operator == "&&"
-
-	left = expression.left
-	assert isinstance(left, Node.ComplexExpression)
-	assert left.operator == ">="
-	assert isinstance(left.left, Node.Identifier)
-	assert left.left.name == "x"
-	assert isinstance(left.right, Node.Literal)
-	assert left.right.type == "IntegerLiteral"
-	assert left.right.value == 5
-
-	right = expression.right
-	assert isinstance(right, Node.ComplexExpression)
-	assert right.operator == "<="
-	assert isinstance(right.left, Node.Identifier)
-	assert right.left.name == "y"
-	assert isinstance(right.right, Node.Literal)
-	assert right.right.type == "IntegerLiteral"
-	assert right.right.value == 20
+	assert ast == expected
 
 
 def testOr():
-	ast = Parser().parse("x > 5 || y < 20;")
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("x > 5 || y < 20;"),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	assert len(ast.body) == 1
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "ExpressionStatement",
+				"expression": {
+					"type": "LogicalExpression",
+					"operator": "||",
+					"left": {
+						"type": "BinaryExpression",
+						"operator": ">",
+						"left": {
+							"type": "Identifier",
+							"name": "x",
+						},
+						"right": {
+							"type": "IntegerLiteral",
+							"value": 5,
+						},
+					},
+					"right": {
+						"type": "BinaryExpression",
+						"operator": "<",
+						"left": {
+							"type": "Identifier",
+							"name": "y",
+						},
+						"right": {
+							"type": "IntegerLiteral",
+							"value": 20,
+						},
+					},
+				},
+			},
+		],
+	}
 
-	node = ast.body[0]
-
-	assert isinstance(node, Node.ExpressionStatement)
-
-	expression = node.expression
-	assert isinstance(expression, Node.ComplexExpression)
-
-	assert expression.operator == "||"
-
-	left = expression.left
-	assert isinstance(left, Node.ComplexExpression)
-	assert left.operator == ">"
-	assert isinstance(left.left, Node.Identifier)
-	assert left.left.name == "x"
-	assert isinstance(left.right, Node.Literal)
-	assert left.right.type == "IntegerLiteral"
-	assert left.right.value == 5
-
-	right = expression.right
-	assert isinstance(right, Node.ComplexExpression)
-	assert right.operator == "<"
-	assert isinstance(right.left, Node.Identifier)
-	assert right.left.name == "y"
-	assert isinstance(right.right, Node.Literal)
-	assert right.right.type == "IntegerLiteral"
-	assert right.right.value == 20
+	assert ast == expected

@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 import Nyr.Parser.Node as Node
@@ -6,79 +8,105 @@ from Nyr.Parser.Parser import Parser
 
 @pytest.mark.dependency()
 def testSimpleAssignment():
-	ast = Parser().parse("x = 42;")
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("x = 42;"),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	assert len(ast.body) == 1
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "ExpressionStatement",
+				"expression": {
+					"type": "AssignmentExpression",
+					"operator": "=",
+					"left": {
+						"type": "Identifier",
+						"name": "x",
+					},
+					"right": {
+						"type": "IntegerLiteral",
+						"value": 42,
+					},
+				},
+			},
+		],
+	}
 
-	node = ast.body[0]
-
-	assert isinstance(node, Node.ExpressionStatement)
-
-	expression = node.expression
-
-	assert isinstance(expression, Node.ComplexExpression)
-	assert expression.operator == "="
-
-	left = expression.left
-	assert isinstance(left, Node.Identifier)
-	assert left.name == "x"
-
-	right = expression.right
-	assert isinstance(right, Node.Literal)
-	assert right.type == "IntegerLiteral"
-	assert right.value == 42
+	assert ast == expected
 
 
 @pytest.mark.dependency(depends=["testSimpleAssignment"])
 def testChainedSimpleAssignment():
-	ast = Parser().parse("x = y = 42;")
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("x = y = 42;"),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	assert len(ast.body) == 1
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "ExpressionStatement",
+				"expression": {
+					"type": "AssignmentExpression",
+					"operator": "=",
+					"left": {
+						"type": "Identifier",
+						"name": "x",
+					},
+					"right": {
+						"type": "AssignmentExpression",
+						"operator": "=",
+						"left": {
+							"type": "Identifier",
+							"name": "y",
+						},
+						"right": {
+							"type": "IntegerLiteral",
+							"value": 42,
+						},
+					},
+				},
+			},
+		],
+	}
 
-	node = ast.body[0]
-	assert isinstance(node, Node.ExpressionStatement)
-
-	expression = node.expression
-	assert isinstance(expression, Node.ComplexExpression)
-	assert expression.operator == "="
-
-	left0 = expression.left
-	assert isinstance(left0, Node.Identifier)
-	assert left0.name == "x"
-
-	right0 = expression.right
-	assert isinstance(right0, Node.ComplexExpression)
-	assert right0.operator == "="
-
-	left1 = right0.left
-	assert isinstance(left1, Node.Identifier)
-	assert left1.name == "y"
-
-	right1 = right0.right
-	assert isinstance(right1, Node.Literal)
-	assert right1.type == "IntegerLiteral"
-	assert right1.value == 42
+	assert ast == expected
 
 
 def testComplexAssignment():
-	ast = Parser().parse("x += 3;")
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("x += 3;"),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	assert len(ast.body) == 1
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "ExpressionStatement",
+				"expression": {
+					"type": "AssignmentExpression",
+					"operator": "+=",
+					"left": {
+						"type": "Identifier",
+						"name": "x",
+					},
+					"right": {
+						"type": "IntegerLiteral",
+						"value": 3,
+					},
+				},
+			},
+		],
+	}
 
-	node = ast.body[0]
-
-	assert isinstance(node, Node.ExpressionStatement)
-
-	expression = node.expression
-
-	assert isinstance(expression, Node.ComplexExpression)
-	assert expression.operator == "+="
-
-	left = expression.left
-	assert isinstance(left, Node.Identifier)
-	assert left.name == "x"
-
-	right = expression.right
-	assert isinstance(right, Node.Literal)
-	assert right.type == "IntegerLiteral"
-	assert right.value == 3
+	assert ast == expected

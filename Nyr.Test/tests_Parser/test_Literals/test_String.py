@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 import Nyr.Parser.Node as Node
@@ -5,66 +7,89 @@ from Nyr.Parser.Parser import Parser
 
 
 def testEmptyString():
-	ast = Parser().parse(r'"";')
+	ast = json.loads(
+		json.dumps(
+			Parser().parse('"";'),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	assert ast.type == "Program"
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "ExpressionStatement",
+				"expression": {
+					"type": "StringLiteral",
+					"value": "",
+				},
+			},
+		],
+	}
 
-	body = ast.body
-	assert len(body) == 1
-
-	node = body[0]
-
-	assert isinstance(node, Node.ExpressionStatement)
-
-	expression = node.expression
-
-	assert isinstance(expression, Node.Literal)
-	assert expression.type == "StringLiteral"
-	assert expression.value == ""
-
-
-def testSimpleString():
-	parser = Parser()
-
-	for test in [r'"Hello";', r'    "Hello";    ', r'"Hello"  ;']:
-		ast = parser.parse(test)
-
-		assert ast.type == "Program"
-
-		body = ast.body
-		assert len(body) == 1
-
-		node = body[0]
-
-		assert isinstance(node, Node.ExpressionStatement)
-
-		expression = node.expression
-
-		assert isinstance(expression, Node.Literal)
-		assert expression.type == "StringLiteral"
-		assert expression.value == "Hello"
+	assert ast == expected
 
 
-def testComplexString():
-	parser = Parser()
+@pytest.mark.parametrize(
+	("test"), [
+		(r'"Hello";'),
+		(r'    "Hello";    '),
+		(r'"Hello"  ;'),
+	],
+)
+def testSimpleString(test: str):
+	ast = json.loads(
+		json.dumps(
+			Parser().parse(test),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	for test in [r'"Hello, World";', r'   "Hello, World";   ', r'"Hello, World"   ;']:
-		ast = parser.parse(test)
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "ExpressionStatement",
+				"expression": {
+					"type": "StringLiteral",
+					"value": "Hello",
+				},
+			},
+		],
+	}
 
-		assert ast.type == "Program"
+	assert ast == expected
 
-		body = ast.body
-		assert len(body) == 1
 
-		node = body[0]
+@pytest.mark.parametrize(
+	("test"), [
+		(r'"Hello, World";'),
+		(r'    "Hello, World";    '),
+		(r'"Hello, World"  ;'),
+	],
+)
+def testComplexString(test):
+	ast = json.loads(
+		json.dumps(
+			Parser().parse(test),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-		assert isinstance(node, Node.ExpressionStatement)
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "ExpressionStatement",
+				"expression": {
+					"type": "StringLiteral",
+					"value": "Hello, World",
+				},
+			},
+		],
+	}
 
-		expression = node.expression
-
-		assert isinstance(expression, Node.Literal)
-		assert expression.type == "StringLiteral"
-		assert expression.value == "Hello, World"
+	assert ast == expected
 
 
 def testUnclosedString():

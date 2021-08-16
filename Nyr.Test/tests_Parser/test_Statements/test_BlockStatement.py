@@ -1,40 +1,91 @@
+import json
+
 import Nyr.Parser.Node as Node
 from Nyr.Parser.Parser import Parser
 
 
 def testBlockStatement():
-	ast = Parser().parse("""{
-		42;
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("""{
+				42;
 
-		"Hello";
-	}""")
+				"Hello";
+			}"""),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	assert ast.type == "Program"
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "BlockStatement",
+				"body": [
+					{
+						"type": "ExpressionStatement",
+						"expression": {
+							"type": "IntegerLiteral",
+							"value": 42,
+						},
+					},
+					{
+						"type": "ExpressionStatement",
+						"expression": {
+							"type": "StringLiteral",
+							"value": "Hello",
+						},
+					},
+				],
+			},
+		],
+	}
 
-	body = ast.body
-	assert len(body) == 1
+	assert ast == expected
 
-	block = body[0]
-	assert isinstance(block, Node.BlockStatement), f"{block.type} should be of type {Node.BlockStatement.type}"
 
-	blockBody = block.body
+def testNestedBlockStatement():
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("""{
+				42;
 
-	assert len(blockBody) == 2
+				{
+					"Hello";
+				}
+			}"""),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	node = blockBody[0]
-	assert isinstance(node, Node.ExpressionStatement)
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "BlockStatement",
+				"body": [
+					{
+						"type": "ExpressionStatement",
+						"expression": {
+							"type": "IntegerLiteral",
+							"value": 42,
+						},
+					},
+					{
+						"type": "BlockStatement",
+						"body": [
+							{
+								"type": "ExpressionStatement",
+								"expression": {
+									"type": "StringLiteral",
+									"value": "Hello",
+								},
+							},
+						],
+					},
+				],
+			},
+		],
+	}
 
-	expression = node.expression
-
-	assert isinstance(expression, Node.Literal)
-	assert expression.type == "IntegerLiteral"
-	assert expression.value == 42
-
-	node = blockBody[1]
-	assert isinstance(node, Node.ExpressionStatement)
-
-	expression = node.expression
-
-	assert isinstance(expression, Node.Literal)
-	assert expression.type == "StringLiteral"
-	assert expression.value == "Hello"
+	assert ast == expected

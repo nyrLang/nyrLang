@@ -1,53 +1,71 @@
+import json
+
 import pytest
 
 import Nyr.Parser.Node as Node
 from Nyr.Parser.Parser import Parser
 
 
-def testInteger():
-	parser = Parser()
+@pytest.mark.parametrize(
+	("test"), [
+		("42;"),
+		("   42;   "),
+		("42  ;"),
+	],
+)
+def testInteger(test: str):
+	ast = json.loads(
+		json.dumps(
+			Parser().parse(test),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	for test in ["42;", "   42;   ", "42  ;"]:
-		ast = parser.parse(test)
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "ExpressionStatement",
+				"expression": {
+					"type": "IntegerLiteral",
+					"value": 42,
+				},
+			},
+		],
+	}
 
-		assert ast.type == "Program"
-		body = ast.body
-
-		assert len(body) == 1
-
-		node = body[0]
-
-		assert isinstance(node, Node.ExpressionStatement)
-
-		assert node.type == "ExpressionStatement"
-
-		expression = node.expression
-
-		assert isinstance(expression, Node.Literal)
-		assert expression.type == "IntegerLiteral"
-		assert expression.value == 42
+	assert ast == expected
 
 
-def testFloat():
-	parser = Parser()
+@pytest.mark.parametrize(
+	("test"), [
+		("3.141;"),
+		("   3.141;   "),
+		("3.141  ;"),
+	],
+)
+def testFloat(test: str):
+	ast = json.loads(
+		json.dumps(
+			Parser().parse(test),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	for test in ["3.141;", "   3.141;   ", "3.141  ;"]:
-		ast = parser.parse(test)
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "ExpressionStatement",
+				"expression": {
+					"type": "FloatLiteral",
+					"value": 3.141,
+				},
+			},
+		],
+	}
 
-		assert ast.type == "Program"
-		body = ast.body
-
-		assert len(body) == 1
-
-		node = body[0]
-
-		assert isinstance(node, Node.ExpressionStatement)
-
-		expression = node.expression
-
-		assert isinstance(expression, Node.Literal)
-		assert expression.type == "FloatLiteral"
-		assert expression.value == 3.141
+	assert ast == expected
 
 
 def testFloatTooManyDots():
