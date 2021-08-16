@@ -44,7 +44,19 @@ class Interpreter:
 		elif isinstance(node, Node.VariableStatement):
 			for decl in node.declarations:
 				self.interpret(decl, env)
-		# elif isinstance(node, Node.WhileStatement):pass
+		elif isinstance(node, Node.WhileStatement):
+			test = self.interpret(node.test, env)
+			assert isinstance(test, bool)
+			while test is True:
+				self.interpret(node.body, env)
+				test = self.interpret(node.test, env)
+		elif isinstance(node, Node.DoWhileStatement):
+			self.interpret(node.body, env)
+			test = self.interpret(node.test, env)
+			assert isinstance(test, bool)
+			while test is True:
+				self.interpret(node.body, env)
+				test = self.interpret(node.test, env)
 		# elif isinstance(node, Node.ForStatement):pass
 		elif isinstance(node, Node.ComplexExpression):
 			left = self.interpret(node.left, env)
