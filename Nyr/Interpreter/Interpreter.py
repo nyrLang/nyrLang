@@ -78,6 +78,14 @@ class Interpreter:
 				else:
 					op = node.operator[0]
 					exec(f"{left} = {left} {op} {right}", env)
+			elif node.type == "LogicalExpression":
+				if node.operator == "&&":
+					operator = "and"
+				elif node.operator == "||":
+					operator = "or"
+				else:
+					raise Exception(f"Unknown operator in Logical Expression: {node.operator}")
+				return eval(f"{left} {operator} {right}", env)
 			else: raise Exception(f"Unknown ComplexExpression: {node.type}")
 		elif isinstance(node, Node.UnaryExpression):
 			val = self.interpret(node.argument, env)
