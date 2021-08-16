@@ -109,6 +109,9 @@ if __name__ == "__main__":
 		while True:
 			cmd = input("nyr> ")
 			if cmd == "exit": exit(0)
+			elif cmd == "clear":
+				print("\033c", end="")
+				continue
 
 			if ";" not in cmd:
 				cmd += ";"
