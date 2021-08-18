@@ -166,10 +166,10 @@ def testBinaryExpressionNestedMultiply():
 				"left": {
 					"type": "BinaryExpression",
 					"operator": "*",
-					"left": { "type": "IntegerLiteral", "value": 1},
-					"right": { "type": "IntegerLiteral", "value": 2},
+					"left": {"type": "IntegerLiteral", "value": 1},
+					"right": {"type": "IntegerLiteral", "value": 2},
 				},
-				"right": { "type": "IntegerLiteral", "value": 3},
+				"right": {"type": "IntegerLiteral", "value": 3},
 			},
 		}],
 	}

@@ -204,7 +204,6 @@ def testChainedAndMixedPropertyAccess():
 	assert ast == expected
 
 
-
 @pytest.mark.dependency(depends=["testSimplePropertyAssign", "testComputedPropertyAssign", "testChainedAndMixedPropertyAccess"])
 def testChainedAndMixedPropertyAssign():
 	ast = json.loads(

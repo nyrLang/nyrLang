@@ -4,7 +4,6 @@ from Nyr.Interpreter.Env import Env
 from Nyr.Interpreter.Interpreter import Interpreter
 from Nyr.Parser.Parser import Parser
 
-
 deadInterpreter = pytest.mark.xfail(raises=NotImplementedError, reason="Interpreter is currently dead code", run=False)
 
 

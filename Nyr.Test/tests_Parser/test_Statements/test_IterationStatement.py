@@ -118,152 +118,50 @@ def testDoWhileStatement():
 	assert ast == expected
 
 
+testForStatementInit = {
+	"type": "VariableStatement",
+	"declarations": [{
+		"type": "VariableDeclaration",
+		"id": {"type": "Identifier", "name": "i"},
+		"init": {"type": "IntegerLiteral", "value": 0},
+	}],
+}
+testForStatementTest = {
+	"type": "BinaryExpression",
+	"operator": "<",
+	"left": {"type": "Identifier", "name": "i"},
+	"right": {"type": "IntegerLiteral", "value": 10},
+}
+testForStatementUpdate = {
+	"type": "AssignmentExpression",
+	"operator": "+=",
+	"left": {"type": "Identifier", "name": "i"},
+	"right": {"type": "IntegerLiteral", "value": 1},
+}
+
+testForStatementTests = [
+	(testForStatementInit, testForStatementTest, testForStatementUpdate),
+	(None, testForStatementTest, testForStatementUpdate),
+	(None, None, testForStatementUpdate),
+	(None, testForStatementTest, None),
+	(testForStatementInit, None, testForStatementUpdate),
+	(testForStatementInit, None, None),
+	(testForStatementInit, testForStatementTest, None),
+	(None, None, None),
+]
+
+
 @pytest.mark.parametrize(
-	("code", "init", "test", "update", "body"), [
-		( # full
-			"for (let i = 0; i < 10; i += 1) { x += i; }", # code
-			{ # init
-				"type": "VariableStatement",
-				"declarations": [{
-					"type": "VariableDeclaration",
-					"id": { "type": "Identifier", "name": "i"},
-					"init": { "type": "IntegerLiteral", "value": 0},
-				}],
-			}, # /init
-			{ # test
-				"type": "BinaryExpression",
-				"operator": "<",
-				"left": { "type": "Identifier", "name": "i"},
-				"right": { "type": "IntegerLiteral", "value": 10},
-			}, # /test
-			{ # update
-				"type": "AssignmentExpression",
-				"operator": "+=",
-				"left": { "type": "Identifier", "name": "i"},
-				"right": { "type": "IntegerLiteral", "value": 1},
-			}, # /update
-			{ # body
-				"type": "BlockStatement",
-				"body": [{
-					"type": "ExpressionStatement",
-					"expression": {
-						"type": "AssignmentExpression",
-						"operator": "+=",
-						"left": { "type": "Identifier", "name": "x"},
-						"right": { "type": "Identifier", "name": "i"},
-					},
-				}],
-			}, # /body
-		), # full
-		( # missing init
-			"for ( ; i < 10; i += 1) { x += i; }", # code
-			None, # init
-			{ # test
-				"type": "BinaryExpression",
-				"operator": "<",
-				"left": { "type": "Identifier", "name": "i"},
-				"right": { "type": "IntegerLiteral", "value": 10},
-			}, # /test
-			{ # update
-				"type": "AssignmentExpression",
-				"operator": "+=",
-				"left": { "type": "Identifier", "name": "i"},
-				"right": { "type": "IntegerLiteral", "value": 1},
-			}, # /update
-			{ # body
-				"type": "BlockStatement",
-				"body": [{
-					"type": "ExpressionStatement",
-					"expression": {
-						"type": "AssignmentExpression",
-						"operator": "+=",
-						"left": { "type": "Identifier", "name": "x"},
-						"right": { "type": "Identifier", "name": "i"},
-					},
-				}],
-			}, # /body
-		), # /missing init
-		( # missing test
-			"for (let i = 0 ; ; i += 1) { x += i; }", # code
-			{ # init
-				"type": "VariableStatement",
-				"declarations": [{
-					"type": "VariableDeclaration",
-					"id": { "type": "Identifier", "name": "i"},
-					"init": { "type": "IntegerLiteral", "value": 0},
-				}],
-			}, # /init, # init
-			None, # /test
-			{ # update
-				"type": "AssignmentExpression",
-				"operator": "+=",
-				"left": { "type": "Identifier", "name": "i"},
-				"right": { "type": "IntegerLiteral", "value": 1},
-			}, # /update
-			{ # body
-				"type": "BlockStatement",
-				"body": [{
-					"type": "ExpressionStatement",
-					"expression": {
-						"type": "AssignmentExpression",
-						"operator": "+=",
-						"left": { "type": "Identifier", "name": "x"},
-						"right": { "type": "Identifier", "name": "i"},
-					},
-				}],
-			}, # /body
-		), # /missing test
-		( # missing update
-			"for (let i = 0 ; i < 10; ) { x += i; }", # code
-			{ # init
-				"type": "VariableStatement",
-				"declarations": [{
-					"type": "VariableDeclaration",
-					"id": { "type": "Identifier", "name": "i"},
-					"init": { "type": "IntegerLiteral", "value": 0},
-				}],
-			}, # /init
-			{ # test
-				"type": "BinaryExpression",
-				"operator": "<",
-				"left": { "type": "Identifier", "name": "i"},
-				"right": { "type": "IntegerLiteral", "value": 10},
-			}, # /test
-			None, # update
-			{ # body
-				"type": "BlockStatement",
-				"body": [{
-					"type": "ExpressionStatement",
-					"expression": {
-						"type": "AssignmentExpression",
-						"operator": "+=",
-						"left": { "type": "Identifier", "name": "x"},
-						"right": { "type": "Identifier", "name": "i"},
-					},
-				}],
-			}, # /body
-		), # /missing update
-		( # missing all
-			"for ( ; ; ) { x += i; }", # code
-			None, # init
-			None, # test
-			None, # update
-			{ # body
-				"type": "BlockStatement",
-				"body": [{
-					"type": "ExpressionStatement",
-					"expression": {
-						"type": "AssignmentExpression",
-						"operator": "+=",
-						"left": { "type": "Identifier", "name": "x"},
-						"right": { "type": "Identifier", "name": "i"},
-					},
-				}],
-			}, # /body
-		), # /missing all
-	],
+	("init", "test", "update"),
+	testForStatementTests,
 )
-def testForStatement(code: str, init, test, update, body):
+def testForStatement(init, test, update):
+	init_ = "" if init is None else "let i = 0"
+	test_ = "" if test is None else "i < 10"
+	update_ = "" if update is None else "i += 1"
+
+	code = f"for ({init_}; {test_}; {update_}) " + "{ x += i; }"
+
 	ast = json.loads(
 		json.dumps(
 			Parser().parse(code),
@@ -279,12 +177,20 @@ def testForStatement(code: str, init, test, update, body):
 				"init": init,
 				"test": test,
 				"update": update,
-				"body": body,
+				"body": {
+					"type": "BlockStatement",
+					"body": [{
+						"type": "ExpressionStatement",
+						"expression": {
+							"type": "AssignmentExpression",
+							"operator": "+=",
+							"left": {"type": "Identifier", "name": "x"},
+							"right": {"type": "Identifier", "name": "i"},
+						},
+					}],
+				},
 			},
 		],
 	}
-
-	print(f"\n\n{ast=}\n\n")
-	print(f"\n\n{expected=}\n\n")
 
 	assert ast == expected

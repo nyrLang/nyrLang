@@ -1,7 +1,5 @@
 import json
 
-import pytest
-
 import Nyr.Parser.Node as Node
 from Nyr.Parser.Parser import Parser
 

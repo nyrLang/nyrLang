@@ -202,7 +202,6 @@ class TestFunctionCalls:
 
 		assert ast == expected
 
-
 	def testChainedFunctionCall(self):
 		ast = json.loads(
 			json.dumps(
