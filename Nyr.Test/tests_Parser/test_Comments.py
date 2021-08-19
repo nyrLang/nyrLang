@@ -1,64 +1,98 @@
+import json
+
 import Nyr.Parser.Node as Node
 from Nyr.Parser.Parser import Parser
 
 
 def testSingleLineComment():
-	ast = Parser().parse("// Single line comment")
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("// Single line comment"),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	assert len(ast.body) == 0
+	expected = {
+		"type": "Program",
+		"body": [],
+	}
+
+	assert ast == expected
 
 
 def testSingleLineCommentWithValue():
-	ast = Parser().parse("""
-		// Comment
-		"value here";
-	""")
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("""
+				// Comment
+				"value here";
+			"""),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	body = ast.body
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "ExpressionStatement",
+				"expression": {
+					"type": "StringLiteral",
+					"value": "value here",
+				},
+			},
+		],
+	}
 
-	assert len(body) == 1
-
-	node = body[0]
-
-	assert isinstance(node, Node.ExpressionStatement)
-
-	expression = node.expression
-
-	assert isinstance(expression, Node.Literal)
-	assert expression.type == "StringLiteral"
-	assert expression.value == "value here"
+	assert ast == expected
 
 
 def testMultiLineComment():
-	ast = Parser().parse("""
-		/*
-			Multi-line
-			Comment
-		*/
-	""")
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("""
+				/*
+					Multi-line
+					Comment
+				*/
+			"""),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	assert len(ast.body) == 0
+	expected = {
+		"type": "Program",
+		"body": [],
+	}
+
+	assert ast == expected
 
 
 def testMultiLineCommentWithValue():
-	ast = Parser().parse("""
-		/*
-			Multi-line
-			Comment
-		*/
-		3.141;
-	""")
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("""
+				/*
+					Multi-line
+					Comment
+				*/
+				3.141;
+			"""),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	body = ast.body
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "ExpressionStatement",
+				"expression": {
+					"type": "FloatLiteral",
+					"value": 3.141,
+				},
+			},
+		],
+	}
 
-	assert len(body) == 1
-
-	node = body[0]
-
-	assert isinstance(node, Node.ExpressionStatement)
-
-	expression = node.expression
-
-	assert isinstance(expression, Node.Literal)
-	assert expression.type == "FloatLiteral"
-	assert expression.value == 3.141
+	assert ast == expected

@@ -1,11 +1,29 @@
+import json
+
+import pytest
+
 import Nyr.Parser.Node as Node
 from Nyr.Parser.Parser import Parser
 
 
-def testEmptyStatement():
-	ast = Parser().parse(";")
+@pytest.mark.parametrize(
+	("code", "expectedBody"), [
+		(";", [{"type": "EmptyStatement"}]),
+		(";;", [{"type": "EmptyStatement"}, {"type": "EmptyStatement"}]),
+		(";;;", [{"type": "EmptyStatement"}, {"type": "EmptyStatement"}, {"type": "EmptyStatement"}]),
+	],
+)
+def testEmptyStatement(code: str, expectedBody):
+	ast = json.loads(
+		json.dumps(
+			Parser().parse(code),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	assert len(ast.body) == 1
+	expected = {
+		"type": "Program",
+		"body": expectedBody,
+	}
 
-	assert isinstance(ast.body[0], Node.EmptyStatement)
-	assert ast.body[0].type == "EmptyStatement"
+	assert ast == expected

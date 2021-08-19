@@ -1,28 +1,46 @@
+import json
+
+import pytest
+
 import Nyr.Parser.Node as Node
 from Nyr.Parser.Parser import Parser
 
 
-def testAll():
-	operators = (">", ">=", "<", "<=")
-	parser = Parser()
+@pytest.mark.parametrize(
+	("operator"), (
+		(">"),
+		(">="),
+		("<"),
+		("<="),
+	),
+)
+def testAll(operator: str):
+	ast = json.loads(
+		json.dumps(
+			Parser().parse(f"x {operator} 0;"),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	for operator in operators:
-		ast = parser.parse(f"x {operator} 0;")
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "ExpressionStatement",
+				"expression": {
+					"type": "BinaryExpression",
+					"operator": operator,
+					"left": {
+						"type": "Identifier",
+						"name": "x",
+					},
+					"right": {
+						"type": "IntegerLiteral",
+						"value": 0,
+					},
+				},
+			},
+		],
+	}
 
-		assert len(ast.body) == 1
-
-		node = ast.body[0]
-		assert isinstance(node, Node.ExpressionStatement)
-
-		expression = node.expression
-		assert isinstance(expression, Node.ComplexExpression)
-		assert expression.operator == operator
-
-		left = expression.left
-		assert isinstance(left, Node.Identifier)
-		assert left.name == "x"
-
-		right = expression.right
-		assert isinstance(right, Node.Literal)
-		assert right.type == "IntegerLiteral"
-		assert right.value == 0
+	assert ast == expected

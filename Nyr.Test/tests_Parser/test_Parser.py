@@ -1,7 +1,20 @@
+import json
+
+from Nyr.Parser.Node import ComplexEncoder
 from Nyr.Parser.Parser import Parser
 
 
 def testParseEmpty():
-	ast = Parser().parse("")
+	ast = json.loads(
+		json.dumps(
+			Parser().parse(""),
+			cls=ComplexEncoder,
+		),
+	)
 
-	assert len(ast.body) == 0
+	expected = {
+		"type": "Program",
+		"body": [],
+	}
+
+	assert ast == expected

@@ -1,313 +1,196 @@
+import json
+
+import pytest
+
 import Nyr.Parser.Node as Node
 from Nyr.Parser.Parser import Parser
 
 
 def testWhileStatement():
-	ast = Parser().parse("""
-		while (x > 10) {
-			x -= 1;
-		}
-	""")
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("""
+				while (x > 10) {
+					x -= 1;
+				}
+			"""),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	assert len(ast.body) == 1
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "WhileStatement",
+				"test": {
+					"type": "BinaryExpression",
+					"operator": ">",
+					"left": {
+						"type": "Identifier",
+						"name": "x",
+					},
+					"right": {
+						"type": "IntegerLiteral",
+						"value": 10,
+					},
+				},
+				"body": {
+					"type": "BlockStatement",
+					"body": [
+						{
+							"type": "ExpressionStatement",
+							"expression": {
+								"type": "AssignmentExpression",
+								"operator": "-=",
+								"left": {
+									"type": "Identifier",
+									"name": "x",
+								},
+								"right": {
+									"type": "IntegerLiteral",
+									"value": 1,
+								},
+							},
+						},
+					],
+				},
+			},
+		],
+	}
 
-	node = ast.body[0]
-
-	assert isinstance(node, Node.WhileStatement)
-	assert node.type == "WhileStatement"
-
-	# DoWhile.test
-	test = node.test
-	assert isinstance(test, Node.ComplexExpression)
-	assert test.operator == ">"
-
-	assert isinstance(test.left, Node.Identifier)
-	assert test.left.name == "x"
-
-	assert isinstance(test.right, Node.Literal)
-	assert test.right.type == "IntegerLiteral"
-	assert test.right.value == 10
-
-	# DoWhile.body
-	body = node.body
-	assert isinstance(body, Node.BlockStatement)
-	assert len(body.body) == 1
-
-	blockBody = body.body[0]
-	assert isinstance(blockBody, Node.ExpressionStatement)
-
-	expression = blockBody.expression
-
-	assert isinstance(expression, Node.ComplexExpression)
-	assert expression.operator == "-="
-
-	assert isinstance(expression.left, Node.Identifier)
-	assert expression.left.name == "x"
-
-	assert isinstance(expression.right, Node.Literal)
-	assert expression.right.type == "IntegerLiteral"
-	assert expression.right.value == 1
+	assert ast == expected
 
 
 def testDoWhileStatement():
-	ast = Parser().parse("""
-		do {
-			x -= 1;
-		} while (x > 10);
-	""")
-
-	assert len(ast.body) == 1
-
-	node = ast.body[0]
-
-	assert isinstance(node, Node.DoWhileStatement)
-	assert node.type == "DoWhileStatement"
-
-	# DoWhile.body
-	body = node.body
-	assert isinstance(body, Node.BlockStatement)
-	assert len(body.body) == 1
-
-	blockBody = body.body[0]
-	assert isinstance(blockBody, Node.ExpressionStatement)
-
-	expression = blockBody.expression
-
-	assert isinstance(expression, Node.ComplexExpression)
-	assert expression.operator == "-="
-
-	assert isinstance(expression.left, Node.Identifier)
-	assert expression.left.name == "x"
-
-	assert isinstance(expression.right, Node.Literal)
-	assert expression.right.type == "IntegerLiteral"
-	assert expression.right.value == 1
-
-	# DoWhile.test
-	test = node.test
-	assert isinstance(test, Node.ComplexExpression)
-	assert test.operator == ">"
-
-	assert isinstance(test.left, Node.Identifier)
-	assert test.left.name == "x"
-
-	assert isinstance(test.right, Node.Literal)
-	assert test.right.type == "IntegerLiteral"
-	assert test.right.value == 10
-
-
-class TestForStatement:
-	def testFull(self):
-		ast = Parser().parse("""
-			for (let i = 0; i < 10; i += 1) {
-				x += i;
-			}
-		""")
-
-		assert len(ast.body) == 1
-
-		node = ast.body[0]
-
-		assert isinstance(node, Node.ForStatement)
-
-		# ForStatement.init
-		init = node.init
-		assert isinstance(init, Node.VariableStatement)
-		assert len(init.declarations) == 1
-
-		declaration = init.declarations[0]
-		assert isinstance(declaration, Node.VariableDeclaration)
-
-		assert isinstance(declaration.id, Node.Identifier)
-		assert declaration.id.name == "i"
-
-		assert isinstance(declaration.init, Node.Literal)
-		assert declaration.init.type == "IntegerLiteral"
-		assert declaration.init.value == 0
-
-		# ForStatement.test
-		test = node.test
-		assert isinstance(test, Node.ComplexExpression)
-		assert test.operator == "<"
-
-		assert isinstance(test.left, Node.Identifier)
-		assert test.left.name == "i"
-
-		assert isinstance(test.right, Node.Literal)
-		assert test.right.type == "IntegerLiteral"
-		assert test.right.value == 10
-
-		# ForStatement.update
-		update = node.update
-		assert isinstance(update, Node.ComplexExpression)
-		assert update.operator == "+="
-
-		assert isinstance(update.left, Node.Identifier)
-		assert update.left.name == "i"
-
-		assert isinstance(update.right, Node.Literal)
-		assert update.right.type == "IntegerLiteral"
-		assert update.right.value == 1
-
-		# ForStatement.body
-		body = node.body
-		assert isinstance(body, Node.BlockStatement)
-
-	def testMissingInit(self):
-		ast = Parser().parse("""
-			for ( ; i < 10; i += 1) {
-				x += i;
-			}
-		""")
-
-		assert len(ast.body) == 1
-
-		node = ast.body[0]
-
-		assert isinstance(node, Node.ForStatement)
-
-		# ForStatement.init
-		assert node.init is None
-
-		# ForStatement.test
-		test = node.test
-		assert isinstance(test, Node.ComplexExpression)
-		assert test.operator == "<"
-
-		assert isinstance(test.left, Node.Identifier)
-		assert test.left.name == "i"
-
-		assert isinstance(test.right, Node.Literal)
-		assert test.right.type == "IntegerLiteral"
-		assert test.right.value == 10
-
-		# ForStatement.update
-		update = node.update
-		assert isinstance(update, Node.ComplexExpression)
-		assert update.operator == "+="
-
-		assert isinstance(update.left, Node.Identifier)
-		assert update.left.name == "i"
-
-		assert isinstance(update.right, Node.Literal)
-		assert update.right.type == "IntegerLiteral"
-		assert update.right.value == 1
-
-		# ForStatement.body
-		body = node.body
-		assert isinstance(body, Node.BlockStatement)
-
-	def testMissingTest(self):
-		ast = Parser().parse("""
-			for (let i = 0; ; i += 1) {
-				x += i;
-			}
-		""")
-
-		assert len(ast.body) == 1
-
-		node = ast.body[0]
-
-		assert isinstance(node, Node.ForStatement)
-
-		# ForStatement.init
-		init = node.init
-		assert isinstance(init, Node.VariableStatement)
-		assert len(init.declarations) == 1
-
-		declaration = init.declarations[0]
-		assert isinstance(declaration, Node.VariableDeclaration)
-
-		assert isinstance(declaration.id, Node.Identifier)
-		assert declaration.id.name == "i"
-
-		assert isinstance(declaration.init, Node.Literal)
-		assert declaration.init.type == "IntegerLiteral"
-		assert declaration.init.value == 0
-
-		# ForStatement.test
-		assert node.test is None
-
-		# ForStatement.update
-		update = node.update
-		assert isinstance(update, Node.ComplexExpression)
-		assert update.operator == "+="
-
-		assert isinstance(update.left, Node.Identifier)
-		assert update.left.name == "i"
-
-		assert isinstance(update.right, Node.Literal)
-		assert update.right.type == "IntegerLiteral"
-		assert update.right.value == 1
-
-		# ForStatement.body
-		body = node.body
-		assert isinstance(body, Node.BlockStatement)
-
-	def testMissingUpdate(self):
-		ast = Parser().parse("""
-			for (let i = 0; i < 10; ) {
-				x += i;
-			}
-		""")
-
-		assert len(ast.body) == 1
-
-		node = ast.body[0]
-
-		assert isinstance(node, Node.ForStatement)
-
-		# ForStatement.init
-		init = node.init
-		assert isinstance(init, Node.VariableStatement)
-		assert len(init.declarations) == 1
-
-		declaration = init.declarations[0]
-		assert isinstance(declaration, Node.VariableDeclaration)
-
-		assert isinstance(declaration.id, Node.Identifier)
-		assert declaration.id.name == "i"
-
-		assert isinstance(declaration.init, Node.Literal)
-		assert declaration.init.type == "IntegerLiteral"
-		assert declaration.init.value == 0
-
-		# ForStatement.test
-		test = node.test
-		assert isinstance(test, Node.ComplexExpression)
-		assert test.operator == "<"
-
-		assert isinstance(test.left, Node.Identifier)
-		assert test.left.name == "i"
-
-		assert isinstance(test.right, Node.Literal)
-		assert test.right.type == "IntegerLiteral"
-		assert test.right.value == 10
-
-		# ForStatement.update
-		assert node.update is None
-
-		# ForStatement.body
-		body = node.body
-		assert isinstance(body, Node.BlockStatement)
-
-	def testMissingAll(self):
-		ast = Parser().parse("""
-			for ( ; ; ) {
-				x += 1;
-			}
-		""")
-
-		assert len(ast.body) == 1
-
-		node = ast.body[0]
-
-		assert isinstance(node, Node.ForStatement)
-
-		assert node.init is None
-		assert node.test is None
-		assert node.update is None
-
-		# ForStatement.body
-		body = node.body
-		assert isinstance(body, Node.BlockStatement)
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("""
+				do {
+					x -= 1;
+				} while (x > 10);
+			"""),
+			cls=Node.ComplexEncoder,
+		),
+	)
+
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "DoWhileStatement",
+				"body": {
+					"type": "BlockStatement",
+					"body": [
+						{
+							"type": "ExpressionStatement",
+							"expression": {
+								"type": "AssignmentExpression",
+								"operator": "-=",
+								"left": {
+									"type": "Identifier",
+									"name": "x",
+								},
+								"right": {
+									"type": "IntegerLiteral",
+									"value": 1,
+								},
+							},
+						},
+					],
+				},
+				"test": {
+					"type": "BinaryExpression",
+					"operator": ">",
+					"left": {
+						"type": "Identifier",
+						"name": "x",
+					},
+					"right": {
+						"type": "IntegerLiteral",
+						"value": 10,
+					},
+				},
+			},
+		],
+	}
+
+	assert ast == expected
+
+
+testForStatementInit = {
+	"type": "VariableStatement",
+	"declarations": [{
+		"type": "VariableDeclaration",
+		"id": {"type": "Identifier", "name": "i"},
+		"init": {"type": "IntegerLiteral", "value": 0},
+	}],
+}
+testForStatementTest = {
+	"type": "BinaryExpression",
+	"operator": "<",
+	"left": {"type": "Identifier", "name": "i"},
+	"right": {"type": "IntegerLiteral", "value": 10},
+}
+testForStatementUpdate = {
+	"type": "AssignmentExpression",
+	"operator": "+=",
+	"left": {"type": "Identifier", "name": "i"},
+	"right": {"type": "IntegerLiteral", "value": 1},
+}
+
+testForStatementTests = [
+	(testForStatementInit, testForStatementTest, testForStatementUpdate),
+	(None, testForStatementTest, testForStatementUpdate),
+	(None, None, testForStatementUpdate),
+	(None, testForStatementTest, None),
+	(testForStatementInit, None, testForStatementUpdate),
+	(testForStatementInit, None, None),
+	(testForStatementInit, testForStatementTest, None),
+	(None, None, None),
+]
+
+
+@pytest.mark.parametrize(
+	("init", "test", "update"),
+	testForStatementTests,
+)
+def testForStatement(init, test, update):
+	init_ = "" if init is None else "let i = 0"
+	test_ = "" if test is None else "i < 10"
+	update_ = "" if update is None else "i += 1"
+
+	code = f"for ({init_}; {test_}; {update_}) " + "{ x += i; }"
+
+	ast = json.loads(
+		json.dumps(
+			Parser().parse(code),
+			cls=Node.ComplexEncoder,
+		),
+	)
+
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "ForStatement",
+				"init": init,
+				"test": test,
+				"update": update,
+				"body": {
+					"type": "BlockStatement",
+					"body": [{
+						"type": "ExpressionStatement",
+						"expression": {
+							"type": "AssignmentExpression",
+							"operator": "+=",
+							"left": {"type": "Identifier", "name": "x"},
+							"right": {"type": "Identifier", "name": "i"},
+						},
+					}],
+				},
+			},
+		],
+	}
+
+	assert ast == expected

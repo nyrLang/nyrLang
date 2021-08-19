@@ -1,94 +1,146 @@
+import json
+
 import Nyr.Parser.Node as Node
 from Nyr.Parser.Parser import Parser
 
 
 def testDeclarationWithAssign():
-	ast = Parser().parse("let x = 42;")
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("let x = 42;"),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	assert len(ast.body) == 1
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "VariableStatement",
+				"declarations": [
+					{
+						"type": "VariableDeclaration",
+						"id": {
+							"type": "Identifier",
+							"name": "x",
+						},
+						"init": {
+							"type": "IntegerLiteral",
+							"value": 42,
+						},
+					},
+				],
+			},
+		],
+	}
 
-	node = ast.body[0]
-	assert isinstance(node, Node.VariableStatement)
-	assert len(node.declarations) == 1
-
-	declaration = node.declarations[0]
-	assert isinstance(declaration, Node.VariableDeclaration)
-
-	assert isinstance(declaration.id, Node.Identifier)
-	assert declaration.id.name == "x"
-
-	assert isinstance(declaration.init, Node.Literal)
-	assert declaration.init.type == "IntegerLiteral"
-	assert declaration.init.value == 42
+	assert ast == expected
 
 
 def testDeclarationWithoutAssign():
-	ast = Parser().parse("let x;")
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("let x;"),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	assert len(ast.body) == 1
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "VariableStatement",
+				"declarations": [
+					{
+						"type": "VariableDeclaration",
+						"id": {
+							"type": "Identifier",
+							"name": "x",
+						},
+						"init": None,
+					},
+				],
+			},
+		],
+	}
 
-	node = ast.body[0]
-	assert isinstance(node, Node.VariableStatement)
-	assert len(node.declarations) == 1
-
-	declaration = node.declarations[0]
-	assert isinstance(declaration, Node.VariableDeclaration)
-
-	assert isinstance(declaration.id, Node.Identifier)
-	assert declaration.id.name == "x"
-
-	assert declaration.init is None
+	assert ast == expected
 
 
 def testMultipleDeclarationsWithoutAssign():
-	ast = Parser().parse("let x, y;")
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("let x, y;"),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	assert len(ast.body) == 1
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "VariableStatement",
+				"declarations": [
+					{
+						"type": "VariableDeclaration",
+						"id": {
+							"type": "Identifier",
+							"name": "x",
+						},
+						"init": None,
+					},
+					{
+						"type": "VariableDeclaration",
+						"id": {
+							"type": "Identifier",
+							"name": "y",
+						},
+						"init": None,
+					},
+				],
+			},
+		],
+	}
 
-	node = ast.body[0]
-	assert isinstance(node, Node.VariableStatement)
-	assert len(node.declarations) == 2
-
-	declaration1 = node.declarations[0]
-	declaration2 = node.declarations[1]
-	assert isinstance(declaration1, Node.VariableDeclaration)
-
-	assert isinstance(declaration1.id, Node.Identifier)
-	assert declaration1.id.name == "x"
-
-	assert declaration1.init is None
-
-	assert isinstance(declaration2, Node.VariableDeclaration)
-
-	assert isinstance(declaration2.id, Node.Identifier)
-	assert declaration2.id.name == "y"
-
-	assert declaration2.init is None
+	assert ast == expected
 
 
 def testMultipleDeclarationsWithPartialAssign():
-	ast = Parser().parse("let x, y = 42;")
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("let x, y = 42;"),
+			cls=Node.ComplexEncoder,
+		),
+	)
 
-	assert len(ast.body) == 1
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "VariableStatement",
+				"declarations": [
+					{
+						"type": "VariableDeclaration",
+						"id": {
+							"type": "Identifier",
+							"name": "x",
+						},
+						"init": None,
+					},
+					{
+						"type": "VariableDeclaration",
+						"id": {
+							"type": "Identifier",
+							"name": "y",
+						},
+						"init": {
+							"type": "IntegerLiteral",
+							"value": 42,
+						},
+					},
+				],
+			},
+		],
+	}
 
-	node = ast.body[0]
-	assert isinstance(node, Node.VariableStatement)
-	assert len(node.declarations) == 2
-
-	declaration1 = node.declarations[0]
-	declaration2 = node.declarations[1]
-	assert isinstance(declaration1, Node.VariableDeclaration)
-
-	assert isinstance(declaration1.id, Node.Identifier)
-	assert declaration1.id.name == "x"
-
-	assert declaration1.init is None
-
-	assert isinstance(declaration2, Node.VariableDeclaration)
-
-	assert isinstance(declaration2.id, Node.Identifier)
-	assert declaration2.id.name == "y"
-
-	assert isinstance(declaration2.init, Node.Literal)
-	assert declaration2.init.type == "IntegerLiteral"
-	assert declaration2.init.value == 42
+	assert ast == expected

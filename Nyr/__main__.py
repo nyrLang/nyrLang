@@ -44,8 +44,8 @@ def outputAST(ast_: Node, doOutput: bool):
 
 
 def toSExpression(ast_: Node, print_: bool):
-	_ast = ast_.toSExpression()
 	if print_:
+		_ast = ast_.toSExpression()
 		pprint(_ast)
 
 if __name__ == "__main__":
@@ -109,6 +109,9 @@ if __name__ == "__main__":
 		while True:
 			cmd = input("nyr> ")
 			if cmd == "exit": exit(0)
+			elif cmd == "clear":
+				print("\033c", end="")
+				continue
 
 			if ";" not in cmd:
 				cmd += ";"
