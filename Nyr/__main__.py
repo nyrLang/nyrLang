@@ -44,8 +44,8 @@ def outputAST(ast_: Node, doOutput: bool):
 
 
 def toSExpression(ast_: Node, print_: bool):
-	_ast = ast_.toSExpression()
 	if print_:
+		_ast = ast_.toSExpression()
 		pprint(_ast)
 
 if __name__ == "__main__":
