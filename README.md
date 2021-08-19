@@ -28,7 +28,7 @@
 ### Flags
 - `-f [Path].nyr`, `--file [Path].nyr` reads from file (Default: `null`)
 - `-i (true|false)`, `--interpret (true|false)` wether to interpret the input (`true`, `false`) (Default: `false`)
-	- Note: Many statements/operations are not yet supported, and will raise a `RuntimeError` if one is encountered
+	- Note: Many statements/operations are not yet supported, and will raise a `NotImplementedError` if encountered
 - `-o (true|false)`, `--output (true|false)` wether to dump the generated AST into an `ast.json` file (located at `./ast.json`) (Default: `false`)
 - `-s (true|false)`, `--s-expr (true|false)` wether to convert the generated AST to S-Expression format (Default: `false`)
 
@@ -78,7 +78,7 @@ multi-line!";
 ```
 /*
 	Binary operators:
-		+, -, *, /
+		+, -, *, /, %
 
 	Equality Operators:
 		==, !=

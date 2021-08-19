@@ -66,12 +66,12 @@ spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 	# -------------------------
 	# Assignment Operators: =, +=, -=, *=, /=
 	(re.compile(r"^="), "SIMPLE_ASSIGN"),
-	(re.compile(r"^[+\-*/]="), "COMPLEX_ASSIGN"),
+	(re.compile(r"^[+\-*/%]="), "COMPLEX_ASSIGN"),
 
 	# -------------------------
 	# Math Operators: +, -, *, /
 	(re.compile(r"^[+\-]"), "ADDITIVE_OPERATOR"),
-	(re.compile(r"^[*/]"), "MULTIPLICATIVE_OPERATOR"),
+	(re.compile(r"^[*/%]"), "MULTIPLICATIVE_OPERATOR"),
 
 	# -------------------------
 	# Logical Operators: &&, ||, !

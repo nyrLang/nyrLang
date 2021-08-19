@@ -1,9 +1,9 @@
+from __future__ import annotations
+
 import json
 from typing import Any
 from typing import Optional
 from typing import Union
-
-from Nyr.Interpreter.Env import Env
 
 
 class ComplexEncoder(json.JSONEncoder):
@@ -30,9 +30,6 @@ class Node:
 	def toSExpression(self):
 		raise NotImplementedError(f"{self.__class__.__name__}.toSExpression() has not been implemented")
 
-	def exec(self, env: Env):
-		raise NotImplementedError(f"{self.__class__.__name__}.exec() has not been implemented")
-
 
 class Program(Node):
 	def __init__(self, body: list[Node]):
@@ -50,7 +47,7 @@ class Program(Node):
 
 
 class VariableDeclaration(Node):
-	def __init__(self, id_: Node, init: Optional[Node]):
+	def __init__(self, id_: Identifier, init: Optional[Union[Identifier, Literal]]):
 		super().__init__(self.__class__.__name__)
 		self.id = id_
 		self.init = init
@@ -72,9 +69,6 @@ class Identifier(Node):
 		return dict(type=self.type, name=self.name)
 
 	def toSExpression(self):
-		return self.name
-
-	def exec(self, env: Env):
 		return self.name
 
 
@@ -374,7 +368,4 @@ class Literal(Node):
 		return dict(type=self.type, value=self.value)
 
 	def toSExpression(self):
-		return self.value
-
-	def exec(self, env: Env):
 		return self.value
