@@ -1,3 +1,4 @@
+import itertools
 import json
 
 import pytest
@@ -139,21 +140,17 @@ testForStatementUpdate = {
 	"right": {"type": "IntegerLiteral", "value": 1},
 }
 
-testForStatementTests = [
-	(testForStatementInit, testForStatementTest, testForStatementUpdate),
-	(None, testForStatementTest, testForStatementUpdate),
-	(None, None, testForStatementUpdate),
-	(None, testForStatementTest, None),
-	(testForStatementInit, None, testForStatementUpdate),
-	(testForStatementInit, None, None),
-	(testForStatementInit, testForStatementTest, None),
-	(None, None, None),
-]
-
 
 @pytest.mark.parametrize(
 	("init", "test", "update"),
-	testForStatementTests,
+	list(
+		itertools.product(
+			*zip(
+				[testForStatementInit, testForStatementTest, testForStatementUpdate],
+				itertools.repeat(None),
+			),
+		),
+	),
 )
 def testForStatement(init, test, update):
 	init_ = "" if init is None else "let i = 0"
