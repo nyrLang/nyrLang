@@ -102,8 +102,6 @@ class Tokenizer:
 
 	def hasMoreTokens(self) -> bool: return self.pos.cursor < len(self.string)
 
-	def isEOF(self) -> bool: return self.pos.col == len(self.string)
-
 	def _match(self, regex: re.Pattern, string: str):
 		matched = regex.match(string)
 

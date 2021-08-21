@@ -14,7 +14,6 @@ class Args:
 	inputFile: str
 	output: bool
 	interpret: bool
-	toSExpr: bool
 	printAST: bool
 
 
@@ -41,12 +40,6 @@ def outputAST(ast_: Node, doOutput: bool):
 	if doOutput:
 		with open("./ast.json", "w") as o:
 			o.write(json.dumps(ast_, cls=ComplexEncoder, indent=2) + "\n")
-
-
-def toSExpression(ast_: Node, print_: bool):
-	if print_:
-		_ast = ast_.toSExpression()
-		pp(_ast)
 
 
 if __name__ == "__main__":
@@ -77,14 +70,6 @@ if __name__ == "__main__":
 		type=bool,
 		help="output AST to ast.json",
 		dest="output",
-	)
-	argparser.add_argument(
-		"-s", "--s-expr",
-		required=False,
-		default=False,
-		type=bool,
-		help="Enable S-Expression interpreter",
-		dest="toSExpr",
 	)
 	argparser.add_argument(
 		"-p", "--print",
@@ -122,7 +107,6 @@ if __name__ == "__main__":
 			printAst(ast, printAST)
 			outputAST(ast, args.output)
 			interpret(ast, interpreter, env)
-			toSExpression(ast, args.toSExpr)
 
 	# File mode (read from file given via -f flag)
 	elif args.inputFile.endswith(".nyr"):
@@ -138,7 +122,6 @@ if __name__ == "__main__":
 			printAst(ast, printAST)
 			outputAST(ast, args.output)
 			interpret(ast, interpreter)
-			toSExpression(ast, args.toSExpr)
 
 	# Unknown mode
 	else:

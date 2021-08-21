@@ -33,8 +33,6 @@ class Env(dict[str, Any]):
 		except AttributeError:
 			# TODO: find a way to get scope
 			raise Exception(f"Variable with name {varName} does not exist in available scope")
-		except Exception as e:
-			raise e
 
 	def getValue(self, varName):
 		if type(varName) != str:
@@ -44,8 +42,6 @@ class Env(dict[str, Any]):
 		except AttributeError:
 			# TODO: find a way to get scope
 			raise Exception(f"Variable with name {varName} does not exist in available scope")
-		except Exception as e:
-			raise e
 
 	def findFuncOwnder(self, funcName: str) -> Optional[Env]:
 		if funcName in self.functions.keys(): return self
@@ -64,5 +60,3 @@ class Env(dict[str, Any]):
 			return self.findFuncOwnder(funcName).functions.get(funcName)
 		except AttributeError:
 			raise Exception(f"Function with name \"{funcName}\" does not exist in available scope")
-		except Exception as e:
-			raise e

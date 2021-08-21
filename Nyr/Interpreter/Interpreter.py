@@ -36,7 +36,7 @@ class Interpreter:
 			r = self.interpret(node.expression, env)
 			if r == "break":
 				self.breakLoop = True
-		elif isinstance(node, Node.EmptyStatement):
+		elif isinstance(node, Node.EmptyStatement): # pragma: no cover
 			pass
 		elif isinstance(node, Node.BlockStatement):
 			returns = []
@@ -44,12 +44,12 @@ class Interpreter:
 				r = self.interpret(n, env)
 				if r is not None:
 					returns.append(r)
-				if len(returns) == 0:
-					return None
-				elif len(returns) == 1:
-					return returns[0]
-				else:
-					return returns
+			if len(returns) == 0: # pragma: no cover
+				return None
+			elif len(returns) == 1: # pragma: no cover
+				return returns[0]
+			else: # pragma: no cover
+				return returns
 		elif isinstance(node, Node.IfStatement):
 			test = self.interpret(node.test, env)
 			assert isinstance(test, bool)
@@ -100,8 +100,7 @@ class Interpreter:
 		elif isinstance(node, Node.ForStatement):
 			# TODO: enter new environment inside for loop
 			forEnv = Env(parent=env)
-			if node.init is not None:
-				self.interpret(node.init, forEnv)
+			self.interpret(node.init, forEnv)
 			test = True
 			if node.test is not None:
 				test = self.interpret(node.test, forEnv)
@@ -111,8 +110,7 @@ class Interpreter:
 			while test is True:
 				self.interpret(node.body, forEnv)
 
-				if node.update is not None:
-					self.interpret(node.update, forEnv)
+				self.interpret(node.update, forEnv)
 				if node.test is not None:
 					test = self.interpret(node.test, forEnv)
 					assert isinstance(test, bool), f"Interpreter::Node.ForStatement: Expected bool, got {type(test)} instead"
@@ -130,8 +128,10 @@ class Interpreter:
 			left = self.interpret(node.left, env)
 			right = self.interpret(node.right, env)
 
-			if left is None: raise Exception(f"Unknown left-hand side of ComplexExpression")
-			if right is None: raise Exception(f"Unknown right-hand side of ComplexExpression")
+			if left is None: # pragma: no cover
+				raise Exception(f"Unknown left-hand side of ComplexExpression")
+			if right is None: # pragma: no cover
+				raise Exception(f"Unknown right-hand side of ComplexExpression")
 
 			lVal = None
 			rVal = None
@@ -165,9 +165,9 @@ class Interpreter:
 					left = self.interpret(node.left, env)
 					right = self.interpret(node.right, env)
 
-					if left is None:
+					if left is None: # pragma: no cover
 						raise Exception(f"Unknown left-hand side of AssignmentExpression")
-					if right is None:
+					if right is None: # pragma: no cover
 						raise Exception(f"Unknown right-hand side of AssignmentExpression")
 
 					env.setValue(left, right)
@@ -181,10 +181,11 @@ class Interpreter:
 					operator = "and"
 				elif node.operator == "||":
 					operator = "or"
-				else:
+				else: # pragma: no cover
 					raise Exception(f"Unknown operator in Logical Expression: {node.operator}")
 				return eval(f"{left} {operator} {right}", env)
-			else: raise Exception(f"Unknown ComplexExpression: {node.type}")
+			else: # pragma: no cover
+				raise Exception(f"Unknown ComplexExpression: {node.type}")
 		elif isinstance(node, Node.UnaryExpression):
 			val = self.interpret(node.argument, env)
 			return eval(f"{node.operator}{val}", env)
@@ -195,11 +196,7 @@ class Interpreter:
 				args.append(arg.name)
 			env.addFunc(node.name.name, {"args": args, "body": node.body})
 		elif isinstance(node, Node.ReturnStatement):
-			if node.argument is None:
-				ret = None
-			else:
-				ret = self.interpret(node.argument, env)
-			return ret
+			return self.interpret(node.argument, env)
 		elif isinstance(node, Node.CallExpression):
 			func = env.getFunc(node.callee.name)
 			if len(node.arguments) != len(func.get("args", -1)):
@@ -219,6 +216,6 @@ class Interpreter:
 		# elif isinstance(node, Node.NewExpression):pass
 		elif isinstance(node, Node.Literal):
 			return node.value
-		else:
+		else: # pragma: no cover
 			assert isinstance(node, Node.Node), f"Got {type(node)} instead of Node. Value: {node}"
 			raise NotImplementedError(f"{str(type(node)).split('.')[-1][:-2]} ({node.type}) is not yet implemented.")

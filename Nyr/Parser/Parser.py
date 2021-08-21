@@ -24,7 +24,7 @@ class Parser:
 	def _checkValidAssignmentTarget(node: Node.Node) -> Node.Node:
 		if node.type in ["Identifier", "MemberExpression"]:
 			return node
-		else:
+		else: # pragma: no cover
 			raise SyntaxError("Invalid left-hand side in assignment expression")
 
 	def parse(self, string: str) -> Node.Program:
@@ -201,7 +201,8 @@ class Parser:
 		if self.lookahead.type == "while": return self.WhileStatement()
 		elif self.lookahead.type == "do": return self.DoWhileStatement()
 		elif self.lookahead.type == "for": return self.ForStatement()
-		else: raise Exception(f"Unknown IterationStatement {self.lookahead.type}")
+		else: # pragma: no cover
+			raise Exception(f"Unknown IterationStatement {self.lookahead.type}")
 
 	def WhileStatement(self) -> Node.WhileStatement:
 		self._eat("while")
@@ -570,5 +571,5 @@ class Parser:
 		elif self.lookahead.type == "null":
 			self._eat("null")
 			return Node.Literal("NullLiteral", None)
-		else:
+		else: # pragma: no cover
 			raise SyntaxError("Literal: unexpected literal production")
