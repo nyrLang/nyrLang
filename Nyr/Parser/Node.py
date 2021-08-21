@@ -193,7 +193,7 @@ class ComplexExpression(Node):
 	right: Node
 
 	def __init__(self, type_: str, operator: str, left: Node, right: Node):
-		self.type = type_
+		super().__init__(type_)
 		self.operator = operator
 		self.left = left
 		self.right = right
@@ -277,10 +277,10 @@ class ReturnStatement(Node):
 
 
 class CallExpression(Node):
-	callee: Node
+	callee: Identifier
 	arguments: list[Node]
 
-	def __init__(self, callee: Node, arguments: list[Node]):
+	def __init__(self, callee: Identifier, arguments: list[Node]):
 		super().__init__(self.__class__.__name__)
 		self.callee = callee
 		self.arguments = arguments
@@ -361,7 +361,7 @@ class Literal(Node):
 	value: NodeValue
 
 	def __init__(self, type_: str, value: NodeValue):
-		self.type = type_
+		super().__init__(type_)
 		self.value = value
 
 	def toJSON(self):

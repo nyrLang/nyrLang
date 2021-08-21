@@ -18,11 +18,11 @@ def testWhileLoop():
 
 def testDoWhile():
 	ast = Parser().parse("""
-			let x = 0;
-			do {
-				x += 7;
-			} while (false);
-		""")
+		let x = 0;
+		do {
+			x += 7;
+		} while (false);
+	""")
 
 	out = Interpreter().interpret(ast, Env())
 

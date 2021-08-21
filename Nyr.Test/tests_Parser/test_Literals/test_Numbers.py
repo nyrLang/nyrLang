@@ -69,5 +69,5 @@ def testFloat(test: str):
 
 
 def testFloatTooManyDots():
-	with pytest.raises(Exception):
+	with pytest.raises(Exception, match='Unexpected token: "59", expected: "IDENTIFIER"'):
 		Parser().parse("3.141.59")

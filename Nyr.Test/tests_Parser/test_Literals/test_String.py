@@ -1,4 +1,5 @@
 import json
+import re
 
 import pytest
 
@@ -93,5 +94,5 @@ def testComplexString(test):
 
 
 def testUnclosedString():
-	with pytest.raises(Exception):
+	with pytest.raises(Exception, match=re.escape('Could not parse input correctly. starting here (1:0):\n\t"Unclosed string ahead!')):
 		Parser().parse(r'"Unclosed string ahead!')

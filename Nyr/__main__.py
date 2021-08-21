@@ -1,7 +1,7 @@
 import argparse
 import json
 import sys
-from pprint import pprint
+from pprint import pp
 
 from Nyr.Interpreter.Env import Env
 from Nyr.Interpreter.Interpreter import Interpreter
@@ -46,7 +46,8 @@ def outputAST(ast_: Node, doOutput: bool):
 def toSExpression(ast_: Node, print_: bool):
 	if print_:
 		_ast = ast_.toSExpression()
-		pprint(_ast)
+		pp(_ast)
+
 
 if __name__ == "__main__":
 	if (sys.version_info.major, sys.version_info.minor) < (3, 9):

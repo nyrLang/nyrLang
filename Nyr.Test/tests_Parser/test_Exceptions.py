@@ -13,5 +13,6 @@ from Nyr.Parser.Parser import Parser
 def testMissingSemicolon(code: str):
 	parser = Parser()
 
-	with pytest.raises(Exception):
+	# FIXME: get a better exception message
+	with pytest.raises(Exception, match="'NoneType' object has no attribute 'type'"):
 		parser.parse(code)

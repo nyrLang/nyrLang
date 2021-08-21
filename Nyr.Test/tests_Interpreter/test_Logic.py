@@ -13,17 +13,16 @@ from Nyr.Parser.Parser import Parser
 
 
 @pytest.mark.parametrize(
-    ("xVal", "expectedY"), (
-     (-4, "x is 2 or less"),
-     (0, "x is 2 or less"),
-     (2, "x is 2 or less"),
-     (3, "x is greater than 2"),
-     (99999999999999999, "x is greater than 2"),
-    ),
+	("xVal", "expectedY"), (
+		(-4, "x is 2 or less"),
+		(0, "x is 2 or less"),
+		(2, "x is 2 or less"),
+		(3, "x is greater than 2"),
+		(99999999999999999, "x is greater than 2"),
+	),
 )
 def testIfElse(xVal: int, expectedY: str):
-	ast = Parser().parse(
-     """
+	ast = Parser().parse("""
 		let x = __xval__;
 		let y = "";
 		if (x > 2) {
@@ -31,8 +30,7 @@ def testIfElse(xVal: int, expectedY: str):
 		} else {
 			y = "x is 2 or less";
 		}
-	""".replace("__xval__", str(xVal)),
- )
+	""".replace("__xval__", str(xVal)))
 
 	out = Interpreter().interpret(ast, Env())
 
@@ -40,10 +38,10 @@ def testIfElse(xVal: int, expectedY: str):
 
 
 @pytest.mark.parametrize(
-    ("operator", "expected"), (
-     ("&&", (True, False, False, False)),
-     ("||", (True, True, True, False)),
-    ),
+	("operator", "expected"), (
+		("&&", (True, False, False, False)),
+		("||", (True, True, True, False)),
+	),
 )
 def testLogicalOperators(operator: str, expected: tuple[bool]):
 	assert len(expected) == 4, f"expected input must be of lenght 4, input was: {len(expected)}"
