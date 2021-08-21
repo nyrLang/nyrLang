@@ -4,8 +4,15 @@ from typing import Any
 from Nyr.Interpreter.Env import Env
 from Nyr.Parser import Node
 
+MAXITERATIONS = 2 ** 16
+# TODO: find a way to implement this
+RECURSIONDEPTH = 256
+
 
 class Interpreter:
+	# FIXME: Hacky way to break loops
+	breakLoop = False
+
 	def interpret(self, node: Node.Node, env: Env) -> Any:
 		if node is None: return None
 
@@ -18,22 +25,31 @@ class Interpreter:
 		elif isinstance(node, Node.VariableDeclaration):
 			name = self.interpret(node.id, env)
 
-			if name in env.keys():
-				raise Exception(f"Variable '{name}' has already been declared")
 			val = None
 			if node.init is not None:
 				val = self.interpret(node.init, env)
 
-			env[name] = val
+			env.addValue(name, val)
 		elif isinstance(node, Node.Identifier):
 			return node.name
 		elif isinstance(node, Node.ExpressionStatement):
-			self.interpret(node.expression, env)
+			r = self.interpret(node.expression, env)
+			if r == "break":
+				self.breakLoop = True
 		elif isinstance(node, Node.EmptyStatement):
 			pass
 		elif isinstance(node, Node.BlockStatement):
+			returns = []
 			for n in node.body:
-				self.interpret(n, env)
+				r = self.interpret(n, env)
+				if r is not None:
+					returns.append(r)
+				if len(returns) == 0:
+					return None
+				elif len(returns) == 1:
+					return returns[0]
+				else:
+					return returns
 		elif isinstance(node, Node.IfStatement):
 			test = self.interpret(node.test, env)
 			assert isinstance(test, bool)
@@ -47,33 +63,103 @@ class Interpreter:
 		elif isinstance(node, Node.WhileStatement):
 			test = self.interpret(node.test, env)
 			assert isinstance(test, bool)
+
+			iterations = 0
 			while test is True:
 				self.interpret(node.body, env)
 				test = self.interpret(node.test, env)
+
+				iterations += 1
+
+				if iterations > MAXITERATIONS:
+					raise Exception(f"Exceeded {2 ** 16} iterations in for statement")
+
+				# FIXME: hacky way to break loops
+				if self.breakLoop is True:
+					self.breakLoop = False
+					break
 		elif isinstance(node, Node.DoWhileStatement):
 			self.interpret(node.body, env)
 			test = self.interpret(node.test, env)
 			assert isinstance(test, bool)
+
+			iterations = 0
 			while test is True:
 				self.interpret(node.body, env)
 				test = self.interpret(node.test, env)
-		# elif isinstance(node, Node.ForStatement):pass
+
+				iterations += 1
+
+				if iterations > MAXITERATIONS:
+					raise Exception(f"Exceeded {2 ** 16} iterations in for statement")
+
+				# FIXME: hacky way to break loops
+				if self.breakLoop is True:
+					self.breakLoop = False
+					break
+		elif isinstance(node, Node.ForStatement):
+			# TODO: enter new environment inside for loop
+			forEnv = Env(parent=env)
+			if node.init is not None:
+				self.interpret(node.init, forEnv)
+			test = True
+			if node.test is not None:
+				test = self.interpret(node.test, forEnv)
+				assert isinstance(test, bool), f"Interpreter::Node.ForStatement: Expected bool, got {type(test)} instead"
+
+			iterations = 0
+			while test is True:
+				self.interpret(node.body, forEnv)
+
+				if node.update is not None:
+					self.interpret(node.update, forEnv)
+				if node.test is not None:
+					test = self.interpret(node.test, forEnv)
+					assert isinstance(test, bool), f"Interpreter::Node.ForStatement: Expected bool, got {type(test)} instead"
+				iterations += 1
+
+				if iterations > MAXITERATIONS:
+					raise Exception(f"Exceeded {2 ** 16} iterations in for statement")
+
+				# FIXME: hacky way to break loops
+				if self.breakLoop is True:
+					self.breakLoop = False
+					break
+			del forEnv
 		elif isinstance(node, Node.ComplexExpression):
 			left = self.interpret(node.left, env)
 			right = self.interpret(node.right, env)
 
-			if left is None: raise Exception(f"Unknown left-hand side of AssignmentExpression")
-			if right is None: raise Exception(f"Unknown right-hand side of AssignmentExpression")
+			if left is None: raise Exception(f"Unknown left-hand side of ComplexExpression")
+			if right is None: raise Exception(f"Unknown right-hand side of ComplexExpression")
+
+			lVal = None
+			rVal = None
+			if type(left) == str:
+				if env.findOwner(left) is not None:
+					lVal = env.getValue(left)
+			else:
+				lVal = left
+
+			if type(right) == str:
+				if env.findOwner(right) is not None:
+					rVal = env.getValue(right)
+			else:
+				rVal = right
 
 			if node.type == "BinaryExpression":
 				if node.operator == "/":
-					res = eval(f"{left} / {right}", env)
+					assert lVal is not None, f"Expected value, got None instead"
+					assert rVal is not None, f"Expected value, got None instead"
+					res = eval(f"{lVal} / {rVal}", env)
 					if math.floor(res) == math.ceil(res):
 						return int(res)
 					else:
 						return float(res)
 				else:
-					return eval(f"{left} {node.operator} {right}", env)
+					assert lVal is not None, f"Expected value, got None instead"
+					assert rVal is not None, f"Expected value, got None instead"
+					return eval(f"{lVal} {node.operator} {rVal}")
 			elif node.type == "AssignmentExpression":
 				if node.operator == "=":
 					left = self.interpret(node.left, env)
@@ -84,12 +170,12 @@ class Interpreter:
 					if right is None:
 						raise Exception(f"Unknown right-hand side of AssignmentExpression")
 
-					if left not in env.keys():
-						raise Exception(f"Variable {left} accessed before declaration")
-					env[left] = right
+					env.setValue(left, right)
 				else:
 					op = node.operator[0]
-					exec(f"{left} = {left} {op} {right}", env)
+					assert lVal is not None, f"Expected value, got None instead"
+					assert rVal is not None, f"Expected value, got None instead"
+					env.setValue(left, eval(f"{lVal} {op} {rVal}"))
 			elif node.type == "LogicalExpression":
 				if node.operator == "&&":
 					operator = "and"
@@ -102,9 +188,31 @@ class Interpreter:
 		elif isinstance(node, Node.UnaryExpression):
 			val = self.interpret(node.argument, env)
 			return eval(f"{node.operator}{val}", env)
-		# elif isinstance(node, Node.FunctionDeclaration):pass
-		# elif isinstance(node, Node.ReturnStatement):pass
-		# elif isinstance(node, Node.CallExpression):pass
+		elif isinstance(node, Node.FunctionDeclaration):
+			args = []
+			for arg in node.params:
+				assert isinstance(arg, Node.Identifier)
+				args.append(arg.name)
+			env.addFunc(node.name.name, {"args": args, "body": node.body})
+		elif isinstance(node, Node.ReturnStatement):
+			if node.argument is None:
+				ret = None
+			else:
+				ret = self.interpret(node.argument, env)
+			return ret
+		elif isinstance(node, Node.CallExpression):
+			func = env.getFunc(node.callee.name)
+			if len(node.arguments) != len(func.get("args", -1)):
+				raise Exception(f"Incorrect amount of arguments given. Expected {len(func.get('args'))}, got {len(node.arguments)}")
+
+			funcEnv = Env(parent=env)
+			for i in range(len(node.arguments)):
+				funcEnv.addValue(
+					# FIXME: Another hack
+					self.interpret(Node.Identifier(func.get("args")[i]), funcEnv),
+					funcEnv.getValue(self.interpret(node.arguments[i], funcEnv)),
+				)
+			return self.interpret(func.get("body"), funcEnv)
 		# elif isinstance(node, Node.ClassDeclaration):pass
 		# elif isinstance(node, Node.Super):pass
 		# elif isinstance(node, Node.ThisExpression):pass
@@ -112,4 +220,5 @@ class Interpreter:
 		elif isinstance(node, Node.Literal):
 			return node.value
 		else:
+			assert isinstance(node, Node.Node), f"Got {type(node)} instead of Node. Value: {node}"
 			raise NotImplementedError(f"{str(type(node)).split('.')[-1][:-2]} ({node.type}) is not yet implemented.")

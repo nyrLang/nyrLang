@@ -27,3 +27,16 @@ def testDoWhile():
 	out = Interpreter().interpret(ast, Env())
 
 	assert out == {"x": 7}
+
+
+def testForLoop():
+	ast = Parser().parse("""
+		let x = 0;
+		for (let i = 0; i < 10; i += 2) {
+			x += i;
+		}
+	""")
+
+	out = Interpreter().interpret(ast, Env())
+
+	assert out == {"x": 20}
