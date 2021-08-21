@@ -1,0 +1,28 @@
+[tool.coverage.run]
+cover_pylib = false
+branch = true
+include = [
+	"Nyr/*",
+	"Nyr.Test/*",
+]
+omit = [
+	"Nyr/__main__.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+precision = 3
+include = [
+	"Nyr/*",
+	"Nyr.Test/*",
+]
+omit = [
+	"Nyr/__main__.py",
+]
+
+[tool.coverage.html]
+directory = "reports/coverage"
+
+[tool.coverage.xml]
+output = "reports/coverage/coverage.xml"
