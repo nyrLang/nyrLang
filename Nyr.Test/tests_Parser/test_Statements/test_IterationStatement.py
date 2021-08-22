@@ -191,3 +191,115 @@ def testForStatement(init, test, update):
 	}
 
 	assert ast == expected
+
+
+def testForStatementPredefinedInit():
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("""
+				let x = 0;
+				let i = 7;
+				for (i = 0; i < 10; i += 1) {
+					x += i;
+				}
+			"""),
+			cls=Node.ComplexEncoder,
+		),
+	)
+
+	assert ast == {
+		"type": "Program",
+		"body": [
+			{
+				"type": "VariableStatement",
+				"declarations": [
+					{
+						"type": "VariableDeclaration",
+						"id": {
+							"type": "Identifier",
+							"name": "x",
+						},
+						"init": {
+							"type": "IntegerLiteral",
+							"value": 0,
+						},
+					},
+				],
+			},
+			{
+				"type": "VariableStatement",
+				"declarations": [
+					{
+						"type": "VariableDeclaration",
+						"id": {
+							"type": "Identifier",
+							"name": "i",
+						},
+						"init": {
+							"type": "IntegerLiteral",
+							"value": 7,
+						},
+					},
+				],
+			},
+			{
+				"type": "ForStatement",
+				"init": {
+					"type": "AssignmentExpression",
+					"operator": "=",
+					"left": {
+						"type": "Identifier",
+						"name": "i",
+					},
+					"right": {
+						"type": "IntegerLiteral",
+						"value": 0,
+					},
+				},
+				"test": {
+					"type": "BinaryExpression",
+					"operator": "<",
+					"left": {
+						"type": "Identifier",
+						"name": "i",
+					},
+					"right": {
+						"type": "IntegerLiteral",
+						"value": 10,
+					},
+				},
+				"update": {
+					"type": "AssignmentExpression",
+					"operator": "+=",
+					"left": {
+						"type": "Identifier",
+						"name": "i",
+					},
+					"right": {
+						"type": "IntegerLiteral",
+						"value": 1,
+					},
+				},
+				"body": {
+					"type": "BlockStatement",
+					"body": [
+						{
+							"type": "ExpressionStatement",
+							"expression": {
+								"type": "AssignmentExpression",
+								"operator": "+=",
+								"left": {
+									"type": "Identifier",
+									"name": "x",
+								},
+								"right": {
+									"type": "Identifier",
+									"name": "i",
+								},
+							},
+						},
+					],
+				},
+			},
+		],
+	}

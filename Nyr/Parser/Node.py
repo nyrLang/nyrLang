@@ -6,7 +6,7 @@ from typing import Optional
 from typing import Union
 
 
-class ComplexEncoder(json.JSONEncoder): # pragma: no cover
+class ComplexEncoder(json.JSONEncoder):  # pragma: no cover
 	def default(self, o: Any) -> Any:
 		if hasattr(o, "toJSON"):
 			return o.toJSON()
@@ -24,13 +24,13 @@ class Node:
 	def __init__(self, type_: str):
 		self.type = type_
 
-	def toJSON(self): # pragma: no cover
+	def toJSON(self):  # pragma: no cover
 		raise NotImplementedError(f"{self.__class__.__name__}.toJSON() has not been implemented")
 
 
 class Program(Node):
 	def __init__(self, body: list[Node]):
-		super(Program, self).__init__(self.__class__.__name__)
+		super().__init__(self.__class__.__name__)
 		self.body = body
 
 	def toJSON(self):

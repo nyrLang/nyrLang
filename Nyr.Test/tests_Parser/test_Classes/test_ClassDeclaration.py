@@ -300,3 +300,187 @@ def testClassInheritance():
 	}
 
 	assert ast == expected
+
+
+def testNewClassInstance():
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("""
+				class Point3D : Point {
+					def Point(x, y, z) {
+						super(x, y);
+						this.z = z;
+					}
+
+					def add() {
+						return super() + this.z;
+					}
+				}
+
+				let cls = new Point3D(10, 20, 30);
+			"""),
+			cls=Node.ComplexEncoder,
+		),
+	)
+
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "ClassDeclaration",
+				"id": {
+					"type": "Identifier",
+					"name": "Point3D",
+				},
+				"superClass": {
+					"type": "Identifier",
+					"name": "Point",
+				},
+				"body": {
+					"type": "BlockStatement",
+					"body": [
+						{
+							"type": "FunctionDeclaration",
+							"name": {
+								"type": "Identifier",
+								"name": "Point",
+							},
+							"params": [
+								{
+									"type": "Identifier",
+									"name": "x",
+								},
+								{
+									"type": "Identifier",
+									"name": "y",
+								},
+								{
+									"type": "Identifier",
+									"name": "z",
+								},
+							],
+							"body": {
+								"type": "BlockStatement",
+								"body": [
+									{
+										"type": "ExpressionStatement",
+										"expression": {
+											"type": "CallExpression",
+											"callee": {
+												"type": "Super",
+											},
+											"arguments": [
+												{
+													"type": "Identifier",
+													"name": "x",
+												},
+												{
+													"type": "Identifier",
+													"name": "y",
+												},
+											],
+										},
+									},
+									{
+										"type": "ExpressionStatement",
+										"expression": {
+											"type": "AssignmentExpression",
+											"operator": "=",
+											"left": {
+												"type": "MemberExpression",
+												"computed": False,
+												"object": {
+													"type": "ThisExpression",
+												},
+												"property": {
+													"type": "Identifier",
+													"name": "z",
+												},
+											},
+											"right": {
+												"type": "Identifier",
+												"name": "z",
+											},
+										},
+									},
+								],
+							},
+						},
+						{
+							"type": "FunctionDeclaration",
+							"name": {
+								"type": "Identifier",
+								"name": "add",
+							},
+							"params": [],
+							"body": {
+								"type": "BlockStatement",
+								"body": [
+									{
+										"type": "ReturnStatement",
+										"argument": {
+											"type": "BinaryExpression",
+											"operator": "+",
+											"left": {
+												"type": "CallExpression",
+												"callee": {
+													"type": "Super",
+												},
+												"arguments": [],
+											},
+											"right": {
+												"type": "MemberExpression",
+												"computed": False,
+												"object": {
+													"type": "ThisExpression",
+												},
+												"property": {
+													"type": "Identifier",
+													"name": "z",
+												},
+											},
+										},
+									},
+								],
+							},
+						},
+					],
+				},
+			},
+			{
+				"type": "VariableStatement",
+				"declarations": [
+					{
+						"type": "VariableDeclaration",
+						"id": {
+							"type": "Identifier",
+							"name": "cls",
+						},
+						"init": {
+							"type": "NewExpression",
+							"callee": {
+								"type": "Identifier",
+								"name": "Point3D",
+							},
+							"arguments": [
+								{
+									"type": "IntegerLiteral",
+									"value": 10,
+								},
+								{
+									"type": "IntegerLiteral",
+									"value": 20,
+								},
+								{
+									"type": "IntegerLiteral",
+									"value": 30,
+								},
+							],
+						},
+					},
+				],
+			},
+		],
+	}
+
+	assert ast == expected

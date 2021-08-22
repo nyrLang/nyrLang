@@ -5,3 +5,4 @@ venv/
 .vscode/
 debug/
 .coverage
+reports/coverage/htmlreport/

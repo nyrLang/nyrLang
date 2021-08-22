@@ -14,7 +14,7 @@ from Nyr.Parser.Parser import Parser
 		("<="),
 	),
 )
-def testAll(operator: str):
+def testRelationalOperators(operator: str):
 	ast = json.loads(
 		json.dumps(
 			Parser().parse(f"x {operator} 0;"),

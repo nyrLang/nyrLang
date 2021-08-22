@@ -1,7 +1,6 @@
 import argparse
 import json
 import sys
-from pprint import pp
 
 from Nyr.Interpreter.Env import Env
 from Nyr.Interpreter.Interpreter import Interpreter

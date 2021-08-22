@@ -19,10 +19,11 @@ include = [
 ]
 omit = [
 	"Nyr/__main__.py",
+	"Nyr.Test/*",
 ]
 
 [tool.coverage.html]
-directory = "reports/coverage"
+directory = "reports/coverage/htmlreport"
 
 [tool.coverage.xml]
 output = "reports/coverage/coverage.xml"

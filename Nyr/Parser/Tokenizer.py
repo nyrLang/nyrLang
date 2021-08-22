@@ -3,8 +3,7 @@ from __future__ import annotations
 import re
 from typing import AnyStr
 from typing import Optional
-
-from Nyr.Parser.Node import Node
+from typing import Union
 
 spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 	# -------------------------
@@ -89,6 +88,15 @@ spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 ]
 
 
+class Token:  # pragma: no cover
+	def __init__(self, type_: str, value: Union[None, int, float, bool, str]):
+		self.type = type_
+		self.value = value
+
+	def __repr__(self):
+		return f"{self.__module__}.{self.__class__.__name__}({self.type!r}{f', {self.value}' if self.value is not None else ''})"
+
+
 class Tokenizer:
 	string: str = ""
 	pos: Position
@@ -113,9 +121,9 @@ class Tokenizer:
 			self.pos.col += lm
 			return matched[0]
 
-	def getNextToken(self) -> Optional[Node]:
+	def _getNextToken(self) -> Token:
 		if not self.hasMoreTokens():
-			return None
+			return Token("EOF", None)
 
 		string: str = self.string[self.pos.cursor:]
 
@@ -126,27 +134,34 @@ class Tokenizer:
 				continue
 
 			if tokenType is None:
-				return self.getNextToken()
+				return self._getNextToken()
 			elif tokenType == "NEWLINE":
 				self.pos.line += 1
 				self.pos.col = 0
-				return self.getNextToken()
+				return self._getNextToken()
 			elif tokenType == "BLOCK_COMMENT":
 				tokenValue = tokenValue.replace(r"\\n", "_")
 				self.pos.line += tokenValue.count("\n")
 				self.pos.col = 0
-				return self.getNextToken()
+				return self._getNextToken()
 
-			node = Node(tokenType)
-			node.value = tokenValue
-			return node
+			return Token(tokenType, tokenValue)
 
 		string = string.replace("\n", " ")
 
 		raise Exception(f"Could not parse input correctly. starting here ({self.pos.line}:{self.pos.col}):\n\t{string}")
 
+	def getTokens(self) -> list[Token]:
+		tokens = []
+		while True:
+			tk = self._getNextToken()
+			tokens.append(tk)
+			if tk.type == "EOF":
+				break
+		return tokens
 
-class Position:
+
+class Position:  # pragma: no cover
 	cursor: int
 	line: int
 	col: int

@@ -1,13 +1,16 @@
 from typing import Any
 
 import Nyr.Parser.Node as Node
+from Nyr.Parser.Tokenizer import Token
 from Nyr.Parser.Tokenizer import Tokenizer
 
 
 class Parser:
 	string: str
 	tokenizer: Tokenizer
-	lookahead: Node
+	lookahead: Token
+	tokens: list[Token]
+	tkIndex: int = 0
 
 	def __init__(self):
 		self.tokenizer = Tokenizer()
@@ -24,38 +27,48 @@ class Parser:
 	def _checkValidAssignmentTarget(node: Node.Node) -> Node.Node:
 		if node.type in ["Identifier", "MemberExpression"]:
 			return node
-		else: # pragma: no cover
+		else:  # pragma: no cover
 			raise SyntaxError("Invalid left-hand side in assignment expression")
 
-	def parse(self, string: str) -> Node.Program:
-		self.string = string
-		self.tokenizer.init(string)
+	def getNextToken(self) -> Token:
+		tk = self.tokens[self.tkIndex]
+		self.tkIndex += 1
+		return tk
 
-		self.lookahead = self.tokenizer.getNextToken()
+	def hasMoreTokens(self) -> bool:
+		return self.tkIndex == len(self.tokens) and self.tokens[self.tkIndex - 1].type == "EOF"
+
+	def parse(self, string: str) -> Node.Program:
+		self.string = string.strip()
+		self.tokenizer.init(self.string)
+
+		self.tokens = self.tokenizer.getTokens()
+		self.lookahead = self.getNextToken()
+
+		if self.lookahead.type == "EOF":
+			return Node.Program([])
 
 		return self.Program()
 
 	def Program(self) -> Node.Program:
 		return Node.Program(self.StatementList())
 
-	def _eat(self, tokenType: str) -> Node.Node:
+	def _eat(self, tokenType: str) -> Token:
 		token = self.lookahead
 
-		if not token:
-			raise SyntaxError(f"Unexpected end of input, exprected {tokenType}")
+		if token.type == tokenType:
+			self.lookahead = self.getNextToken()
+			return token
 
-		if token.type != tokenType:
-			raise SyntaxError(f'Unexpected token: "{token.value}", expected: "{tokenType}"')
+		if not self.hasMoreTokens() is True or token.type == "EOF":
+			raise SyntaxError(f'Unexpected end of input, expected "{tokenType}"')
 
-		self.lookahead = self.tokenizer.getNextToken()
-
-		return token
+		raise SyntaxError(f'Unexpected token: "{token}", expected: "{tokenType}"')  # pragma: no cover
 
 	def StatementList(self, stopLookahead: Any = None) -> list[Node.Node]:
-		if not self.lookahead: return []
 		statementList: list[Node.Node] = [self.Statement()]
 
-		while self.lookahead and self.lookahead.type != stopLookahead:
+		while self.lookahead.type not in [stopLookahead, "EOF"]:
 			statementList.append(self.Statement())
 
 		return statementList
@@ -179,8 +192,10 @@ class Parser:
 			if self.lookahead.type == ",":
 				self._eat(",")
 				continue
-			else:
+			else:  # pragma: no cover
 				break
+
+		print(f"{len(params)=}")
 
 		return params
 
@@ -201,7 +216,7 @@ class Parser:
 		if self.lookahead.type == "while": return self.WhileStatement()
 		elif self.lookahead.type == "do": return self.DoWhileStatement()
 		elif self.lookahead.type == "for": return self.ForStatement()
-		else: # pragma: no cover
+		else:  # pragma: no cover
 			raise Exception(f"Unknown IterationStatement {self.lookahead.type}")
 
 	def WhileStatement(self) -> Node.WhileStatement:
@@ -286,7 +301,7 @@ class Parser:
 			declarations.append(self.VariableDeclaration())
 			if self.lookahead.type == ",":
 				self._eat(",")
-			else:
+			else:  # pragma: no cover
 				break
 
 		return declarations
@@ -340,7 +355,7 @@ class Parser:
 			self.AssignmentExpression(),
 		)
 
-	def AssignmentOperator(self) -> Node.Node:
+	def AssignmentOperator(self) -> Token:
 		""" AssignmentOperator
 			: SIMPLE_ASSIGN
 			| COMPLEX_ASSIGN
@@ -442,7 +457,7 @@ class Parser:
 			argumentList.append(self.AssignmentExpression())
 			if self.lookahead.type == ",":
 				self._eat(",")
-			else:
+			else:  # pragma: no cover
 				break
 
 		return argumentList
@@ -542,7 +557,7 @@ class Parser:
 			return self.ThisExpression()
 		elif self.lookahead.type == "new":
 			return self.NewExpression()
-		else:
+		else:  # pragma: no cover
 			return self.LeftHandSideExpression()
 
 	def ParenthesizedExpression(self) -> Node.Node:
@@ -571,5 +586,5 @@ class Parser:
 		elif self.lookahead.type == "null":
 			self._eat("null")
 			return Node.Literal("NullLiteral", None)
-		else: # pragma: no cover
+		else:  # pragma: no cover
 			raise SyntaxError("Literal: unexpected literal production")
