@@ -36,7 +36,7 @@ class Interpreter:
 			r = self.interpret(node.expression, env)
 			if r == "break":
 				self.breakLoop = True
-		elif isinstance(node, Node.EmptyStatement): # pragma: no cover
+		elif isinstance(node, Node.EmptyStatement):  # pragma: no cover
 			pass
 		elif isinstance(node, Node.BlockStatement):
 			returns = []
@@ -44,11 +44,11 @@ class Interpreter:
 				r = self.interpret(n, env)
 				if r is not None:
 					returns.append(r)
-			if len(returns) == 0: # pragma: no cover
+			if len(returns) == 0:  # pragma: no cover
 				return None
-			elif len(returns) == 1: # pragma: no cover
+			elif len(returns) == 1:  # pragma: no cover
 				return returns[0]
-			else: # pragma: no cover
+			else:  # pragma: no cover
 				return returns
 		elif isinstance(node, Node.IfStatement):
 			test = self.interpret(node.test, env)
@@ -128,9 +128,9 @@ class Interpreter:
 			left = self.interpret(node.left, env)
 			right = self.interpret(node.right, env)
 
-			if left is None: # pragma: no cover
+			if left is None:  # pragma: no cover
 				raise Exception(f"Unknown left-hand side of ComplexExpression")
-			if right is None: # pragma: no cover
+			if right is None:  # pragma: no cover
 				raise Exception(f"Unknown right-hand side of ComplexExpression")
 
 			lVal = None
@@ -165,9 +165,9 @@ class Interpreter:
 					left = self.interpret(node.left, env)
 					right = self.interpret(node.right, env)
 
-					if left is None: # pragma: no cover
+					if left is None:  # pragma: no cover
 						raise Exception(f"Unknown left-hand side of AssignmentExpression")
-					if right is None: # pragma: no cover
+					if right is None:  # pragma: no cover
 						raise Exception(f"Unknown right-hand side of AssignmentExpression")
 
 					env.setValue(left, right)
@@ -181,10 +181,10 @@ class Interpreter:
 					operator = "and"
 				elif node.operator == "||":
 					operator = "or"
-				else: # pragma: no cover
+				else:  # pragma: no cover
 					raise Exception(f"Unknown operator in Logical Expression: {node.operator}")
 				return eval(f"{left} {operator} {right}", env)
-			else: # pragma: no cover
+			else:  # pragma: no cover
 				raise Exception(f"Unknown ComplexExpression: {node.type}")
 		elif isinstance(node, Node.UnaryExpression):
 			val = self.interpret(node.argument, env)
@@ -216,6 +216,6 @@ class Interpreter:
 		# elif isinstance(node, Node.NewExpression):pass
 		elif isinstance(node, Node.Literal):
 			return node.value
-		else: # pragma: no cover
+		else:  # pragma: no cover
 			assert isinstance(node, Node.Node), f"Got {type(node)} instead of Node. Value: {node}"
 			raise NotImplementedError(f"{str(type(node)).split('.')[-1][:-2]} ({node.type}) is not yet implemented.")

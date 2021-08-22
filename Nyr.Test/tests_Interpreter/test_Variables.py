@@ -31,6 +31,7 @@ def testMultipleUninitializedVariables(code: str, expected):
 		("let int = 42;", {"int": 42}),
 		("let float = 3.14159;", {"float": 3.14159}),
 		("let bool = false;", {"bool": False}),
+		("let none = null;", {"none": None}),
 	],
 )
 def testTypeAssignments(code: str, expected):
