@@ -24,6 +24,9 @@ class Node:
 	def __init__(self, type_: str):
 		self.type = type_
 
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}('{self.type}')"
+
 	def toJSON(self):  # pragma: no cover
 		raise NotImplementedError(f"{self.__class__.__name__}.toJSON() has not been implemented")
 
@@ -33,15 +36,21 @@ class Program(Node):
 		super().__init__(self.__class__.__name__)
 		self.body = body
 
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}({self.body!r})"
+
 	def toJSON(self):
 		return dict(type=self.type, body=self.body)
 
 
 class VariableDeclaration(Node):
-	def __init__(self, id_: Identifier, init: Optional[Union[Identifier, Literal]]):
+	def __init__(self, id_: Identifier, init: Union[None, Identifier, Literal]):
 		super().__init__(self.__class__.__name__)
 		self.id = id_
 		self.init = init
+
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}({self.id!r}, {self.init!r})"
 
 	def toJSON(self):
 		return dict(type=self.type, id=self.id, init=self.init)
@@ -52,6 +61,9 @@ class Identifier(Node):
 		super().__init__(self.__class__.__name__)
 		self.name = name
 
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}('{self.name}')"
+
 	def toJSON(self):
 		return dict(type=self.type, name=self.name)
 
@@ -61,6 +73,9 @@ class ExpressionStatement(Node):
 	def __init__(self, expression: Node):
 		super().__init__(self.__class__.__name__)
 		self.expression = expression
+
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}({self.expression!r})"
 
 	def toJSON(self):
 		return dict(type=self.type, expression=self.expression)
@@ -79,6 +94,9 @@ class BlockStatement(Node):
 		super().__init__(self.__class__.__name__)
 		self.body = body
 
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}({self.body!r})"
+
 	def toJSON(self):
 		return dict(type=self.type, body=self.body)
 
@@ -90,6 +108,9 @@ class IfStatement(Node):
 		self.consequent = consequent
 		self.alternative = alternative
 
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}({self.test!r}, {self.consequent!r}, {self.alternative!r})"
+
 	def toJSON(self):
 		return dict(type=self.type, test=self.test, consequent=self.consequent, alternative=self.alternative)
 
@@ -98,6 +119,9 @@ class VariableStatement(Node):
 	def __init__(self, declarations: list[Node]):
 		super().__init__(self.__class__.__name__)
 		self.declarations = declarations
+
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}({self.declarations!r})"
 
 	def toJSON(self):
 		return dict(type=self.type, declarations=self.declarations)
@@ -109,6 +133,9 @@ class WhileStatement(Node):
 		self.test = test
 		self.body = body
 
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}({self.test!r}, {self.body!r})"
+
 	def toJSON(self):
 		return dict(type=self.type, test=self.test, body=self.body)
 
@@ -118,6 +145,9 @@ class DoWhileStatement(Node):
 		super().__init__(self.__class__.__name__)
 		self.test = test
 		self.body = body
+
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}({self.body!r}, {self.test!r})"
 
 	def toJSON(self):
 		return dict(type=self.type, body=self.body, test=self.test)
@@ -130,6 +160,9 @@ class ForStatement(Node):
 		self.test = test
 		self.update = update
 		self.body = body
+
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}({self.init!r}, {self.test!r}, {self.update!r}, {self.body!r})"
 
 	def toJSON(self):
 		return dict(type=self.type, init=self.init, test=self.test, update=self.update, body=self.body)
@@ -148,6 +181,9 @@ class ComplexExpression(Node):
 		self.left = left
 		self.right = right
 
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}({self.type}, {self.operator}, {self.left!r}, {self.right!r})"
+
 	def toJSON(self):
 		return dict(type=self.type, operator=self.operator, left=self.left, right=self.right)
 
@@ -157,6 +193,9 @@ class UnaryExpression(Node):
 		super().__init__(self.__class__.__name__)
 		self.operator = operator
 		self.argument = argument
+
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}({self.operator}, {self.argument!r})"
 
 	def toJSON(self):
 		return dict(type=self.type, operator=self.operator, argument=self.argument)
@@ -172,6 +211,9 @@ class MemberExpression(Node):
 		self.computed = computed
 		self.object = object_
 		self.property = property_
+
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}({self.computed}, {self.object!r}, {self.property!r})"
 
 	def toJSON(self):
 		return dict(type=self.type, computed=self.computed, object=self.object, property=self.property)
@@ -189,6 +231,9 @@ class FunctionDeclaration(Node):
 		self.params = parameters
 		self.body = body
 
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}({self.name!r}, {self.params!r}, {self.body!r})"
+
 	def toJSON(self):
 		return dict(type=self.type, name=self.name, params=self.params, body=self.body)
 
@@ -197,6 +242,9 @@ class ReturnStatement(Node):
 	def __init__(self, argument: Optional[Node]):
 		super().__init__(self.__class__.__name__)
 		self.argument = argument
+
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}({self.argument!r})"
 
 	def toJSON(self):
 		return dict(type=self.type, argument=self.argument)
@@ -210,6 +258,9 @@ class CallExpression(Node):
 		super().__init__(self.__class__.__name__)
 		self.callee = callee
 		self.arguments = arguments
+
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}({self.callee!r}, {self.arguments!r})"
 
 	def toJSON(self):
 		return dict(type=self.type, callee=self.callee, arguments=self.arguments)
@@ -226,6 +277,9 @@ class ClassDeclaration(Node):
 		self.id = id_
 		self.superClass = superClass
 		self.body = body
+
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}({self.id!r}, {self.superClass!r}, {self.body!r})"
 
 	def toJSON(self):
 		return dict(type=self.type, id=self.id, superClass=self.superClass, body=self.body)
@@ -256,6 +310,9 @@ class NewExpression(Node):
 		self.callee = callee
 		self.arguments = arguments
 
+	def __repr__(self):  # pragma: no cover
+		return f"{self.__module__}.{self.__class__.__name__}({self.callee!r}, {self.arguments!r})"
+
 	def toJSON(self):
 		return dict(type=self.type, callee=self.callee, arguments=self.arguments)
 
@@ -267,6 +324,9 @@ class Literal(Node):
 	def __init__(self, type_: str, value: NodeValue):
 		super().__init__(type_)
 		self.value = value
+
+	def __repr__(self):  # pragma: no cover
+			return f"{self.__module__}.{self.__class__.__name__}({self.type}, {self.value})"
 
 	def toJSON(self):
 		return dict(type=self.type, value=self.value)
