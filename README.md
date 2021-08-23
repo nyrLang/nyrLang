@@ -3,7 +3,7 @@
 ![Tests Status](./badges/tests-badge.svg?dummy=8484744)
 ![Coverage Status](./badges/coverage-badge.svg?dummy=8484744)
 
-# Nyr: A soon-to-be programming language
+# Nyr: A programming language
 
 ## TOC
 - [Features]
@@ -28,7 +28,7 @@
 - File input (must end with `.nyr`)
 
 ### Flags
-- `-f [Path].nyr`, `--file [Path].nyr` reads from file (Default: `null`)
+- `-f [path/to/file].nyr`, `--file [Path].nyr` reads from file (Default: `null`)
 - `-i (true|false)`, `--interpret (true|false)` wether to interpret the input (`true`, `false`) (Default: `false`)
 	- Note: Many statements/operations are not yet supported, and will raise a `NotImplementedError` if encountered
 - `-o (true|false)`, `--output (true|false)` wether to dump the generated AST into an `ast.json` file (located at `./ast.json`) (Default: `false`)
@@ -96,7 +96,6 @@ multi-line!";
 - - -
 
 ## Variables
-<small>NOTE: Currently variables are only global; no scoped variables exist</small>
 ```
 // Variable declaration
 let x = 0;
