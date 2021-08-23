@@ -7,11 +7,11 @@ from Nyr.Parser.Parser import Parser
 
 
 @pytest.mark.parametrize(
-	("test"), [
+	("test"), (
 		("42;"),
 		("   42;   "),
 		("42  ;"),
-	],
+	),
 )
 def testInteger(test: str):
 	ast = json.loads(
@@ -38,11 +38,11 @@ def testInteger(test: str):
 
 
 @pytest.mark.parametrize(
-	("test"), [
+	("test"), (
 		("3.141;"),
 		("   3.141;   "),
 		("3.141  ;"),
-	],
+	),
 )
 def testFloat(test: str):
 	ast = json.loads(

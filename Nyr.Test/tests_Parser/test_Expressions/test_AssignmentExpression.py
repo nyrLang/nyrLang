@@ -1,4 +1,5 @@
 import json
+import re
 
 import pytest
 
@@ -110,3 +111,8 @@ def testComplexAssignment():
 	}
 
 	assert ast == expected
+
+
+def testInvalidAssignment():
+	with pytest.raises(Exception, match=re.escape("Invalid left-hand side in assignment expression: Nyr.Parser.Node.Literal(IntegerLiteral, 1); expected: Identifier, MemberExpression")):
+		Parser().parse("1 = 2;")

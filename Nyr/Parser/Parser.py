@@ -27,8 +27,8 @@ class Parser:
 	def _checkValidAssignmentTarget(node: Node.Node) -> Node.Node:
 		if node.type in ["Identifier", "MemberExpression"]:
 			return node
-		else:  # pragma: no cover
-			raise SyntaxError("Invalid left-hand side in assignment expression")
+		else:
+			raise SyntaxError(f"Invalid left-hand side in assignment expression: {node}; expected: Identifier, MemberExpression")
 
 	def getNextToken(self) -> Token:
 		tk = self.tokens[self.tkIndex]
@@ -192,10 +192,8 @@ class Parser:
 			if self.lookahead.type == ",":
 				self._eat(",")
 				continue
-			else:  # pragma: no cover
+			else:
 				break
-
-		print(f"{len(params)=}")
 
 		return params
 
@@ -301,7 +299,7 @@ class Parser:
 			declarations.append(self.VariableDeclaration())
 			if self.lookahead.type == ",":
 				self._eat(",")
-			else:  # pragma: no cover
+			else:
 				break
 
 		return declarations
@@ -457,7 +455,7 @@ class Parser:
 			argumentList.append(self.AssignmentExpression())
 			if self.lookahead.type == ",":
 				self._eat(",")
-			else:  # pragma: no cover
+			else:
 				break
 
 		return argumentList
@@ -557,7 +555,7 @@ class Parser:
 			return self.ThisExpression()
 		elif self.lookahead.type == "new":
 			return self.NewExpression()
-		else:  # pragma: no cover
+		else:
 			return self.LeftHandSideExpression()
 
 	def ParenthesizedExpression(self) -> Node.Node:

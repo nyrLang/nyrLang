@@ -30,10 +30,10 @@ def testMultiplication():
 
 
 @pytest.mark.parametrize(
-	("code", "expected"), [
+	("code", "expected"), (
 		("let res = 9 / 3;", {'res': int(3)}),
 		("let res = 3 / 2;", {'res': float(3 / 2)}),
-	],
+	),
 )
 def testDivision(code: str, expected):
 	ast = Parser().parse(code)

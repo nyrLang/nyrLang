@@ -7,11 +7,11 @@ from Nyr.Parser.Parser import Parser
 
 
 @pytest.mark.parametrize(
-	("code", "expectedBody"), [
+	("code", "expectedBody"), (
 		(";", [{"type": "EmptyStatement"}]),
 		(";;", [{"type": "EmptyStatement"}, {"type": "EmptyStatement"}]),
 		(";;;", [{"type": "EmptyStatement"}, {"type": "EmptyStatement"}, {"type": "EmptyStatement"}]),
-	],
+	),
 )
 def testEmptyStatement(code: str, expectedBody):
 	ast = json.loads(

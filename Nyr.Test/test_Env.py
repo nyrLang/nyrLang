@@ -25,7 +25,7 @@ def testGetValue():
 	assert env.getValue(-5) == -5
 
 	with pytest.raises(Exception, match="Variable with name z does not exist in available scope"):
-		env.setValue("z", 666)
+		env.getValue("z")
 
 	assert env == {"x": "A String"}
 

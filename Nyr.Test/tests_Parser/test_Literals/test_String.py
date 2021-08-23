@@ -32,11 +32,11 @@ def testEmptyString():
 
 
 @pytest.mark.parametrize(
-	("test"), [
+	("test"), (
 		(r'"Hello";'),
 		(r'    "Hello";    '),
 		(r'"Hello"  ;'),
-	],
+	),
 )
 def testSimpleString(test: str):
 	ast = json.loads(
@@ -63,11 +63,11 @@ def testSimpleString(test: str):
 
 
 @pytest.mark.parametrize(
-	("test"), [
+	("test"), (
 		(r'"Hello, World";'),
 		(r'    "Hello, World";    '),
 		(r'"Hello, World"  ;'),
-	],
+	),
 )
 def testComplexString(test):
 	ast = json.loads(

@@ -13,10 +13,10 @@ def testUninitializedVariable():
 
 
 @pytest.mark.parametrize(
-	("code", "expected"), [
+	("code", "expected"), (
 		("let x; let y;", {'x': None, 'y': None}),
 		("let x; let y;", {'x': None, 'y': None}),
-	],
+	),
 )
 def testMultipleUninitializedVariables(code: str, expected):
 	ast = Parser().parse(code)
@@ -26,13 +26,13 @@ def testMultipleUninitializedVariables(code: str, expected):
 
 
 @pytest.mark.parametrize(
-	("code", "expected"), [
+	("code", "expected"), (
 		('let string = "I am a string!";', {"string": "I am a string!"}),
 		("let int = 42;", {"int": 42}),
 		("let float = 3.14159;", {"float": 3.14159}),
 		("let bool = false;", {"bool": False}),
 		("let none = null;", {"none": None}),
-	],
+	),
 )
 def testTypeAssignments(code: str, expected):
 	ast = Parser().parse(code)

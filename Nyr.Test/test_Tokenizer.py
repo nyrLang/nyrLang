@@ -54,3 +54,7 @@ def testInput():
 	for i in range(9):
 		assert tks[i].type == expected[i].type
 		assert tks[i].value == expected[i].value
+
+
+def testTokenRepr():
+	assert repr(Token("EOF", None)) == f"Nyr.Parser.Tokenizer.Token('EOF')"

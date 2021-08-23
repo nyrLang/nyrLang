@@ -88,7 +88,7 @@ spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 ]
 
 
-class Token:  # pragma: no cover
+class Token:
 	def __init__(self, type_: str, value: Union[None, int, float, bool, str]):
 		self.type = type_
 		self.value = value
@@ -161,7 +161,7 @@ class Tokenizer:
 		return tokens
 
 
-class Position:  # pragma: no cover
+class Position:
 	cursor: int
 	line: int
 	col: int

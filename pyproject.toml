@@ -1,3 +1,8 @@
+[tool.pytest.ini_options]
+console_output_style = "progress"
+log_auto_indent = true
+minversion = 6.0
+
 [tool.coverage.run]
 cover_pylib = false
 branch = true
@@ -24,6 +29,7 @@ omit = [
 
 [tool.coverage.html]
 directory = "reports/coverage/htmlreport"
+skip_covered = false
 
 [tool.coverage.xml]
 output = "reports/coverage/coverage.xml"

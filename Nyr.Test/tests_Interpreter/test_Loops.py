@@ -1,5 +1,8 @@
+import pytest
+
 from Nyr.Interpreter.Env import Env
 from Nyr.Interpreter.Interpreter import Interpreter
+from Nyr.Interpreter.Interpreter import MAXITERATIONS
 from Nyr.Parser.Parser import Parser
 
 
@@ -83,7 +86,7 @@ def testForLoop():
 def testForLoopBreak():
 	ast = Parser().parse("""
 		let x = 0;
-		for (let i = 0; i < 10; i += 2) {
+		for (let i = 0; ; i += 2) {
 			x += i;
 			if (i == 6) {
 				break;
@@ -100,3 +103,18 @@ def testForLoopBreak():
 	out = Interpreter().interpret(ast, Env())
 
 	assert out == {"i": 10, "x": 12, "y": 20}
+
+
+@pytest.mark.parametrize(
+	("loop", "type_"), (
+		("for (;;) { }", "for"),
+		("while (true) { }", "while"),
+		("do { } while (true);", "do-while"),
+	),
+)
+def testIterationOverflow(loop: str, type_: str):
+	# Iterate forever
+	ast = Parser().parse(loop)
+
+	with pytest.raises(Exception, match=f"Exceeded {MAXITERATIONS} iterations in {type_} statement"):
+		Interpreter().interpret(ast, Env())

@@ -36,7 +36,7 @@ class Interpreter:
 			r = self.interpret(node.expression, env)
 			if r == "break":
 				self.breakLoop = True
-		elif isinstance(node, Node.EmptyStatement):  # pragma: no cover
+		elif isinstance(node, Node.EmptyStatement):
 			pass
 		elif isinstance(node, Node.BlockStatement):
 			returns = []
@@ -72,7 +72,7 @@ class Interpreter:
 				iterations += 1
 
 				if iterations > MAXITERATIONS:
-					raise Exception(f"Exceeded {2 ** 16} iterations in for statement")
+					raise Exception(f"Exceeded {MAXITERATIONS} iterations in while statement")
 
 				# FIXME: hacky way to break loops
 				if self.breakLoop is True:
@@ -91,14 +91,13 @@ class Interpreter:
 				iterations += 1
 
 				if iterations > MAXITERATIONS:
-					raise Exception(f"Exceeded {2 ** 16} iterations in for statement")
+					raise Exception(f"Exceeded {MAXITERATIONS} iterations in do-while statement")
 
 				# FIXME: hacky way to break loops
 				if self.breakLoop is True:
 					self.breakLoop = False
 					break
 		elif isinstance(node, Node.ForStatement):
-			# TODO: enter new environment inside for loop
 			forEnv = Env(parent=env)
 			self.interpret(node.init, forEnv)
 			test = True
@@ -117,7 +116,7 @@ class Interpreter:
 				iterations += 1
 
 				if iterations > MAXITERATIONS:
-					raise Exception(f"Exceeded {2 ** 16} iterations in for statement")
+					raise Exception(f"Exceeded {MAXITERATIONS} iterations in for statement")
 
 				# FIXME: hacky way to break loops
 				if self.breakLoop is True:
@@ -129,9 +128,9 @@ class Interpreter:
 			right = self.interpret(node.right, env)
 
 			if left is None:  # pragma: no cover
-				raise Exception(f"Unknown left-hand side of ComplexExpression")
+				raise Exception(f"Unknown left-hand side of ComplexExpression: {node.left}")
 			if right is None:  # pragma: no cover
-				raise Exception(f"Unknown right-hand side of ComplexExpression")
+				raise Exception(f"Unknown right-hand side of ComplexExpression: {node.right}")
 
 			lVal = None
 			rVal = None
@@ -166,9 +165,9 @@ class Interpreter:
 					right = self.interpret(node.right, env)
 
 					if left is None:  # pragma: no cover
-						raise Exception(f"Unknown left-hand side of AssignmentExpression")
+						raise Exception(f"Unknown left-hand side of AssignmentExpression: {node.left}")
 					if right is None:  # pragma: no cover
-						raise Exception(f"Unknown right-hand side of AssignmentExpression")
+						raise Exception(f"Unknown right-hand side of AssignmentExpression: {node.right}")
 
 					env.setValue(left, right)
 				else:
@@ -182,10 +181,11 @@ class Interpreter:
 				elif node.operator == "||":
 					operator = "or"
 				else:  # pragma: no cover
+					# **should** not happen
 					raise Exception(f"Unknown operator in Logical Expression: {node.operator}")
 				return eval(f"{left} {operator} {right}", env)
 			else:  # pragma: no cover
-				raise Exception(f"Unknown ComplexExpression: {node.type}")
+				raise Exception(f"Unknown ComplexExpression: {node}")
 		elif isinstance(node, Node.UnaryExpression):
 			val = self.interpret(node.argument, env)
 			return eval(f"{node.operator}{val}", env)
