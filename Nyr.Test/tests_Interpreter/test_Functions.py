@@ -18,9 +18,10 @@ def testFunction():
 		z = add(x, y);
 	""")
 
-	out = Interpreter().interpret(ast, Env())
+	env = Env()
+	Interpreter().interpret(ast, env)
 
-	assert out == {
+	assert env == {
 		"x": 42,
 		"y": 58,
 		"z": 100,
@@ -53,7 +54,7 @@ def testFunctionNotExists():
 		z = add(x, y);
 	""")
 
-	with pytest.raises(Exception, match='Function with name "add" does not exist in available scope'):
+	with pytest.raises(Exception, match='Function "add" does not exist in available scope'):
 		Interpreter().interpret(ast, Env())
 
 
@@ -74,5 +75,5 @@ def testFunctionAlreadyExists():
 		z = add(x);
 	""")
 
-	with pytest.raises(Exception, match='Function "add" already defined'):
+	with pytest.raises(Exception, match='Function "add" already exists in available scope'):
 		Interpreter().interpret(ast, Env())

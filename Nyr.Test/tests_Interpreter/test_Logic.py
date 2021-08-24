@@ -1,10 +1,3 @@
-"""
-if (x > 1) {
-	// stuff
-} else {
-	// other stuff
-}
-"""
 import pytest
 
 from Nyr.Interpreter.Env import Env
@@ -22,7 +15,7 @@ from Nyr.Parser.Parser import Parser
 	),
 )
 def testIfElse(xVal: int, expectedY: str):
-	ast = Parser().parse("""
+	code = """
 		let x = __xval__;
 		let y = "";
 		if (x > 2) {
@@ -30,7 +23,8 @@ def testIfElse(xVal: int, expectedY: str):
 		} else {
 			y = "x is 2 or less";
 		}
-	""".replace("__xval__", str(xVal)))
+	""".replace("__xval__", str(xVal))
+	ast = Parser().parse(code)
 
 	out = Interpreter().interpret(ast, Env())
 

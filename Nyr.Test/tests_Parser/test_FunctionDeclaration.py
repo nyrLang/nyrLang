@@ -170,6 +170,33 @@ class TestFunctionDeclarations:
 
 
 class TestFunctionCalls:
+	def testSimpleFunctionCallWithoutParams(self):
+		ast = json.loads(
+			json.dumps(
+				Parser().parse("foo();"),
+				cls=Node.ComplexEncoder,
+			),
+		)
+
+		expected = {
+			"type": "Program",
+			"body": [
+				{
+					"type": "ExpressionStatement",
+					"expression": {
+						"type": "CallExpression",
+						"callee": {
+							"type": "Identifier",
+							"name": "foo",
+						},
+						"arguments": [],
+					},
+				},
+			],
+		}
+
+		assert ast == expected
+
 	def testSimpleFunctionCall(self):
 		ast = json.loads(
 			json.dumps(

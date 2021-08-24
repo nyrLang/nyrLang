@@ -144,3 +144,47 @@ def testMultipleDeclarationsWithPartialAssign():
 	}
 
 	assert ast == expected
+
+
+def testMultipleDeclarationsWithAllAssign():
+	ast = json.loads(
+		json.dumps(
+			Parser().parse("let x = 7, y = 42;"),
+			cls=Node.ComplexEncoder,
+		),
+	)
+
+	expected = {
+		"type": "Program",
+		"body": [
+			{
+				"type": "VariableStatement",
+				"declarations": [
+					{
+						"type": "VariableDeclaration",
+						"id": {
+							"type": "Identifier",
+							"name": "x",
+						},
+						"init": {
+							"type": "IntegerLiteral",
+							"value": 7,
+						},
+					},
+					{
+						"type": "VariableDeclaration",
+						"id": {
+							"type": "Identifier",
+							"name": "y",
+						},
+						"init": {
+							"type": "IntegerLiteral",
+							"value": 42,
+						},
+					},
+				],
+			},
+		],
+	}
+
+	assert ast == expected

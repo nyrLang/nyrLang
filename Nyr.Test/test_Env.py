@@ -10,7 +10,7 @@ def testAddValue():
 	env.addValue("varName", 17)
 	env.addValue("anotherVarName", "varName")
 
-	with pytest.raises(Exception, match="Variable varName already exists"):
+	with pytest.raises(Exception, match='Variable "varName" already exists in available scope'):
 		env.addValue("varName", 42)
 
 	assert env == {"varName": 17, "anotherVarName": 17}
@@ -24,7 +24,7 @@ def testGetValue():
 	assert env.getValue("x") == "A String"
 	assert env.getValue(-5) == -5
 
-	with pytest.raises(Exception, match="Variable with name z does not exist in available scope"):
+	with pytest.raises(Exception, match='Variable "z" does not exist in available scope'):
 		env.getValue("z")
 
 	assert env == {"x": "A String"}
@@ -39,7 +39,7 @@ def testSetValue():
 	env.setValue("y", "x")
 	env.setValue("x", 3.14159)
 
-	with pytest.raises(Exception, match="Variable with name z does not exist in available scope"):
+	with pytest.raises(Exception, match='Variable "z" does not exist in available scope'):
 		env.setValue("z", 666)
 
 	assert env == {"x": 3.14159, "y": "A String"}
@@ -77,22 +77,21 @@ def testAddFunc():
 				[Node.Identifier("arg1"), Node.Identifier("arg2")],
 				Node.BlockStatement([
 					Node.ReturnStatement(
-					Node.ComplexExpression(
-						"BinaryExpression",
-						"+",
-						Node.Identifier("arg1"),
-						Node.Identifier("arg2"),
-					),
+						Node.ComplexExpression(
+							"BinaryExpression",
+							"+",
+							Node.Identifier("arg1"),
+							Node.Identifier("arg2"),
+						),
 					),
 				]),
 			),
 		},
 	)
 
-	with pytest.raises(Exception, match='Function "foo" already defined'):
+	with pytest.raises(Exception, match='Function "foo" already exists in available scope'):
 		# No need to add dict since it will raise an exception
 		env.addFunc("foo", {})
-
 
 
 @pytest.mark.dependency(depends=["testAddFunc"])
@@ -119,7 +118,7 @@ def testGetFunc():
 
 	assert env.getFunc("foo") == func
 
-	with pytest.raises(Exception, match='Function with name "bar" does not exist in available scope'):
+	with pytest.raises(Exception, match='Function "bar" does not exist in available scope'):
 		env.getFunc("bar")
 
 

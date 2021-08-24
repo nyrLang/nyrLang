@@ -49,3 +49,19 @@ def testModulo():
 	out = Interpreter().interpret(ast, Env())
 
 	assert out == {"res": 1}
+
+
+@pytest.mark.parametrize(
+	("string1", "string2", "expectedStr"), (
+		("Ba", "nabra", "Banabra"),
+		("Spag", "hetti", "Spaghetti"),
+		("string", "", "string"),
+		("", "concat", "concat"),
+		("42", "77", "4277"),
+	),
+)
+def testStringConcatenation(string1: str, string2: str, expectedStr: str):
+	ast = Parser().parse(f'let res = "{string1}" + "{string2}";')
+	env = Interpreter().interpret(ast, Env())
+
+	assert env == {"res": expectedStr}

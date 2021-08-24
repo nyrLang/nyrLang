@@ -52,3 +52,21 @@ def testMixedInitialize():
 	}
 
 	assert out == expected
+
+
+def testAssignWithBinaryExpr():
+	ast = Parser().parse("""
+		let x = 4;
+		let y = 7;
+		let z = x + y;
+	""")
+
+	env = Interpreter().interpret(ast, Env())
+
+	expected = {
+		"x": 4,
+		"y": 7,
+		"z": 11,
+	}
+
+	assert env == expected
