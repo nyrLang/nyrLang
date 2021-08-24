@@ -151,14 +151,14 @@ class Tokenizer:
 
 		raise Exception(f"Could not parse input correctly. starting here ({self.pos.line}:{self.pos.col}):\n\t{string}")
 
-	def getTokens(self) -> list[Token]:
+	def getTokens(self) -> tuple[Token]:
 		tokens = []
 		while True:
 			tk = self._getNextToken()
 			tokens.append(tk)
 			if tk.type == "EOF":
 				break
-		return tokens
+		return tuple(tokens)
 
 
 class Position:

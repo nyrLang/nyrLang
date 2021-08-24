@@ -24,7 +24,6 @@ include = [
 ]
 omit = [
 	"Nyr/__main__.py",
-	"Nyr.Test/*",
 ]
 
 [tool.coverage.html]

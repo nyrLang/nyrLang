@@ -326,7 +326,7 @@ class Literal(Node):
 		self.value = value
 
 	def __repr__(self):  # pragma: no cover
-			return f"{self.__module__}.{self.__class__.__name__}({self.type}, {self.value})"
+		return f"{self.__module__}.{self.__class__.__name__}({self.type}, {self.value})"
 
 	def toJSON(self):
 		return dict(type=self.type, value=self.value)

@@ -132,19 +132,19 @@ class Interpreter:
 			if right is None:  # pragma: no cover
 				raise Exception(f"Unknown right-hand side of ComplexExpression: {node.right}")
 
-			lVal = None
-			rVal = None
+			lVal = left
+			rVal = right
 			if type(left) == str:
 				if env.findOwner(left) is not None:
 					lVal = env.getValue(left)
-			else:
-				lVal = left
+				else:
+					lVal = f'"{lVal}"'
 
 			if type(right) == str:
 				if env.findOwner(right) is not None:
 					rVal = env.getValue(right)
-			else:
-				rVal = right
+				else:
+					rVal = f'"{rVal}"'
 
 			if node.type == "BinaryExpression":
 				if node.operator == "/":

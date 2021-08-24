@@ -9,7 +9,7 @@ class Parser:
 	string: str
 	tokenizer: Tokenizer
 	lookahead: Token
-	tokens: list[Token]
+	tokens: tuple[Token]
 	tkIndex: int = 0
 
 	def __init__(self):
