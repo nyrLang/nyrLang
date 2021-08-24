@@ -150,7 +150,10 @@ class Interpreter:
 				if node.operator == "/":
 					assert lVal is not None, f"Expected value, got None instead"
 					assert rVal is not None, f"Expected value, got None instead"
-					res = eval(f"{lVal} / {rVal}", env)
+					try:
+						res = eval(f"{lVal} / {rVal}", env)
+					except ZeroDivisionError:
+						raise ZeroDivisionError(f"Cannot divide by 0")
 					if math.floor(res) == math.ceil(res):
 						return int(res)
 					else:

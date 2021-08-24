@@ -5,50 +5,28 @@ from Nyr.Interpreter.Interpreter import Interpreter
 from Nyr.Parser.Parser import Parser
 
 
-def testAddition():
-	ast = Parser().parse("let res = 1 + 2;")
-
-	out = Interpreter().interpret(ast, Env())
-
-	assert out == {"res": 3}
-
-
-def testSubtraction():
-	ast = Parser().parse("let res = 1 - 2;")
-
-	out = Interpreter().interpret(ast, Env())
-
-	assert out == {"res": -1}
-
-
-def testMultiplication():
-	ast = Parser().parse("let res = 3 * 4;")
-
-	out = Interpreter().interpret(ast, Env())
-
-	assert out == {"res": 12}
-
-
 @pytest.mark.parametrize(
-	("code", "expected"), (
-		("let res = 9 / 3;", {'res': int(3)}),
-		("let res = 3 / 2;", {'res': float(3 / 2)}),
+	("expr", "expectedRes"), (
+		("1 + 2", 3),
+		("1 - 2", -1),
+		("3 * 4", 12),
+		("9 / 3", int(3)),
+		("3 / 2", float(3 / 2)),
+		("9 % 2", 1),
 	),
 )
-def testDivision(code: str, expected):
-	ast = Parser().parse(code)
+def testSimpleExpression(expr: str, expectedRes):
+	ast = Parser().parse(f"let res = {expr};")
+	env = Interpreter().interpret(ast, Env())
 
-	out = Interpreter().interpret(ast, Env())
-
-	assert out == expected
+	assert env == {"res": expectedRes}
 
 
-def testModulo():
-	ast = Parser().parse("let res = 9 % 2;")
+def testDivideBy0():
+	ast = Parser().parse("1 / 0;")
 
-	out = Interpreter().interpret(ast, Env())
-
-	assert out == {"res": 1}
+	with pytest.raises(ZeroDivisionError, match="Cannot divide by 0"):
+		Interpreter().interpret(ast, Env())
 
 
 @pytest.mark.parametrize(
