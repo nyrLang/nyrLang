@@ -1,0 +1,16 @@
+// a is a string
+let a = "Hello";
+
+// b is null
+let b;
+// x is null; y is an integer; z is a boolean
+let x, y = 7, z = false;
+
+// b is now "Hello, World!"
+b = a + ", World!";
+
+// x is now 3
+x = 3;
+
+// x is now 10
+x += y;

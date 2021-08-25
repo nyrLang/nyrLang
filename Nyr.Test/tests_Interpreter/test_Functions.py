@@ -77,3 +77,25 @@ def testFunctionAlreadyExists():
 
 	with pytest.raises(Exception, match='Function "add" already exists in available scope'):
 		Interpreter().interpret(ast, Env())
+
+
+@pytest.mark.xfail(reason="Recursion not yet working", strict=True, run=True)
+def testRecursion():
+	ast = Parser().parse("""
+		def factorial(x) {
+			if (x <= 1) {
+				return 1;
+			} else {
+				return x * factorial(x - 1);
+			}
+		}
+
+		let fac = factorial(5);
+	""")
+
+	env = Env()
+	Interpreter().interpret(ast, env)
+
+	assert env == {
+		"fac": 120,
+	}

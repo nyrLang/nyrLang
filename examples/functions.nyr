@@ -1,0 +1,11 @@
+def square(x) {
+	return x * x;
+}
+
+def cube(x) {
+	return square(x) * x;
+}
+
+let twoSquared = square(2);
+let tenSquared = square(10);
+let fourCubed = cube(4);

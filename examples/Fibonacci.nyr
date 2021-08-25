@@ -1,0 +1,15 @@
+def fibonacci(n) {
+	if (n < 0) {
+		return "Input must be 1 or greater";
+	} else if (n == 0) {
+		return 0;
+	} else if (n == 1 || n == 2) {
+		return 1;
+	} else {
+		return fibonacci(n - 1) + fibonacci(n - 2);
+	}
+}
+
+let fib0 = fibonacci(0);
+let fib1 = fibonacci(1);
+let fib10 = fibonacci(10);

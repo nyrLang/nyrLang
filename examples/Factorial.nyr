@@ -1,0 +1,10 @@
+def factorial(x) {
+	if (x <= 1) {
+		return 1;
+	} else {
+		return x * factorial(x - 1);
+	}
+}
+
+let fac1 = factorial(1);
+let fac10 = factorial(10);
