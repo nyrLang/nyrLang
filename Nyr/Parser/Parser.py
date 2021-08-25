@@ -17,15 +17,15 @@ class Parser:
 
 	@staticmethod
 	def _isLiteral(tokenType) -> bool:
-		return tokenType in ["INTEGER", "FLOAT", "STRING", "true", "false", "null"]
+		return tokenType in ("INTEGER", "FLOAT", "STRING", "true", "false", "null")
 
 	@staticmethod
 	def _isAssignmentOperator(tokenType):
-		return tokenType in ["SIMPLE_ASSIGN", "COMPLEX_ASSIGN"]
+		return tokenType in ("SIMPLE_ASSIGN", "COMPLEX_ASSIGN")
 
 	@staticmethod
 	def _checkValidAssignmentTarget(node: Node.Node) -> Node.Node:
-		if node.type in ["Identifier", "MemberExpression"]:
+		if node.type in ("Identifier", "MemberExpression"):
 			return node
 		else:
 			raise SyntaxError(f"Invalid left-hand side in assignment expression: {node}; expected: Identifier, MemberExpression")
@@ -96,7 +96,7 @@ class Parser:
 			return self.VariableStatement()
 		elif self.lookahead.type == "if":
 			return self.IfStatement()
-		elif self.lookahead.type in ["while", "do", "for"]:
+		elif self.lookahead.type in ("while", "do", "for"):
 			return self.IterationStatement()
 		elif self.lookahead.type == "def":
 			return self.FunctionDeclaration()
@@ -186,14 +186,11 @@ class Parser:
 		"""
 		params: list[Node.Node] = []
 
-		while True:
-			params.append(self.Identifier())
+		params.append(self.Identifier())
 
-			if self.lookahead.type == ",":
-				self._eat(",")
-				continue
-			else:
-				break
+		while self.lookahead.type == ",":
+			self._eat(",")
+			params.append(self.Identifier())
 
 		return params
 
@@ -295,12 +292,10 @@ class Parser:
 	def VariableDeclarationList(self) -> list[Node.Node]:
 		declarations: list[Node.Node] = []
 
-		while True:
+		declarations.append(self.VariableDeclaration())
+		while self.lookahead.type == ",":
+			self._eat(",")
 			declarations.append(self.VariableDeclaration())
-			if self.lookahead.type == ",":
-				self._eat(",")
-			else:
-				break
 
 		return declarations
 
@@ -479,12 +474,10 @@ class Parser:
 
 		argumentList: list[Node.Node] = []
 
-		while True:
+		argumentList.append(self.AssignmentExpression())
+		while self.lookahead.type == ",":
+			self._eat(",")
 			argumentList.append(self.AssignmentExpression())
-			if self.lookahead.type == ",":
-				self._eat(",")
-			else:
-				break
 
 		return argumentList
 

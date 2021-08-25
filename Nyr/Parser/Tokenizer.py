@@ -156,11 +156,11 @@ class Tokenizer:
 
 	def getTokens(self) -> tuple[Token]:
 		tokens = []
-		while True:
-			tk = self._getNextToken()
+		tk = self._getNextToken()
+		while tk.type != "EOF":
 			tokens.append(tk)
-			if tk.type == "EOF":
-				break
+			tk = self._getNextToken()
+		tokens.append(tk)
 		return tuple(tokens)
 
 
