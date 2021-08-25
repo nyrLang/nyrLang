@@ -4,6 +4,10 @@ from Nyr.Parser.Tokenizer import Token
 from Nyr.Parser.Tokenizer import Tokenizer
 
 
+def testFails():
+	assert False
+
+
 def testEmptyInput():
 	t = Tokenizer()
 	t.init("")
