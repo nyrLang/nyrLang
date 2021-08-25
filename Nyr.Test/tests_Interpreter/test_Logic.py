@@ -37,7 +37,34 @@ def testIfElse(xVal: int, expectedY: str):
 		("||", (True, True, True, False)),
 	),
 )
-def testLogicalOperators(operator: str, expected: tuple[bool]):
+def testLogicalOperatorsI(operator: str, expected: tuple[bool]):
+	assert len(expected) == 4, f"expected input must be of lenght 4, input was: {len(expected)}"
+	ast = Parser().parse(f"""
+		let a, b, c, d;
+		a = true {operator} true;
+		b = true {operator} false;
+		c = false {operator} true;
+		d = false {operator} false;
+	""")
+
+	out = Interpreter().interpret(ast, Env())
+
+	assert out == {
+		"a": expected[0],
+		"b": expected[1],
+		"c": expected[2],
+		"d": expected[3],
+	}
+
+
+@pytest.mark.parametrize(
+	("operator", "expected"), (
+		(r"^", (False, True, True, False)),
+		(r"|", (True, True, True, False)),
+		(r"&", (True, False, False, False)),
+	),
+)
+def testBitwiseOperatorsI(operator: str, expected: tuple[bool]):
 	assert len(expected) == 4, f"expected input must be of lenght 4, input was: {len(expected)}"
 	ast = Parser().parse(f"""
 		let a, b, c, d;

@@ -8,15 +8,15 @@ from Nyr.Parser.Parser import Parser
 
 @pytest.mark.parametrize(
 	("operator"), (
-		("+"),
-		("-"),
-		("!"),
+		(r"^"),
+		(r"|"),
+		(r"&"),
 	),
 )
-def testUnary(operator: str):
+def testBitwiseOperatorP(operator: str):
 	ast = json.loads(
 		json.dumps(
-			Parser().parse(f"{operator}x;"),
+			Parser().parse(f"true {operator} false;"),
 			cls=Node.ComplexEncoder,
 		),
 	)
@@ -27,11 +27,15 @@ def testUnary(operator: str):
 			{
 				"type": "ExpressionStatement",
 				"expression": {
-					"type": "UnaryExpression",
+					"type": "BitwiseExpression",
 					"operator": operator,
-					"argument": {
-						"type": "Identifier",
-						"name": "x",
+					"left": {
+						"type": "BooleanLiteral",
+						"value": True,
+					},
+					"right": {
+						"type": "BooleanLiteral",
+						"value": False,
 					},
 				},
 			},

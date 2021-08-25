@@ -1,6 +1,6 @@
 from typing import Any
 
-import Nyr.Parser.Node as Node
+from Nyr.Parser import Node
 from Nyr.Parser.Tokenizer import Token
 from Nyr.Parser.Tokenizer import Tokenizer
 
@@ -386,7 +386,35 @@ class Parser:
 		return self.LogicalExpression("LogicalANDExpression", "LOGICAL_OR")
 
 	def LogicalANDExpression(self) -> Node.Node:
-		return self.LogicalExpression("EqualityExpression", "LOGICAL_AND")
+		return self.LogicalExpression("BitwiseORExpression", "LOGICAL_AND")
+
+	def BitwiseExpression(self, builderName, operatorToken) -> Node.Node:
+		builder = getattr(self, builderName)
+
+		left = builder()
+
+		while self.lookahead.type == operatorToken:
+			operator = self._eat(operatorToken).value
+
+			right = builder()
+
+			left = Node.ComplexExpression(
+				"BitwiseExpression",
+				operator,
+				left,
+				right,
+			)
+
+		return left
+
+	def BitwiseORExpression(self) -> Node.Node:
+		return self.BitwiseExpression("BitwiseXORExpression", "BITWISE_OR")
+
+	def BitwiseXORExpression(self) -> Node.Node:
+		return self.BitwiseExpression("BitwiseANDExpression", "BITWISE_XOR")
+
+	def BitwiseANDExpression(self) -> Node.Node:
+		return self.BitwiseExpression("EqualityExpression", "BITWISE_AND")
 
 	def LeftHandSideExpression(self) -> Node.Node:
 		""" LeftHandSideExpression

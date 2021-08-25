@@ -187,6 +187,10 @@ class Interpreter:
 					# **should** not happen
 					raise Exception(f"Unknown operator in Logical Expression: {node.operator}")
 				return eval(f"{left} {operator} {right}", env)
+			elif node.type == "BitwiseExpression":
+				assert lVal is not None, f"Expected value, got None instead"
+				assert rVal is not None, f"Expected value, got None instead"
+				return eval(f"{lVal} {node.operator} {rVal}")
 			else:  # pragma: no cover
 				raise Exception(f"Unknown ComplexExpression: {node}")
 		elif isinstance(node, Node.UnaryExpression):

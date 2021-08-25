@@ -5,7 +5,7 @@ from typing import AnyStr
 from typing import Optional
 from typing import Union
 
-spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
+spec: tuple[tuple[re.Pattern[AnyStr], Optional[str]]] = (
 	# -------------------------
 	# Whitespace
 	(re.compile(r"^\n"), "NEWLINE"),
@@ -79,13 +79,19 @@ spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 	(re.compile(r"^!"), "LOGICAL_NOT"),
 
 	# -------------------------
+	# Bitwise Operators
+	(re.compile(r"^\&"), "BITWISE_AND"),
+	(re.compile(r"^\^"), "BITWISE_XOR"),
+	(re.compile(r"^\|"), "BITWISE_OR"),
+
+	# -------------------------
 	# Relational Operators: >, >=, <, <=
 	(re.compile(r"^[><]=?"), "RELATIONAL_OPERATOR"),
 
 	# -------------------------
 	# Strings
 	(re.compile(r'^"[^"]*"'), "STRING"),
-]
+)
 
 
 class Token:
@@ -100,9 +106,6 @@ class Token:
 class Tokenizer:
 	string: str = ""
 	pos: Position
-
-	def __init__(self):
-		pass
 
 	def init(self, string: str):
 		self.string = string

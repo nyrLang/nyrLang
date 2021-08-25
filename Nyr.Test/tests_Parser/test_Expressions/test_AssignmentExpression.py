@@ -3,7 +3,7 @@ import re
 
 import pytest
 
-import Nyr.Parser.Node as Node
+from Nyr.Parser import Node
 from Nyr.Parser.Parser import Parser
 
 
