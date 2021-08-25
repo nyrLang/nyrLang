@@ -79,7 +79,7 @@ def testFunctionAlreadyExists():
 		Interpreter().interpret(ast, Env())
 
 
-@pytest.mark.xfail(reason="Recursion not yet working", strict=True, run=True)
+@pytest.mark.xfail(reason="Recursion not yet working")
 def testRecursion():
 	ast = Parser().parse("""
 		def factorial(x) {

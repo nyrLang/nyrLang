@@ -2,6 +2,8 @@
 console_output_style = "progress"
 log_auto_indent = true
 minversion = 6.0
+addopts = "--strict-config --strict-markers"
+xfail_strict = true
 
 [tool.coverage.run]
 cover_pylib = false
