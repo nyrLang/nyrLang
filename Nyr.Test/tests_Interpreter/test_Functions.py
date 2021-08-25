@@ -18,8 +18,7 @@ def testFunction():
 		z = add(x, y);
 	""")
 
-	env = Env()
-	Interpreter().interpret(ast, env)
+	env = Interpreter().interpret(ast, Env())
 
 	assert env == {
 		"x": 42,
@@ -93,8 +92,7 @@ def testRecursion():
 		let fac = factorial(5);
 	""")
 
-	env = Env()
-	Interpreter().interpret(ast, env)
+	env = Interpreter().interpret(ast, Env())
 
 	assert env == {
 		"fac": 120,

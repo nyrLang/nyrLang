@@ -5,7 +5,6 @@ from Nyr.Parser.Parser import Parser
 
 def testEmptyStatement():
 	ast = Parser().parse(";;")
+	env = Interpreter().interpret(ast, Env())
 
-	out = Interpreter().interpret(ast, Env())
-
-	assert out == dict()
+	assert env == dict()

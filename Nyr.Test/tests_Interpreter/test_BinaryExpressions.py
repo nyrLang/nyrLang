@@ -8,14 +8,32 @@ from Nyr.Parser.Parser import Parser
 @pytest.mark.parametrize(
 	("expr", "expectedRes"), (
 		("1 + 2", 3),
+		("1 + 2.14", float(3.14)),
 		("1 - 2", -1),
 		("3 * 4", 12),
+		("6 * 2.5", 15),
 		("9 / 3", int(3)),
 		("3 / 2", float(3 / 2)),
 		("9 % 2", 1),
 	),
 )
 def testSimpleExpression(expr: str, expectedRes):
+	ast = Parser().parse(f"let res = {expr};")
+	env = Interpreter().interpret(ast, Env())
+
+	assert env == {"res": expectedRes}
+
+
+@pytest.mark.parametrize(
+	("expr", "expectedRes"), (
+		("(1 + 2) * 3", 9),
+		("(5 + 13) / 6", int(3)),
+		("(10 / 4) * 2", int(5)),
+		("(42 / 2) + 17", int(38)),
+		("((2 + 1.14) * 2) / 2", pytest.approx(3.14)),
+	),
+)
+def testParenthesizedExpressions(expr: str, expectedRes):
 	ast = Parser().parse(f"let res = {expr};")
 	env = Interpreter().interpret(ast, Env())
 

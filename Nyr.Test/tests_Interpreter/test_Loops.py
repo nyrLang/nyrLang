@@ -14,9 +14,9 @@ def testWhileLoop():
 		}
 	""")
 
-	out = Interpreter().interpret(ast, Env())
+	env = Interpreter().interpret(ast, Env())
 
-	assert out == {"x": 5}
+	assert env == {"x": 5}
 
 
 def testWhileLoopBreak():
@@ -30,9 +30,9 @@ def testWhileLoopBreak():
 		}
 	""")
 
-	out = Interpreter().interpret(ast, Env())
+	env = Interpreter().interpret(ast, Env())
 
-	assert out == {"x": 2}
+	assert env == {"x": 2}
 
 
 def testDoWhile():
@@ -43,9 +43,9 @@ def testDoWhile():
 		} while (false);
 	""")
 
-	out = Interpreter().interpret(ast, Env())
+	env = Interpreter().interpret(ast, Env())
 
-	assert out == {"x": 7}
+	assert env == {"x": 7}
 
 
 def testDoWhileBreak():
@@ -59,9 +59,9 @@ def testDoWhileBreak():
 		} while (true);
 	""")
 
-	out = Interpreter().interpret(ast, Env())
+	env = Interpreter().interpret(ast, Env())
 
-	assert out == {"x": 9}
+	assert env == {"x": 9}
 
 
 def testForLoop():
@@ -78,9 +78,9 @@ def testForLoop():
 		}
 	""")
 
-	out = Interpreter().interpret(ast, Env())
+	env = Interpreter().interpret(ast, Env())
 
-	assert out == {"i": 10, "x": 20, "y": 20}
+	assert env == {"i": 10, "x": 20, "y": 20}
 
 
 def testForLoopBreak():
@@ -100,9 +100,9 @@ def testForLoopBreak():
 		}
 	""")
 
-	out = Interpreter().interpret(ast, Env())
+	env = Interpreter().interpret(ast, Env())
 
-	assert out == {"i": 10, "x": 12, "y": 20}
+	assert env == {"i": 10, "x": 12, "y": 20}
 
 
 @pytest.mark.parametrize(

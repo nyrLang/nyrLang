@@ -25,10 +25,9 @@ def testIfElse(xVal: int, expectedY: str):
 		}
 	""".replace("__xval__", str(xVal))
 	ast = Parser().parse(code)
+	env = Interpreter().interpret(ast, Env())
 
-	out = Interpreter().interpret(ast, Env())
-
-	assert out == {"x": xVal, "y": expectedY}
+	assert env == {"x": xVal, "y": expectedY}
 
 
 @pytest.mark.parametrize(
@@ -47,9 +46,9 @@ def testLogicalOperatorsI(operator: str, expected: tuple[bool]):
 		d = false {operator} false;
 	""")
 
-	out = Interpreter().interpret(ast, Env())
+	env = Interpreter().interpret(ast, Env())
 
-	assert out == {
+	assert env == {
 		"a": expected[0],
 		"b": expected[1],
 		"c": expected[2],
@@ -74,9 +73,9 @@ def testBitwiseOperatorsI(operator: str, expected: tuple[bool]):
 		d = false {operator} false;
 	""")
 
-	out = Interpreter().interpret(ast, Env())
+	env = Interpreter().interpret(ast, Env())
 
-	assert out == {
+	assert env == {
 		"a": expected[0],
 		"b": expected[1],
 		"c": expected[2],
