@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from enum import auto
 from enum import Enum
+from pprint import pp
 from typing import Optional
 
 
@@ -47,6 +48,7 @@ class ActivationRecord:
 			del self.members["__builtins__"]
 
 		for key, val in self.members.items():
+			if key is None: continue
 			if type(val) == str:
 				val = f'"{val}"'
 			lines.append(f"  {key:<20}: {val}")

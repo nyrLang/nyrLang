@@ -65,3 +65,16 @@ def testAssignWithBinaryExpr():
 		"y": 7,
 		"z": 11,
 	}
+
+
+@pytest.mark.parametrize(
+	("code"), (
+		("let x; let x;"),
+		("let x, x;"),
+	),
+)
+def testVarExists(code: str):
+	ast = Parser().parse(code)
+
+	with pytest.raises(Exception, match='Unknown variable "None"'):
+		Interpreter(ast).interpret()

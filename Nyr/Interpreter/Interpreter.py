@@ -20,7 +20,7 @@ class NodeVisitor:
 		visitor = getattr(self, vName, self.genericVisit)
 		return visitor(node)
 
-	def genericVisit(self, node):
+	def genericVisit(self, node):  # pragma: no cover
 		raise Exception(f"visit{type(node).__name__} not found")
 
 
@@ -33,7 +33,7 @@ class Interpreter(NodeVisitor):
 		self.logStack: bool = kwargs.get("logStack", False)
 		self.logFinal: bool = kwargs.get("logFinal", False)
 		self.logAll: bool = kwargs.get("logAll", False)
-		if self.logAll is True:
+		if self.logAll is True: # pragma: no cover
 			self.logVisit = True
 			self.logStack = True
 			self.logFinal = True
@@ -47,15 +47,15 @@ class Interpreter(NodeVisitor):
 		# FIXME: Hacky way to break loops
 		self.breakLoop = False
 
-	def lVisit(self, msg):
+	def lVisit(self, msg):  # pragma: no cover
 		if self.logVisit is True:
 			self.logger.info(msg)
 
-	def lStack(self, msg):
+	def lStack(self, msg):  # pragma: no cover
 		if self.logStack is True:
 			self.logger.debug(msg)
 
-	def lFinal(self):
+	def lFinal(self):  # pragma: no cover
 		if self.logFinal is True:
 			self.logger.debug(str(self.stack))
 
@@ -106,11 +106,11 @@ class Interpreter(NodeVisitor):
 
 		self.lVisit("LEAVE: Node.BlockStatement")
 
-		if len(returns) == 0:
+		if len(returns) == 0:  # pragma: no cover
 			return
-		elif len(returns) == 1:
+		elif len(returns) == 1:  # pragma: no cover
 			return returns[0]
-		else:
+		else:  # pragma: no cover
 			return returns
 
 	def visitIfStatement(self, node: Node.IfStatement):
@@ -366,6 +366,8 @@ class Interpreter(NodeVisitor):
 		ar = self.stack.peek()
 		if ar.varExists(varName):
 			raise Exception(f'Variable "{varName}" already exists in available scope')
+		elif type(varName) != str:
+			raise Exception(f'Unknown variable "{varName}"')
 		ar[varName] = varValue
 		self.lVisit(f"LEAVE: Node.VariableDeclaration({varName}, {_vv})")
 		del _vv

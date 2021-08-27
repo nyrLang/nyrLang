@@ -3,7 +3,6 @@ import json
 import sys
 from pprint import pp
 
-from Nyr.Interpreter.Env import Env
 from Nyr.Interpreter.Interpreter import Interpreter
 from Nyr.Parser.Node import ComplexEncoder
 from Nyr.Parser.Node import Node
@@ -26,11 +25,9 @@ def printAst(ast_: Node, print_: bool):
 		print(json.dumps(ast_, cls=ComplexEncoder, indent=2))
 
 
-def interpret(ast_: Node, interpret_: bool, env_: Env = None):
-	if env_ is None:
-		env_ = Env()
+def interpret(ast_: Node, interpret_: bool):
 	if interpret_ is True:
-		_env: Env = Interpreter(ast_).interpret()
+		_env = Interpreter(ast_, logVisit=True).interpret()
 		print(f"Env = ", end="")
 		pp(_env)
 
@@ -89,7 +86,6 @@ if __name__ == "__main__":
 
 	# CLI mode (read from stdin)
 	if args.inputFile == "<stdin>":
-		env = Env()
 		while True:
 			cmd = input("nyr> ")
 			if cmd == "exit": exit(0)
@@ -104,7 +100,7 @@ if __name__ == "__main__":
 
 			printAst(ast, printAST)
 			outputAST(ast, args.output)
-			interpret(ast, args.interpret, env)
+			interpret(ast, args.interpret)
 
 	# File mode (read from file given via -f flag)
 	elif args.inputFile.endswith(".nyr"):
