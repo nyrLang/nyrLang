@@ -3,7 +3,7 @@ name: codecov
 on:
   pull_request:
   push:
-    branches: [ senpai ]
+    branches: [ main ]
 
 jobs:
   cov:
