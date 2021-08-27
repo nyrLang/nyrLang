@@ -27,7 +27,7 @@ def printAst(ast_: Node, print_: bool):
 
 def interpret(ast_: Node, interpret_: bool):
 	if interpret_ is True:
-		_env = Interpreter(ast_, logVisit=True).interpret()
+		_env = Interpreter(ast_).interpret()
 		print(f"Env = ", end="")
 		pp(_env)
 

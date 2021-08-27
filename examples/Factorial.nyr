@@ -1,4 +1,3 @@
-// NOTE: Since recursion is not working with the current interpreter, running this file will not work
 def factorial(x) {
 	if (x <= 1) {
 		return 1;

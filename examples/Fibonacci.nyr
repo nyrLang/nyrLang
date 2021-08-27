@@ -1,4 +1,3 @@
-// NOTE: Since recursion is not working with the current interpreter, running this file will not work
 def fibonacci(n) {
 	if (n < 0) {
 		return "Input must be 1 or greater";
@@ -11,6 +10,5 @@ def fibonacci(n) {
 	}
 }
 
-let fib0 = fibonacci(0);
 let fib1 = fibonacci(1);
 let fib10 = fibonacci(10);
