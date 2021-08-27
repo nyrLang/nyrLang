@@ -1,228 +1,396 @@
+import logging
 import math
-from typing import Any
+import sys
 
-from Nyr.Interpreter.Env import Env
+from Nyr.Interpreter.Stack import ActivationRecord
+from Nyr.Interpreter.Stack import ARType
+from Nyr.Interpreter.Stack import Stack
 from Nyr.Parser import Node
 
 MAXITERATIONS = 2 ** 16
 # TODO: find a way to implement this
-RECURSIONDEPTH = 256
+RECURSIONDEPTH = 512
 
 
-class Interpreter:
-	# FIXME: Hacky way to break loops
-	breakLoop = False
+class NodeVisitor:
+	def visit(self, node: Node.Node):
+		if node is None:
+			return None
+		vName = f"visit{type(node).__name__}"
+		visitor = getattr(self, vName, self.genericVisit)
+		return visitor(node)
 
-	def interpret(self, node: Node.Node, env: Env) -> Any:
-		if node is None: return None
+	def genericVisit(self, node):
+		raise Exception(f"visit{type(node).__name__} not found")
 
-		if isinstance(node, Node.Program):
-			for n in node.body:
-				self.interpret(n, env)
-			if "__builtins__" in env.keys():
-				del env["__builtins__"]
-			return env
-		elif isinstance(node, Node.VariableDeclaration):
-			name = self.interpret(node.id, env)
 
-			val = None
-			if node.init is not None:
-				val = self.interpret(node.init, env)
+class Interpreter(NodeVisitor):
+	def __init__(self, ast: Node.Program, **kwargs):
+		self.ast = ast
+		self.stack: Stack = Stack()
+		self.fns: list = []
+		self.logVisit: bool = kwargs.get("logVisit", False)
+		self.logStack: bool = kwargs.get("logStack", False)
+		self.logFinal: bool = kwargs.get("logFinal", False)
+		self.logAll: bool = kwargs.get("logAll", False)
+		if self.logAll is True:
+			self.logVisit = True
+			self.logStack = True
+			self.logFinal = True
 
-			env.addValue(name, val)
-		elif isinstance(node, Node.Identifier):
-			return node.name
-		elif isinstance(node, Node.ExpressionStatement):
-			r = self.interpret(node.expression, env)
-			if r == "break":
-				self.breakLoop = True
-		elif isinstance(node, Node.EmptyStatement):
-			pass
-		elif isinstance(node, Node.BlockStatement):
-			returns = []
-			for n in node.body:
-				r = self.interpret(n, env)
-				if r is not None:
-					returns.append(r)
-			if len(returns) == 0:  # pragma: no cover
-				return None
-			elif len(returns) == 1:  # pragma: no cover
-				return returns[0]
-			else:  # pragma: no cover
-				return returns
-		elif isinstance(node, Node.IfStatement):
-			test = self.interpret(node.test, env)
-			assert isinstance(test, bool)
-			if test is True:
-				self.interpret(node.consequent, env)
-			else:
-				self.interpret(node.alternative, env)
-		elif isinstance(node, Node.VariableStatement):
-			for decl in node.declarations:
-				self.interpret(decl, env)
-		elif isinstance(node, Node.WhileStatement):
-			test = self.interpret(node.test, env)
-			assert isinstance(test, bool)
+		hdlr = logging.StreamHandler(sys.stdout)
+		hdlr.setFormatter(logging.Formatter("[ %(name)s ] | %(levelname)s | %(message)s"))
+		self.logger = logging.getLogger(f"{self.__module__}.{self.__class__.__name__}")
+		self.logger.setLevel(logging.DEBUG)
+		self.logger.addHandler(hdlr)
 
-			iterations = 0
-			while test is True:
-				self.interpret(node.body, env)
-				test = self.interpret(node.test, env)
+		# FIXME: Hacky way to break loops
+		self.breakLoop = False
 
-				iterations += 1
+	def lVisit(self, msg):
+		if self.logVisit is True:
+			self.logger.info(msg)
 
-				if iterations > MAXITERATIONS:
-					raise Exception(f"Exceeded {MAXITERATIONS} iterations in while statement")
+	def lStack(self, msg):
+		if self.logStack is True:
+			self.logger.debug(msg)
 
-				# FIXME: hacky way to break loops
-				if self.breakLoop is True:
-					self.breakLoop = False
-					break
-		elif isinstance(node, Node.DoWhileStatement):
-			self.interpret(node.body, env)
-			test = self.interpret(node.test, env)
-			assert isinstance(test, bool)
+	def lFinal(self):
+		if self.logFinal is True:
+			self.logger.debug(str(self.stack))
 
-			iterations = 0
-			while test is True:
-				self.interpret(node.body, env)
-				test = self.interpret(node.test, env)
+	def interpret(self):
+		return self.visit(self.ast)
 
-				iterations += 1
+	def visitProgram(self, node: Node.Program):
+		self.lVisit("ENTER: Node.Program")
 
-				if iterations > MAXITERATIONS:
-					raise Exception(f"Exceeded {MAXITERATIONS} iterations in do-while statement")
+		ar = ActivationRecord(
+			node.type,
+			ARType.PROGRAM,
+			1,
+		)
+		self.stack.push(ar)
 
-				# FIXME: hacky way to break loops
-				if self.breakLoop is True:
-					self.breakLoop = False
-					break
-		elif isinstance(node, Node.ForStatement):
-			forEnv = Env(parent=env)
-			self.interpret(node.init, forEnv)
-			test = True
+		self.lStack(str(ar))
+
+		for n in node.body:
+			self.visit(n)
+
+		self.lVisit("LEAVE: Node.Program")
+		self.lStack(str(self.stack))
+		self.lFinal()
+		return self.stack.pop().members
+
+	# STATEMENTS
+
+	def visitExpressionStatement(self, node: Node.ExpressionStatement):
+		self.lVisit("ENTER: Node.ExpressionStatement")
+		r = self.visit(node.expression)
+		if r == "break":
+			self.breakLoop = True
+		self.lVisit("LEAVE: Node.ExpressionStatement")
+
+	def visitEmptyStatement(self, node: Node.EmptyStatement):
+		self.lVisit("ENTER: Node.EmptyStatement")
+		self.lVisit("LEAVE: Node.EmptyStatement")
+
+	def visitBlockStatement(self, node: Node.BlockStatement):
+		self.lVisit("ENTER: Node.BlockStatement")
+
+		returns = []
+		for n in node.body:
+			r = self.visit(n)
+			if r:
+				returns.append(r)
+
+		self.lVisit("LEAVE: Node.BlockStatement")
+
+		if len(returns) == 0:
+			return
+		elif len(returns) == 1:
+			return returns[0]
+		else:
+			return returns
+
+	def visitIfStatement(self, node: Node.IfStatement):
+		self.lVisit("ENTER: Node.IfStatement")
+		test = self.visit(node.test)
+		assert isinstance(test, bool), f'Expected bool, got {type(test).__name__} instead'
+		if test is True:
+			ret = self.visit(node.consequent)
+		else:
+			ret = self.visit(node.alternative)
+		self.lVisit("LEAVE: Node.IfStatement")
+		return ret
+
+	def visitVariableStatement(self, node: Node.VariableStatement):
+		self.lVisit("ENTER: Node.VariableStatement")
+		for decl in node.declarations:
+			self.visit(decl)
+		self.lVisit("LEAVE: Node.VariableStatement")
+
+	def visitWhileStatement(self, node: Node.WhileStatement):
+		self.lVisit("ENTER: Node.WhileStatement")
+		test = self.visit(node.test)
+		assert isinstance(test, bool)
+
+		iterations = 0
+		while test is True:
+			self.visit(node.body)
+			test = self.visit(node.test)
+
+			iterations += 1
+
+			if iterations > MAXITERATIONS:
+				raise Exception(f"Exceeded {MAXITERATIONS} iterations in while statement")
+
+			# FIXME: hacky way to break loops
+			if self.breakLoop is True:
+				self.breakLoop = False
+				break
+
+		self.lVisit("LEAVE: Node.WhileStatement")
+
+	def visitDoWhileStatement(self, node: Node.DoWhileStatement):
+		self.lVisit("ENTER: Node.DoWhileStatement")
+		self.visit(node.body)
+		test = self.visit(node.test)
+		assert isinstance(test, bool)
+
+		iterations = 0
+		while test is True:
+			self.visit(node.body)
+			test = self.visit(node.test)
+
+			iterations += 1
+
+			if iterations > MAXITERATIONS:
+				raise Exception(f"Exceeded {MAXITERATIONS} iterations in do-while statement")
+
+			# FIXME: hacky way to break loops
+			if self.breakLoop is True:
+				self.breakLoop = False
+				break
+
+		self.lVisit("LEAVE: Node.DoWhileStatement")
+
+	def visitForStatement(self, node: Node.ForStatement):
+		self.lVisit("ENTER: Node.ForStatement")
+		self.visit(node.init)
+		test = True
+		if node.test is not None:
+			test = self.visit(node.test)
+			assert isinstance(test, bool), f"Interpreter::Node.ForStatement: Expected bool, got {type(test)} instead"
+
+		iterations = 0
+		while test is True:
+			self.visit(node.body)
+			self.visit(node.update)
+
 			if node.test is not None:
-				test = self.interpret(node.test, forEnv)
+				test = self.visit(node.test)
 				assert isinstance(test, bool), f"Interpreter::Node.ForStatement: Expected bool, got {type(test)} instead"
+			iterations += 1
 
-			iterations = 0
-			while test is True:
-				self.interpret(node.body, forEnv)
+			if iterations > MAXITERATIONS:
+				raise Exception(f"Exceeded {MAXITERATIONS} iterations in for statement")
 
-				self.interpret(node.update, forEnv)
-				if node.test is not None:
-					test = self.interpret(node.test, forEnv)
-					assert isinstance(test, bool), f"Interpreter::Node.ForStatement: Expected bool, got {type(test)} instead"
-				iterations += 1
+			if self.breakLoop is True:
+				self.breakLoop = False
+				break
 
-				if iterations > MAXITERATIONS:
-					raise Exception(f"Exceeded {MAXITERATIONS} iterations in for statement")
+		self.lVisit("LEAVE: Node.ForStatement")
 
-				# FIXME: hacky way to break loops
-				if self.breakLoop is True:
-					self.breakLoop = False
-					break
-			del forEnv
-		elif isinstance(node, Node.ComplexExpression):
-			left = self.interpret(node.left, env)
-			right = self.interpret(node.right, env)
+	def visitReturnStatement(self, node: Node.ReturnStatement):
+		self.lVisit("ENTER: Node.ReturnStatement")
+		ret = self.visit(node.argument)
+		self.lVisit("LEAVE: Node.ReturnStatement")
+		return ret
 
-			if left is None:  # pragma: no cover
-				raise Exception(f"Unknown left-hand side of ComplexExpression: {node.left}")
-			if right is None:  # pragma: no cover
-				raise Exception(f"Unknown right-hand side of ComplexExpression: {node.right}")
+	# EXPRESSIONS
 
+	def visitComplexExpression(self, node: Node.ComplexExpression):
+		self.lVisit("ENTER: Node.ComplexExpression")
+
+		if isinstance(node.left, Node.Identifier):
+			left = node.left.name
+		else:
+			left = self.visit(node.left)
+
+		if isinstance(node.right, Node.Identifier):
+			right = node.right.name
+		else:
+			right = self.visit(node.right)
+
+		if type(left) == str:
+			if self.stack.peek().varExists(left):
+				lVal = self.stack.peek().get(left)
+			else:
+				lVal = f'{left}'
+		else:
 			lVal = left
+
+		if type(right) == str:
+			if self.stack.peek().varExists(right):
+				rVal = self.stack.peek().get(right)
+			else:
+				rVal = f'{right}'
+		else:
 			rVal = right
-			if type(left) == str:
-				if env.findOwner(left) is not None:
-					lVal = env.getValue(left)
-				else:
-					lVal = f'"{lVal}"'
 
-			if type(right) == str:
-				if env.findOwner(right) is not None:
-					rVal = env.getValue(right)
-				else:
-					rVal = f'"{rVal}"'
+		if left is None:  # pragma: no cover
+			raise Exception(f"Unknown left-hand side of ComplexExpression: {node.left}")
+		if right is None:  # pragma: no cover
+			raise Exception(f"Unknown right-hand side of ComplexExpression: {node.right}")
 
-			if node.type == "BinaryExpression":
-				if node.operator == "/":
-					assert lVal is not None, f"Expected value, got None instead"
-					assert rVal is not None, f"Expected value, got None instead"
-					try:
-						res = eval(f"{lVal} / {rVal}", env)
-					except ZeroDivisionError:
-						raise ZeroDivisionError(f"Cannot divide by 0")
-					if math.floor(res) == math.ceil(res):
-						return int(res)
-					else:
-						return float(res)
+		if node.type == "BinaryExpression":
+			if node.operator == "/":
+				assert left is not None, f"Expected value, got None instead"
+				assert right is not None, f"Expected value, got None instead"
+				try:
+					res = eval(f"{lVal} / {rVal}")
+				except ZeroDivisionError:
+					raise ZeroDivisionError(f"Cannot divide by 0")
+				if math.floor(res) == math.ceil(res):
+					self.lVisit("LEAVE: Node.ComplexExpression")
+					return int(res)
 				else:
-					assert lVal is not None, f"Expected value, got None instead"
-					assert rVal is not None, f"Expected value, got None instead"
-					return eval(f"{lVal} {node.operator} {rVal}")
-			elif node.type == "AssignmentExpression":
-				if node.operator == "=":
-					left = self.interpret(node.left, env)
-					right = self.interpret(node.right, env)
+					self.lVisit("LEAVE: Node.ComplexExpression")
+					return float(res)
+			else:
+				assert left is not None, f"Expected value, got None instead"
+				assert right is not None, f"Expected value, got None instead"
+				if type(lVal) == str: lVal = f'"{lVal}"'
+				if type(rVal) == str: rVal = f'"{rVal}"'
+				res = eval(f"{lVal} {node.operator} {rVal}")
+				self.lVisit("LEAVE: Node.ComplexExpression")
+				return res
+		elif node.type == "AssignmentExpression":
+			if node.operator == "=":
+				ar = self.stack.peek()
+				if not ar.varExists(left):
+					raise Exception(f'Variable "{left}" does not exist in available scope')
 
-					if left is None:  # pragma: no cover
-						raise Exception(f"Unknown left-hand side of AssignmentExpression: {node.left}")
-					if right is None:  # pragma: no cover
-						raise Exception(f"Unknown right-hand side of AssignmentExpression: {node.right}")
-
-					env.setValue(left, right)
-				else:
-					op = node.operator[0]
-					assert lVal is not None, f"Expected value, got None instead"
-					assert rVal is not None, f"Expected value, got None instead"
-					env.setValue(left, eval(f"{lVal} {op} {rVal}"))
-			elif node.type == "LogicalExpression":
-				if node.operator == "&&":
-					operator = "and"
-				elif node.operator == "||":
-					operator = "or"
-				else:  # pragma: no cover
-					# **should** not happen
-					raise Exception(f"Unknown operator in Logical Expression: {node.operator}")
-				return eval(f"{left} {operator} {right}", env)
-			elif node.type == "BitwiseExpression":
+				ar[left] = rVal
+			else:
+				op = node.operator[0]
 				assert lVal is not None, f"Expected value, got None instead"
 				assert rVal is not None, f"Expected value, got None instead"
-				return eval(f"{lVal} {node.operator} {rVal}")
+				ar = self.stack.peek()
+				if not ar.varExists(left):
+					raise Exception(f'Variable "{left}" does not exist in available scope')
+				if type(lVal) == str: lVal = f'"{lVal}"'
+				if type(rVal) == str: rVal = f'"{rVal}"'
+				ar[left] = eval(f"{lVal} {op} {rVal}")
+		elif node.type == "LogicalExpression":
+			if node.operator == "&&":
+				operator = "and"
+			elif node.operator == "||":
+				operator = "or"
 			else:  # pragma: no cover
-				raise Exception(f"Unknown ComplexExpression: {node}")
-		elif isinstance(node, Node.UnaryExpression):
-			val = self.interpret(node.argument, env)
-			return eval(f"{node.operator}{val}", env)
-		elif isinstance(node, Node.FunctionDeclaration):
-			args = []
-			for arg in node.params:
-				assert isinstance(arg, Node.Identifier)
-				args.append(arg.name)
-			env.addFunc(node.name.name, {"args": args, "body": node.body})
-		elif isinstance(node, Node.ReturnStatement):
-			return self.interpret(node.argument, env)
-		elif isinstance(node, Node.CallExpression):
-			func = env.getFunc(node.callee.name)
-			if len(node.arguments) != len(func.get("args", -1)):
-				raise Exception(f"Incorrect amount of arguments given. Expected {len(func.get('args'))}, got {len(node.arguments)}")
-
-			funcEnv = Env(parent=env)
-			for i in range(len(node.arguments)):
-				funcEnv.addValue(
-					# FIXME: Another hack
-					self.interpret(Node.Identifier(func.get("args")[i]), funcEnv),
-					funcEnv.getValue(self.interpret(node.arguments[i], funcEnv)),
-				)
-			return self.interpret(func.get("body"), funcEnv)
-		# elif isinstance(node, Node.ClassDeclaration):pass
-		# elif isinstance(node, Node.Super):pass
-		# elif isinstance(node, Node.ThisExpression):pass
-		# elif isinstance(node, Node.NewExpression):pass
-		elif isinstance(node, Node.Literal):
-			return node.value
+				# **should** not happen
+				raise Exception(f"Unknown operator in Logical Expression: {node.operator}")
+			return eval(f"{left} {operator} {right}", self.stack.peek().members)
+		elif node.type == "BitwiseExpression":
+			assert left is not None, f"Expected value, got None instead"
+			assert right is not None, f"Expected value, got None instead"
+			return eval(f"{left} {node.operator} {right}")
 		else:  # pragma: no cover
-			assert isinstance(node, Node.Node), f"Got {type(node)} instead of Node. Value: {node}"
-			raise NotImplementedError(f"{str(type(node)).split('.')[-1][:-2]} ({node.type}) is not yet implemented.")
+			raise Exception(f"Unknown ComplexExpression: {node}")
+		self.lVisit("LEAVE: Node.ComplexExpression")
+
+	def visitUnaryExpression(self, node: Node.UnaryExpression):
+		self.lVisit("ENTER: Node.UnaryExpression")
+		val = self.visit(node.argument)
+		self.lVisit("LEAVE: Node.UnaryExpression")
+		if val is None:
+			return None
+		else:
+			if node.operator == "!":
+				return eval(f"not {val}", self.stack.peek().members)
+			else:
+				return eval(f"{node.operator}{val}", self.stack.peek().members)
+
+	def visitCallExpression(self, node: Node.CallExpression):
+		if node.callee.name not in self.fns:
+			raise Exception(f'Function "{node.callee.name}" does not exist in available scope')
+		if node.fn is None:
+			raise Exception(f'Failed to aquire function for "{node.callee.name}"')
+		assert len(node.arguments) == len(node.fn.get("args")), f"Incorrect amount of arguments given. Expected {len(node.fn.get('args'))}, got {len(node.arguments)}"
+
+		ar = ActivationRecord(
+			node.type,
+			ARType.FUNCTION,
+			self.stack.peek().nestingLevel + 1,
+		)
+		for argName, argValue in zip(node.fn.get("args", {}), node.arguments):
+			if isinstance(argName, Node.Identifier):
+				ar[argName.name] = self.visit(argValue)
+			else:
+				ar[argName] = self.visit(argValue)
+
+		self.stack.push(ar)
+		self.lVisit(f"ENTER: Node.CallExpression({node.callee.name}, {ar.members})")
+		self.lStack(str(self.stack))
+
+		f = node.fn.get("body", None)
+		assert f is not None, f'Failed to aquire function body for "{node.callee.name}"'
+
+		ret = self.visit(f)
+
+		self.lVisit(f"LEAVE: Node.CallExpression({node.callee.name})")
+		self.lStack(str(self.stack))
+		self.stack.pop()
+		return ret
+
+	# def visitSuperExpression(self, node: Node.SuperExpression):
+	# 	self.lVisit("ENTER: Node.SuperExpression")
+	# 	self.lVisit("LEAVE: Node.SuperExpression")
+
+	# def visitThisExpression(self, node: Node.ThisExpression):
+	# 	self.lVisit("ENTER: Node.ThisExpression")
+	# 	self.lVisit("LEAVE: Node.ThisExpression")
+
+	# def visitNewExpression(self, node: Node.NewExpression):
+	# 	self.lVisit("ENTER: Node.NewExpression")
+	# 	self.lVisit("LEAVE: Node.NewExpression")
+
+	# DECLARATIONS
+
+	def visitVariableDeclaration(self, node: Node.VariableDeclaration):
+		varName = self.visit(node.id)
+		varValue = self.visit(node.init)
+		_vv = f'"{varValue}"' if type(varValue) == str else varValue
+		self.lVisit(f"ENTER: Node.VariableDeclaration({varName}, {_vv})")
+		ar = self.stack.peek()
+		if ar.varExists(varName):
+			raise Exception(f'Variable "{varName}" already exists in available scope')
+		ar[varName] = varValue
+		self.lVisit(f"LEAVE: Node.VariableDeclaration({varName}, {_vv})")
+		del _vv
+
+	def visitFunctionDeclaration(self, node: Node.FunctionDeclaration):
+		if node.name.name in self.fns:
+			raise Exception(f'Function "{node.name.name}" already exists in available scope')
+		self.fns.append(node.name.name)
+
+	# def visitClassDeclaration(self, node: Node.ClassDeclaration):
+	# 	self.lVisit("ENTER: Node.ClassDeclaration")
+	# 	self.lVisit("LEAVE: Node.ClassDeclaration")
+
+	# OTHER
+
+	def visitIdentifier(self, node: Node.Identifier):
+		self.lVisit("ENTER: Node.Identifier")
+		if self.stack.peek().varExists(node.name):
+			val = self.stack.peek().members.get(node.name)
+		else:
+			val = node.name
+		self.lVisit("LEAVE: Node.Identifier")
+		return val
+
+	def visitLiteral(self, node: Node.Literal):
+		self.lVisit("ENTER: Node.Literal")
+		self.lVisit("LEAVE: Node.Literal")
+		return node.value

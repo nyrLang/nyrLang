@@ -164,6 +164,15 @@ def square(x) {
 	return x * x;
 }
 
+// recursion
+def factorial(x) {
+	if (x <= 1) {
+		return 1;
+	} else {
+		return x * self(x - 1);
+	}
+}
+
 // call square(2)
 square(2);
 

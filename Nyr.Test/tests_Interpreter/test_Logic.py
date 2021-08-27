@@ -1,6 +1,5 @@
 import pytest
 
-from Nyr.Interpreter.Env import Env
 from Nyr.Interpreter.Interpreter import Interpreter
 from Nyr.Parser.Parser import Parser
 
@@ -25,7 +24,7 @@ def testIfElse(xVal: int, expectedY: str):
 		}
 	""".replace("__xval__", str(xVal))
 	ast = Parser().parse(code)
-	env = Interpreter().interpret(ast, Env())
+	env = Interpreter(ast).interpret()
 
 	assert env == {"x": xVal, "y": expectedY}
 
@@ -46,7 +45,7 @@ def testLogicalOperatorsI(operator: str, expected: tuple[bool]):
 		d = false {operator} false;
 	""")
 
-	env = Interpreter().interpret(ast, Env())
+	env = Interpreter(ast).interpret()
 
 	assert env == {
 		"a": expected[0],
@@ -73,7 +72,7 @@ def testBitwiseOperatorsI(operator: str, expected: tuple[bool]):
 		d = false {operator} false;
 	""")
 
-	env = Interpreter().interpret(ast, Env())
+	env = Interpreter(ast).interpret()
 
 	assert env == {
 		"a": expected[0],

@@ -1,13 +1,12 @@
 import pytest
 
-from Nyr.Interpreter.Env import Env
 from Nyr.Interpreter.Interpreter import Interpreter
 from Nyr.Parser.Parser import Parser
 
 
 def testUninitializedVariable():
 	ast = Parser().parse("let x;")
-	env = Interpreter().interpret(ast, Env())
+	env = Interpreter(ast).interpret()
 
 	assert env == {'x': None}
 
@@ -15,12 +14,12 @@ def testUninitializedVariable():
 @pytest.mark.parametrize(
 	("code", "expected"), (
 		("let x; let y;", {'x': None, 'y': None}),
-		("let x; let y;", {'x': None, 'y': None}),
+		("let x, y;", {'x': None, 'y': None}),
 	),
 )
 def testMultipleUninitializedVariables(code: str, expected):
 	ast = Parser().parse(code)
-	env = Interpreter().interpret(ast, Env())
+	env = Interpreter(ast).interpret()
 
 	assert env == expected
 
@@ -36,14 +35,14 @@ def testMultipleUninitializedVariables(code: str, expected):
 )
 def testTypeAssignments(code: str, expected):
 	ast = Parser().parse(code)
-	env = Interpreter().interpret(ast, Env())
+	env = Interpreter(ast).interpret()
 
 	assert env == expected
 
 
 def testMixedInitialize():
 	ast = Parser().parse("let x, y = 7, z;")
-	env = Interpreter().interpret(ast, Env())
+	env = Interpreter(ast).interpret()
 
 	assert env == {
 		'x': None,
@@ -59,7 +58,7 @@ def testAssignWithBinaryExpr():
 		let z = x + y;
 	""")
 
-	env = Interpreter().interpret(ast, Env())
+	env = Interpreter(ast).interpret()
 
 	assert env == {
 		"x": 4,

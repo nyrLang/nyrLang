@@ -38,7 +38,7 @@ def testInput():
 	t = Tokenizer()
 	t.init("let x, y; foo()")
 	tks = t.getTokens()
-	expected = [
+	expected = (
 		Token("let", "let"),
 		Token("IDENTIFIER", "x"),
 		Token(",", ","),
@@ -48,7 +48,7 @@ def testInput():
 		Token("(", "("),
 		Token(")", ")"),
 		Token("EOF", None),
-	]
+	)
 
 	assert len(tks) == 9
 	for i in range(9):

@@ -11,6 +11,7 @@ class Parser:
 	lookahead: Token
 	tokens: tuple[Token]
 	tkIndex: int = 0
+	fns: dict[str, dict[str, Any]] = dict()
 
 	def __init__(self):
 		self.tokenizer = Tokenizer()
@@ -51,7 +52,9 @@ class Parser:
 		return self.Program()
 
 	def Program(self) -> Node.Program:
-		return Node.Program(self.StatementList())
+		prog = Node.Program(self.StatementList())
+
+		return prog
 
 	def _eat(self, tokenType: str) -> Token:
 		token = self.lookahead
@@ -119,14 +122,14 @@ class Parser:
 			arguments=self.Arguments(),
 		)
 
-	def Super(self) -> Node.Super:
+	def SuperExpression(self) -> Node.SuperExpression:
 		""" Super
 			: 'super'
 			;
 		"""
 		self._eat("super")
 
-		return Node.Super()
+		return Node.SuperExpression()
 
 	def ThisExpression(self) -> Node.ThisExpression:
 		""" ThisExpression
@@ -169,12 +172,15 @@ class Parser:
 		"""
 		self._eat("def")
 		name = self.Identifier()
+		self.fns.update({name.name: {}})
 
 		self._eat("(")
 		params: list[Node.Node] = self.FormalParameterList() if self.lookahead.type != ")" else []
 		self._eat(")")
+		self.fns[name.name].update({"args": params})
 
 		body = self.BlockStatement()
+		self.fns[name.name].update({"body": body})
 
 		return Node.FunctionDeclaration(name, params, body)
 
@@ -426,7 +432,7 @@ class Parser:
 		"""
 
 		if self.lookahead.type == "super":
-			return self.CallExpression(self.Super())
+			return self.CallExpression(self.SuperExpression())
 
 		member = self.MemberExpression()
 
@@ -446,7 +452,10 @@ class Parser:
 			;
 		"""
 
-		callExpression = Node.CallExpression(callee, self.Arguments())
+		fn = None
+		if isinstance(callee, Node.Identifier):
+			fn = self.fns.get(callee.name, None)
+		callExpression = Node.CallExpression(callee, self.Arguments(), fn)
 
 		if self.lookahead.type == "(":
 			callExpression = self.CallExpression(callExpression)

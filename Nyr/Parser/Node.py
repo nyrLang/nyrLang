@@ -254,13 +254,14 @@ class CallExpression(Node):
 	callee: Identifier
 	arguments: list[Node]
 
-	def __init__(self, callee: Identifier, arguments: list[Node]):
+	def __init__(self, callee: Identifier, arguments: list[Node], fn: Optional[dict[str, Any]] = None):
 		super().__init__(self.__class__.__name__)
 		self.callee = callee
 		self.arguments = arguments
+		self.fn = fn
 
 	def __repr__(self):  # pragma: no cover
-		return f"{self.__module__}.{self.__class__.__name__}({self.callee!r}, {self.arguments!r})"
+		return f"{self.__module__}.{self.__class__.__name__}({self.callee!r}, {self.arguments!r}, {self.fn!r})"
 
 	def toJSON(self):
 		return dict(type=self.type, callee=self.callee, arguments=self.arguments)
@@ -285,7 +286,7 @@ class ClassDeclaration(Node):
 		return dict(type=self.type, id=self.id, superClass=self.superClass, body=self.body)
 
 
-class Super(Node):
+class SuperExpression(Node):
 	def __init__(self):
 		super().__init__(self.__class__.__name__)
 

@@ -1,6 +1,5 @@
 import pytest
 
-from Nyr.Interpreter.Env import Env
 from Nyr.Interpreter.Interpreter import Interpreter
 from Nyr.Parser.Parser import Parser
 
@@ -19,7 +18,7 @@ from Nyr.Parser.Parser import Parser
 )
 def testSimpleExpression(expr: str, expectedRes):
 	ast = Parser().parse(f"let res = {expr};")
-	env = Interpreter().interpret(ast, Env())
+	env = Interpreter(ast).interpret()
 
 	assert env == {"res": expectedRes}
 
@@ -35,7 +34,7 @@ def testSimpleExpression(expr: str, expectedRes):
 )
 def testParenthesizedExpressions(expr: str, expectedRes):
 	ast = Parser().parse(f"let res = {expr};")
-	env = Interpreter().interpret(ast, Env())
+	env = Interpreter(ast).interpret()
 
 	assert env == {"res": expectedRes}
 
@@ -44,7 +43,7 @@ def testDivideBy0():
 	ast = Parser().parse("1 / 0;")
 
 	with pytest.raises(ZeroDivisionError, match="Cannot divide by 0"):
-		Interpreter().interpret(ast, Env())
+		Interpreter(ast).interpret()
 
 
 @pytest.mark.parametrize(
@@ -58,6 +57,6 @@ def testDivideBy0():
 )
 def testStringConcatenation(string1: str, string2: str, expectedStr: str):
 	ast = Parser().parse(f'let res = "{string1}" + "{string2}";')
-	env = Interpreter().interpret(ast, Env())
+	env = Interpreter(ast).interpret()
 
 	assert env == {"res": expectedStr}

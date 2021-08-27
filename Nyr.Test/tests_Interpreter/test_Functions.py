@@ -1,6 +1,5 @@
 import pytest
 
-from Nyr.Interpreter.Env import Env
 from Nyr.Interpreter.Interpreter import Interpreter
 from Nyr.Parser.Parser import Parser
 
@@ -18,7 +17,7 @@ def testFunction():
 		z = add(x, y);
 	""")
 
-	env = Interpreter().interpret(ast, Env())
+	env = Interpreter(ast).interpret()
 
 	assert env == {
 		"x": 42,
@@ -40,8 +39,8 @@ def testFunctionWithIncorrectArguments():
 		z = add(x);
 	""")
 
-	with pytest.raises(Exception, match='Incorrect amount of arguments given. Expected 2, got 1'):
-		Interpreter().interpret(ast, Env())
+	with pytest.raises(Exception, match=r'Incorrect amount of arguments given. Expected 2, got 1'):
+		Interpreter(ast).interpret()
 
 
 def testFunctionNotExists():
@@ -53,8 +52,8 @@ def testFunctionNotExists():
 		z = add(x, y);
 	""")
 
-	with pytest.raises(Exception, match='Function "add" does not exist in available scope'):
-		Interpreter().interpret(ast, Env())
+	with pytest.raises(Exception, match=r'Function "add" does not exist in available scope'):
+		Interpreter(ast).interpret()
 
 
 def testFunctionAlreadyExists():
@@ -71,14 +70,31 @@ def testFunctionAlreadyExists():
 			return num1 + num2;
 		}
 
-		z = add(x);
+		z = add(x, y);
 	""")
 
-	with pytest.raises(Exception, match='Function "add" already exists in available scope'):
-		Interpreter().interpret(ast, Env())
+	with pytest.raises(Exception, match=r'Function "add" already exists in available scope'):
+		Interpreter(ast).interpret()
 
 
-@pytest.mark.xfail(reason="Recursion not yet working")
+def testFunctionReturnValue():
+	ast = Parser().parse("""
+		def returnString() {
+			let string = "Hello";
+
+			string += ", World!";
+
+			return string;
+		}
+
+		let s = returnString();
+	""")
+
+	env = Interpreter(ast).interpret()
+
+	assert env == {"s": "Hello, World!"}
+
+
 def testRecursion():
 	ast = Parser().parse("""
 		def factorial(x) {
@@ -92,7 +108,7 @@ def testRecursion():
 		let fac = factorial(5);
 	""")
 
-	env = Interpreter().interpret(ast, Env())
+	env = Interpreter(ast).interpret()
 
 	assert env == {
 		"fac": 120,

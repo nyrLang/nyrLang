@@ -216,7 +216,7 @@ def testClassInheritance():
 										"expression": {
 											"type": "CallExpression",
 											"callee": {
-												"type": "Super",
+												"type": "SuperExpression",
 											},
 											"arguments": [
 												{
@@ -273,7 +273,7 @@ def testClassInheritance():
 											"left": {
 												"type": "CallExpression",
 												"callee": {
-													"type": "Super",
+													"type": "SuperExpression",
 												},
 												"arguments": [],
 											},
@@ -367,7 +367,7 @@ def testNewClassInstance():
 										"expression": {
 											"type": "CallExpression",
 											"callee": {
-												"type": "Super",
+												"type": "SuperExpression",
 											},
 											"arguments": [
 												{
@@ -424,7 +424,7 @@ def testNewClassInstance():
 											"left": {
 												"type": "CallExpression",
 												"callee": {
-													"type": "Super",
+													"type": "SuperExpression",
 												},
 												"arguments": [],
 											},

@@ -1,6 +1,7 @@
 import argparse
 import json
 import sys
+from pprint import pp
 
 from Nyr.Interpreter.Env import Env
 from Nyr.Interpreter.Interpreter import Interpreter
@@ -25,14 +26,13 @@ def printAst(ast_: Node, print_: bool):
 		print(json.dumps(ast_, cls=ComplexEncoder, indent=2))
 
 
-def interpret(ast_: Node, interpreter_: Interpreter = None, env_: Env = None):
+def interpret(ast_: Node, interpret_: bool, env_: Env = None):
 	if env_ is None:
 		env_ = Env()
-	if interpreter_ is None:
-		return None
-	else:
-		_env: Env = interpreter_.interpret(ast_, env_)
-		print(f"Env = {json.dumps(_env, indent=2)}")
+	if interpret_ is True:
+		_env: Env = Interpreter(ast_).interpret()
+		print(f"Env = ", end="")
+		pp(_env)
 
 
 def outputAST(ast_: Node, doOutput: bool):
@@ -84,7 +84,6 @@ if __name__ == "__main__":
 	argparser.parse_args(namespace=args)
 
 	parser = Parser()
-	interpreter = Interpreter() if args.interpret else None
 
 	printAST: bool = args.printAST
 
@@ -105,7 +104,7 @@ if __name__ == "__main__":
 
 			printAst(ast, printAST)
 			outputAST(ast, args.output)
-			interpret(ast, interpreter, env)
+			interpret(ast, args.interpret, env)
 
 	# File mode (read from file given via -f flag)
 	elif args.inputFile.endswith(".nyr"):
@@ -120,7 +119,7 @@ if __name__ == "__main__":
 
 			printAst(ast, printAST)
 			outputAST(ast, args.output)
-			interpret(ast, interpreter)
+			interpret(ast, args.interpret)
 
 	# Unknown mode
 	else:
