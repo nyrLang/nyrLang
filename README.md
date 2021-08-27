@@ -1,6 +1,5 @@
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/niyrme/NyrLang/senpai.svg)](https://results.pre-commit.ci/latest/github/niyrme/NyrLang/senpai)
-[![codecov](https://codecov.io/gh/niyrme/NyrLang/branch/senpai/graph/badge.svg?precision=2)](https://codecov.io/gh/niyrme/NyrLang)
-
+[![codecov](https://codecov.io/gh/nyrLang/nyrLang/branch/main/graph/badge.svg?precision=2)](https://codecov.io/gh/nyrLang/nyrLang)
 # Nyr: A programming language
 
 ## TOC
