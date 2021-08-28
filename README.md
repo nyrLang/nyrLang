@@ -24,6 +24,10 @@
 	- When using the CLI the trailing semicolon is optional (so it won't crash just because of that)
 - File input (must end with `.nyr`)
 
+### How to run
+From the project root run `python3 -m Nyr` and then add some flags
+To run tests run `pytest` or `python3 -m pytest` in the project root
+
 ### Flags
 - `-f [path/to/file].nyr`, `--file [Path].nyr` reads from file (Default: `null`)
 - `-i (true|false)`, `--interpret (true|false)` wether to interpret the input (`true`, `false`) (Default: `false`)
