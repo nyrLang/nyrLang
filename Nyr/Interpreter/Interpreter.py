@@ -317,7 +317,7 @@ class Interpreter(NodeVisitor):
 	def visitCallExpression(self, node: Node.CallExpression):
 		if node.callee.name not in self.fns:
 			raise Exception(f'Function "{node.callee.name}" does not exist in available scope')
-		if node.fn is None:
+		if node.fn is None:  # pragma: no cover
 			raise Exception(f'Failed to aquire function for "{node.callee.name}"')
 		assert len(node.arguments) == len(node.fn.get("args")), f"Incorrect amount of arguments given. Expected {len(node.fn.get('args'))}, got {len(node.arguments)}"
 
