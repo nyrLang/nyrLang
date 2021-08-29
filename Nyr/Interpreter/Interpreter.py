@@ -17,7 +17,7 @@ class NodeVisitor:
 		if node is None:
 			return None
 		vName = f"visit{type(node).__name__}"
-		visitor = getattr(self, vName, self.genericVisit)
+		visitor: Callable = getattr(self, vName, self.genericVisit)
 		return visitor(node)
 
 	def genericVisit(self, node):  # pragma: no cover
@@ -33,7 +33,7 @@ class Interpreter(NodeVisitor):
 		self.logStack: bool = kwargs.get("logStack", False)
 		self.logFinal: bool = kwargs.get("logFinal", False)
 		self.logAll: bool = kwargs.get("logAll", False)
-		if self.logAll is True: # pragma: no cover
+		if self.logAll is True:  # pragma: no cover
 			self.logVisit = True
 			self.logStack = True
 			self.logFinal = True
@@ -91,9 +91,8 @@ class Interpreter(NodeVisitor):
 			self.breakLoop = True
 		self.lVisit("LEAVE: Node.ExpressionStatement")
 
-	def visitEmptyStatement(self, node: Node.EmptyStatement):
-		self.lVisit("ENTER: Node.EmptyStatement")
-		self.lVisit("LEAVE: Node.EmptyStatement")
+	def visitEmptyStatement(self, _: Node.EmptyStatement):
+		pass
 
 	def visitBlockStatement(self, node: Node.BlockStatement):
 		self.lVisit("ENTER: Node.BlockStatement")
@@ -133,12 +132,13 @@ class Interpreter(NodeVisitor):
 	def visitWhileStatement(self, node: Node.WhileStatement):
 		self.lVisit("ENTER: Node.WhileStatement")
 		test = self.visit(node.test)
-		assert isinstance(test, bool)
+		assert isinstance(test, bool), f"Interpreter::Node.WhileStatement: Expected bool, got {type(test)} instead"
 
 		iterations = 0
 		while test is True:
 			self.visit(node.body)
 			test = self.visit(node.test)
+			assert isinstance(test, bool), f"Interpreter::Node.WhileStatement: Expected bool, got {type(test)} instead"
 
 			iterations += 1
 
@@ -156,12 +156,13 @@ class Interpreter(NodeVisitor):
 		self.lVisit("ENTER: Node.DoWhileStatement")
 		self.visit(node.body)
 		test = self.visit(node.test)
-		assert isinstance(test, bool)
+		assert isinstance(test, bool), f"Interpreter::Node.DoWhileStatement: Expected bool, got {type(test)} instead"
 
 		iterations = 0
 		while test is True:
 			self.visit(node.body)
 			test = self.visit(node.test)
+			assert isinstance(test, bool), f"Interpreter::Node.DoWhileStatement: Expected bool, got {type(test)} instead"
 
 			iterations += 1
 
@@ -303,14 +304,15 @@ class Interpreter(NodeVisitor):
 	def visitUnaryExpression(self, node: Node.UnaryExpression):
 		self.lVisit("ENTER: Node.UnaryExpression")
 		val = self.visit(node.argument)
-		self.lVisit("LEAVE: Node.UnaryExpression")
 		if val is None:
-			return None
+			raise Exception(f'Cannot use {node.operator} on "null"')
 		else:
 			if node.operator == "!":
-				return eval(f"not {val}", self.stack.peek().members)
+				val = eval(f"not {val}", self.stack.peek().members)
 			else:
-				return eval(f"{node.operator}{val}", self.stack.peek().members)
+				val = eval(f"{node.operator}{val}", self.stack.peek().members)
+		self.lVisit("LEAVE: Node.UnaryExpression")
+		return val
 
 	def visitCallExpression(self, node: Node.CallExpression):
 		if node.callee.name not in self.fns:
@@ -373,9 +375,11 @@ class Interpreter(NodeVisitor):
 		del _vv
 
 	def visitFunctionDeclaration(self, node: Node.FunctionDeclaration):
+		self.lVisit(f"ENTER: Node.FunctionDeclaration({node.name.name})")
 		if node.name.name in self.fns:
 			raise Exception(f'Function "{node.name.name}" already exists in available scope')
 		self.fns.append(node.name.name)
+		self.lVisit(f"LEAVE: Node.FunctionDeclaration({node.name.name})")
 
 	# def visitClassDeclaration(self, node: Node.ClassDeclaration):
 	# 	self.lVisit("ENTER: Node.ClassDeclaration")
