@@ -156,10 +156,10 @@ class DoWhileStatement(Node):
 class ForStatement(Node):
 	def __init__(self, init: Optional[Node], test: Optional[Node], update: Optional[Node], body: Node):
 		super().__init__(self.__class__.__name__)
-		self.init = init
-		self.test = test
-		self.update = update
-		self.body = body
+		self.init: Optional[Node] = init
+		self.test: Optional[Node] = test
+		self.update: Optional[Node] = update
+		self.body: Node = body
 
 	def __repr__(self):  # pragma: no cover
 		return f"{self.__module__}.{self.__class__.__name__}({self.init!r}, {self.test!r}, {self.update!r}, {self.body!r})"
@@ -269,11 +269,11 @@ class CallExpression(Node):
 
 # Classes
 class ClassDeclaration(Node):
-	id: Node
-	superClass: Optional[Node]
+	id: Identifier
+	superClass: Optional[Identifier]
 	body: Node
 
-	def __init__(self, id_: Node, superClass: Optional[Node], body: Node):
+	def __init__(self, id_: Identifier, superClass: Optional[Identifier], body: Node):
 		super().__init__(self.__class__.__name__)
 		self.id = id_
 		self.superClass = superClass
