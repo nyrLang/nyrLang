@@ -1,6 +1,9 @@
+import re
+
 import pytest
 
 from Nyr.Interpreter.Interpreter import Interpreter
+from Nyr.Interpreter.Interpreter import MAXRECURSIONDEPTH
 from Nyr.Parser.Parser import Parser
 
 
@@ -113,3 +116,16 @@ def testRecursion():
 	assert env == {
 		"fac": 120,
 	}
+
+
+def testRecursionOverflow():
+	ast = Parser().parse("""
+		def recursiveFunction() {
+			recursiveFunction();
+		}
+
+		recursiveFunction();
+	""")
+
+	with pytest.raises(Exception, match=re.escape(f'Exceeded recursion depth of {MAXRECURSIONDEPTH} in function "recursiveFunction"')):
+		Interpreter(ast).interpret()

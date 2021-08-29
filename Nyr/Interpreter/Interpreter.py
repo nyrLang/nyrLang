@@ -9,7 +9,7 @@ from Nyr.Interpreter.Stack import Stack
 from Nyr.Parser import Node
 
 MAXITERATIONS = 2 ** 16
-MAXRECURSIONDEPTH = 512
+MAXRECURSIONDEPTH = 128
 
 
 class NodeVisitor:
