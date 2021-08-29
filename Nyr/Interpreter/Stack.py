@@ -11,7 +11,6 @@ class Stack:
 		self._records: list[ActivationRecord] = list()
 
 	def __str__(self) -> str:
-		# if "__builtins__" in self._records
 		s = '\n'.join(repr(ar) for ar in self._records[::-1])
 		return f"CALL STACK\n{s}\n"
 
