@@ -78,3 +78,10 @@ def testVarExists(code: str):
 
 	with pytest.raises(Exception, match='Unknown variable "None"'):
 		Interpreter(ast).interpret()
+
+
+def testVarNotExists():
+	ast = Parser().parse("x = 4;")
+
+	with pytest.raises(Exception, match='Variable "x" does not exist in available scope'):
+		Interpreter(ast).interpret()
