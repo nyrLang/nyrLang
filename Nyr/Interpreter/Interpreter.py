@@ -1,6 +1,7 @@
 import logging
 import math
 import sys
+from collections.abc import Callable
 
 from Nyr.Interpreter.Stack import ActivationRecord
 from Nyr.Interpreter.Stack import ARType
@@ -8,8 +9,7 @@ from Nyr.Interpreter.Stack import Stack
 from Nyr.Parser import Node
 
 MAXITERATIONS = 2 ** 16
-# TODO: find a way to implement this
-RECURSIONDEPTH = 512
+MAXRECURSIONDEPTH = 512
 
 
 class NodeVisitor:
@@ -326,6 +326,8 @@ class Interpreter(NodeVisitor):
 			ARType.FUNCTION,
 			self.stack.peek().nestingLevel + 1,
 		)
+		if ar.nestingLevel > MAXRECURSIONDEPTH:
+			raise Exception(f'Exceeded recursion depth of {MAXRECURSIONDEPTH} in function "{node.callee.name}"')
 		for argName, argValue in zip(node.fn.get("args", {}), node.arguments):
 			if isinstance(argName, Node.Identifier):
 				ar[argName.name] = self.visit(argValue)
