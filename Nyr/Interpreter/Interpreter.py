@@ -178,7 +178,12 @@ class Interpreter(NodeVisitor):
 
 	def visitForStatement(self, node: Node.ForStatement):
 		self.lVisit("ENTER: Node.ForStatement")
-		self.visit(node.init)
+		tempDecls = []
+		if node.init is not None:
+			if isinstance(node.init, Node.VariableStatement):
+				for decl in node.init.declarations:
+					tempDecls.append(decl.id.name)
+			self.visit(node.init)
 		test = True
 		if node.test is not None:
 			test = self.visit(node.test)
@@ -197,9 +202,14 @@ class Interpreter(NodeVisitor):
 			if iterations > MAXITERATIONS:
 				raise Exception(f"Exceeded {MAXITERATIONS} iterations in for statement")
 
+			# FIXME: hacky way to break loops
 			if self.breakLoop is True:
 				self.breakLoop = False
 				break
+
+		for decl in tempDecls:
+			del self.stack.peek().members[decl]
+		del tempDecls
 
 		self.lVisit("LEAVE: Node.ForStatement")
 

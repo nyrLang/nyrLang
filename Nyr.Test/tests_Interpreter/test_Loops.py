@@ -63,7 +63,6 @@ def testDoWhileBreak():
 	assert env == {"x": 9}
 
 
-@pytest.mark.xfail(reason="Something gets added to output for some reasaon")
 def testForLoop():
 	ast = Parser().parse("""
 		let x = 0;
@@ -83,7 +82,6 @@ def testForLoop():
 	assert env == {"i": 10, "x": 20, "y": 20}
 
 
-@pytest.mark.xfail(reason="Something gets added to output for some reasaon")
 def testForLoopBreak():
 	ast = Parser().parse("""
 		let x = 0;

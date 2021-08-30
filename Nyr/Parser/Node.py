@@ -116,9 +116,9 @@ class IfStatement(Node):
 
 
 class VariableStatement(Node):
-	def __init__(self, declarations: list[Node]):
+	def __init__(self, declarations: list[VariableDeclaration]):
 		super().__init__(self.__class__.__name__)
-		self.declarations = declarations
+		self.declarations: list[VariableDeclaration] = declarations
 
 	def __repr__(self):  # pragma: no cover
 		return f"{self.__module__}.{self.__class__.__name__}({self.declarations!r})"
@@ -154,12 +154,12 @@ class DoWhileStatement(Node):
 
 
 class ForStatement(Node):
-	def __init__(self, init: Optional[Node], test: Optional[Node], update: Optional[Node], body: Node):
+	def __init__(self, init: Union[None, VariableStatement, ComplexExpression], test: Optional[Node], update: Optional[Node], body: BlockStatement):
 		super().__init__(self.__class__.__name__)
-		self.init: Optional[Node] = init
+		self.init: Union[None, VariableStatement, ComplexExpression] = init
 		self.test: Optional[Node] = test
 		self.update: Optional[Node] = update
-		self.body: Node = body
+		self.body: BlockStatement = body
 
 	def __repr__(self):  # pragma: no cover
 		return f"{self.__module__}.{self.__class__.__name__}({self.init!r}, {self.test!r}, {self.update!r}, {self.body!r})"
