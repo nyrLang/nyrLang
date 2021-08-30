@@ -54,7 +54,7 @@ if __name__ == "__main__":
 	argparser.add_argument(
 		"-i", "--interpret",
 		required=False,
-		default=False,
+		default=True,
 		type=bool,
 		help="Enable interpreter",
 		dest="interpret",

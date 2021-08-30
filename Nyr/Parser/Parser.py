@@ -190,9 +190,9 @@ class Parser:
 			| FormalParameterList ',' Identifier
 			;
 		"""
-		params: list[Node.Node] = []
-
-		params.append(self.Identifier())
+		params: list[Node.Node] = [
+			self.Identifier(),
+		]
 
 		while self.lookahead.type == ",":
 			self._eat(",")
@@ -296,9 +296,10 @@ class Parser:
 		return variableStatement
 
 	def VariableDeclarationList(self) -> list[Node.Node]:
-		declarations: list[Node.Node] = []
+		declarations: list[Node.Node] = [
+			self.VariableDeclaration(),
+		]
 
-		declarations.append(self.VariableDeclaration())
 		while self.lookahead.type == ",":
 			self._eat(",")
 			declarations.append(self.VariableDeclaration())
@@ -480,10 +481,10 @@ class Parser:
 			| ArgumentList ',' AssignmentExpression
 			;
 		"""
+		argumentList: list[Node.Node] = [
+			self.AssignmentExpression(),
+		]
 
-		argumentList: list[Node.Node] = []
-
-		argumentList.append(self.AssignmentExpression())
 		while self.lookahead.type == ",":
 			self._eat(",")
 			argumentList.append(self.AssignmentExpression())
