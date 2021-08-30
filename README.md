@@ -1,7 +1,7 @@
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/nyrLang/nyrLang/main.svg)](https://results.pre-commit.ci/latest/github/nyrLang/nyrLang/main)
 [![codecov](https://codecov.io/gh/nyrLang/nyrLang/branch/main/graph/badge.svg?precision=2)](https://codecov.io/gh/nyrLang/nyrLang)
 
-# Nyr: A programming language
+# nyr: A programming language
 
 ## TOC
 - [Features]
@@ -26,13 +26,13 @@
 - File input (must end with `.nyr`)
 
 ### How to run
-From the project root run `python3 -m Nyr` and then add some flags
-To run tests run `pytest` or `python3 -m pytest` in the project root
+- From the project root run `python3 -m Nyr` and then add some flags
+- To run tests run `pytest` or `python3 -m pytest` in the project root
 
 ### Flags
 - `-f [path/to/file].nyr`, `--file [Path].nyr` reads from file (Default: `null`)
-- `-i (true|false)`, `--interpret (true|false)` wether to interpret the input (`true`, `false`) (Default: `false`)
-	- Note: Many statements/operations are not yet supported, and will raise a `NotImplementedError` if encountered
+- `-i (true|false)`, `--interpret (true|false)` wether to interpret the input (`true`, `false`) (Default: `true`)
+	- Note: Classes are not yet supported, and will raise a `NotImplementedError` if encountered
 - `-o (true|false)`, `--output (true|false)` wether to dump the generated AST into an `ast.json` file (located at `./ast.json`) (Default: `false`)
 - `-p (true|false)`, `--print (true|false)` wether to print the generated AST to terminal (Default: `false`)
 
@@ -67,7 +67,6 @@ To run tests run `pytest` or `python3 -m pytest` in the project root
 
 ### Strings
 ```
-// Double Quotes
 "A very nice string";
 
 // Multi-line
@@ -81,17 +80,32 @@ multi-line!";
 ## Operators
 ```
 /*
-	Binary operators:
-		+, -, *, /, %
+	Binary Operators:
+		+, // add
+		-, // subtract
+		*, // multiply
+		/, // divide
+		%  // modulo
 
 	Equality Operators:
-		==, !=
+		==, // equals
+		!=  // inequals
 
 	Relational Operators:
-		>, <, >=, <=
+		>,  // greater than
+		<,  // less than
+		>=, // greater than or equal
+		<=  // less than or equal
 
 	Logical Operators:
-		&&, ||, !
+		&&, // and
+		||, // or
+		!   // not
+
+	Bitwise Operators:
+		&, // bitwise and
+		|, // bitwise or
+		^  // bitwise xor
 */
 ```
 
@@ -99,7 +113,7 @@ multi-line!";
 
 ## Variables
 ```
-// Variable declaration
+// variable declaration
 let x = 0;
 
 // declaration without initial value
@@ -131,8 +145,16 @@ if (x < 10) {
 
 // short if, else-if, else
 if (x >= 10) x = 0;
-else if (x != 4) += 1;
+else if (x != 4) x += 1;
 else x = 6;
+
+// they can also be on different lines
+if (x >= 10)
+	x = 0;
+else if (x != 4)
+	x += 1;
+else
+	x = 6;
 ```
 
 - - -
@@ -142,7 +164,8 @@ else x = 6;
 /* For-loop
 	for ('init'; 'test'; 'update') { }
 	any combination if init, test and update can be left empty
-	example for (; i < 10; ) { }
+	example:
+		for (; i < 10; ) { }
 */
 for (let i = 0; i < 10; i += 1) {
 
@@ -163,7 +186,7 @@ do {
 
 ## Functions
 ```
-// square function
+// function declaration
 def square(x) {
 	return x * x;
 }
@@ -173,7 +196,7 @@ def factorial(x) {
 	if (x <= 1) {
 		return 1;
 	} else {
-		return x * self(x - 1);
+		return x * factorial(x - 1);
 	}
 }
 
@@ -181,7 +204,7 @@ def factorial(x) {
 square(2);
 
 // nested calls
-super(super(2));
+square(square(2));
 
 // chaied functions
 callbackFuntion()();
@@ -208,7 +231,7 @@ class Point {
 	}
 }
 
-// Point3d inherits from Point
+// Point3D inherits from Point
 class Point3D : Point {
 	def Point(x, y, z) {
 		// super call to initialize x and y
