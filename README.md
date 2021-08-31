@@ -30,11 +30,13 @@
 - To run tests run `pytest` or `python3 -m pytest` in the project root
 
 ### Flags
-- `-f [path/to/file].nyr`, `--file [Path].nyr` reads from file (Default: `null`)
-- `-i (true|false)`, `--interpret (true|false)` wether to interpret the input (`true`, `false`) (Default: `true`)
+- `-f [path/to/file].nyr`, `--file [Path].nyr` reads from file
+	- If no input file is given it will enter CLI mode
+- `-i`, `--interpret` wether to interpret the input
+	- Note: Adding this flag will turn off interpreting
 	- Note: Classes are not yet supported, and will raise a `NotImplementedError` if encountered
-- `-o (true|false)`, `--output (true|false)` wether to dump the generated AST into an `ast.json` file (located at `./ast.json`) (Default: `false`)
-- `-p (true|false)`, `--print (true|false)` wether to print the generated AST to terminal (Default: `false`)
+- `-o`, `--output` wether to dump the generated AST into an `ast.json` file (located at `./ast.json`)
+- `-p`, `--print` wether to print the generated AST to terminal
 
 - - -
 

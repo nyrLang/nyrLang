@@ -1,42 +1,51 @@
 import argparse
 import json
 import sys
+from enum import Enum
 from pprint import pp
 
 from Nyr.Interpreter.Interpreter import Interpreter
 from Nyr.Parser.Node import ComplexEncoder
-from Nyr.Parser.Node import Node
+from Nyr.Parser.Node import Program
 from Nyr.Parser.Parser import Parser
 
 
 class Args:
 	inputFile: str
-	output: bool
-	interpret: bool
-	printAST: bool
+	output: int
+	interpret: int
+	printAST: int
 
 
-def getAst(string: str):
+class EArgs(Enum):
+	output = 0b0001
+	interpret = 0b0010
+	printAST = 0b0100
+
+
+def getAst(string: str) -> Program:
 	return Parser().parse(string)
 
 
-def printAst(ast_: Node, print_: bool):
-	if print_ is True:
+def printAst(ast_: Program):
+	if args.printAST & EArgs.printAST.value == EArgs.printAST.value:
 		print(json.dumps(ast_, cls=ComplexEncoder, indent=2))
 
 
-def interpret(ast_: Node, interpret_: bool):
-	if interpret_ is True:
+def interpret(ast_: Program):
+	if args.interpret & EArgs.interpret.value == EArgs.interpret.value:
 		_env = Interpreter(ast_).interpret()
 		print(f"Env = ", end="")
 		pp(_env)
 
 
-def outputAST(ast_: Node, doOutput: bool):
-	if doOutput:
+def outputAST(ast_: Program):
+	if args.output & EArgs.output.value == EArgs.output.value:
 		with open("./ast.json", "w") as o:
 			o.write(json.dumps(ast_, cls=ComplexEncoder, indent=2) + "\n")
 
+
+args = Args()
 
 if __name__ == "__main__":
 	if (sys.version_info.major, sys.version_info.minor) < (3, 9):
@@ -54,35 +63,34 @@ if __name__ == "__main__":
 	argparser.add_argument(
 		"-i", "--interpret",
 		required=False,
-		default=True,
-		type=bool,
+		action="store_const",
+		const=0,
+		default=EArgs.interpret.value,
 		help="Enable interpreter",
 		dest="interpret",
 	)
 	argparser.add_argument(
 		"-o", "--output",
 		required=False,
-		default=False,
-		type=bool,
+		action="store_const",
+		const=EArgs.output.value,
+		default=0,
 		help="output AST to ast.json",
 		dest="output",
 	)
 	argparser.add_argument(
 		"-p", "--print",
 		required=False,
-		default=False,
-		type=bool,
+		action="store_const",
+		const=EArgs.printAST.value,
+		default=0,
 		help="Wether tp print the AST to terminal",
 		dest="printAST",
 	)
 
-	args = Args()
-
 	argparser.parse_args(namespace=args)
 
 	parser = Parser()
-
-	printAST: bool = args.printAST
 
 	# CLI mode (read from stdin)
 	if args.inputFile == "<stdin>":
@@ -98,9 +106,9 @@ if __name__ == "__main__":
 
 			ast = getAst(cmd)
 
-			printAst(ast, printAST)
-			outputAST(ast, args.output)
-			interpret(ast, args.interpret)
+			printAst(ast)
+			outputAST(ast)
+			interpret(ast)
 
 	# File mode (read from file given via -f flag)
 	elif args.inputFile.endswith(".nyr"):
@@ -113,9 +121,9 @@ if __name__ == "__main__":
 		else:
 			ast = getAst(text)
 
-			printAst(ast, printAST)
-			outputAST(ast, args.output)
-			interpret(ast, args.interpret)
+			printAst(ast)
+			outputAST(ast)
+			interpret(ast)
 
 	# Unknown mode
 	else:
