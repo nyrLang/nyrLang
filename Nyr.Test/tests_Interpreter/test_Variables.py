@@ -76,6 +76,7 @@ def testAssignWithBinaryExpr():
 def testVarExists(code: str):
 	ast = Parser().parse(code)
 
+	# FIXME: Wrong error returned from code
 	with pytest.raises(Exception, match='Unknown variable "None"'):
 		Interpreter(ast).interpret()
 

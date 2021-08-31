@@ -28,7 +28,6 @@ class Stack:
 
 class ARType(Enum):
 	PROGRAM = auto()
-	BLOCK = auto()
 	FUNCTION = auto()
 
 
