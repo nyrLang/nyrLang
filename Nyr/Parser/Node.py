@@ -302,22 +302,6 @@ class ThisExpression(Node):
 		return dict(type=self.type)
 
 
-class NewExpression(Node):
-	callee: Node
-	arguments: list[Node]
-
-	def __init__(self, callee: Node, arguments: list[Node]):
-		super().__init__(self.__class__.__name__)
-		self.callee = callee
-		self.arguments = arguments
-
-	def __repr__(self):  # pragma: no cover
-		return f"{self.__module__}.{self.__class__.__name__}({self.callee!r}, {self.arguments!r})"
-
-	def toJSON(self):
-		return dict(type=self.type, callee=self.callee, arguments=self.arguments)
-
-
 # Literals
 class Literal(Node):
 	value: NodeValue

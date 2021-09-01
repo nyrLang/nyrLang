@@ -223,7 +223,7 @@ core.print("Hello, nyr!");
 // A class definition
 class Point {
 	// This is how the default constructor will look like
-	def Point(x, y) {
+	def init(x, y) {
 		this.x = x;
 		this.y = y;
 	}
@@ -236,7 +236,7 @@ class Point {
 
 // Point3D inherits from Point
 class Point3D : Point {
-	def Point(x, y, z) {
+	def init(x, y, z) {
 		// super call to initialize x and y
 		super(x, y);
 		this.z = z;
@@ -249,7 +249,7 @@ class Point3D : Point {
 	}
 }
 
-let p = new Point3D(10, 20, 30);
+let p = Point3D(10, 20, 30);
 ```
 
 [Features]: #Features

@@ -47,7 +47,6 @@ spec: tuple[tuple[re.Pattern[AnyStr], Optional[str]]] = (
 	(re.compile(r"^\bclass\b"), "class"),
 	(re.compile(r"^\bthis\b"), "this"),
 	(re.compile(r"^\bsuper\b"), "super"),
-	(re.compile(r"^\bnew\b"), "new"),
 
 	# -------------------------
 	# Numbers

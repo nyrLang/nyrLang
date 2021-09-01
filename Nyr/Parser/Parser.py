@@ -118,18 +118,6 @@ class Parser:
 		else:
 			return self.ExpressionStatement()
 
-	def NewExpression(self) -> Node.NewExpression:
-		""" NewExpression
-			: 'new' MemberExpression Arguments
-			;
-		"""
-		self._eat("new")
-
-		return Node.NewExpression(
-			callee=self.MemberExpression(),
-			arguments=self.Arguments(),
-		)
-
 	def SuperExpression(self) -> Node.SuperExpression:
 		""" Super
 			: 'super'
@@ -592,8 +580,6 @@ class Parser:
 			return self.Identifier()
 		elif self.lookahead.type == "this":
 			return self.ThisExpression()
-		elif self.lookahead.type == "new":
-			return self.NewExpression()
 		else:
 			return self.LeftHandSideExpression()
 

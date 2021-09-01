@@ -317,7 +317,7 @@ def testNewClassInstance():
 					}
 				}
 
-				let cls = new Point3D(10, 20, 30);
+				let cls = Point3D(10, 20, 30);
 			"""),
 			cls=Node.ComplexEncoder,
 		),
@@ -457,7 +457,7 @@ def testNewClassInstance():
 							"name": "cls",
 						},
 						"init": {
-							"type": "NewExpression",
+							"type": "CallExpression",
 							"callee": {
 								"type": "Identifier",
 								"name": "Point3D",
