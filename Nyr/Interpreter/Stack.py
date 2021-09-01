@@ -48,7 +48,7 @@ class ActivationRecord:
 			if key is None: continue
 			if type(val) == str:
 				val = f'"{val}"'
-			lines.append(f"  {key:<20}: {val}")
+			lines.append(f"  {key:<16} ({type(val).__name__:<6}): {val}")
 
 		return '\n'.join(lines)
 
