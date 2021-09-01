@@ -37,6 +37,7 @@
 | `-i`       | `--interpret` | turn off interpretation | Classes are not yet supported, and will raise a `NotImplementedError` if encountered
 | `-o`       | `--output`    | dump generated AST to `ast.json` (located at project rood) |
 | `-p`       | `--print`     | print generated AST to terminal |
+| `-d`       | `--debug`     | print debug messages on what the interpreter is doing |
 
 - - -
 

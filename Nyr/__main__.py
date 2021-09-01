@@ -16,6 +16,7 @@ class Args:
 	output: int
 	interpret: int
 	printAST: int
+	debug: int
 
 
 class EArgs(Enum):
@@ -35,7 +36,7 @@ def printAst(ast_: Program):
 
 def interpret(ast_: Program):
 	if args.interpret & EArgs.interpret.value == EArgs.interpret.value:
-		_env = Interpreter().interpret(ast_)
+		_env = Interpreter(args.debug).interpret(ast_)
 		print(f"Env = ", end="")
 		pp(_env)
 
@@ -76,7 +77,7 @@ if __name__ == "__main__":
 		action="store_const",
 		const=EArgs.output.value,
 		default=0,
-		help="output AST to ast.json",
+		help="Output AST to ast.json",
 		dest="output",
 	)
 	argparser.add_argument(
@@ -85,8 +86,17 @@ if __name__ == "__main__":
 		action="store_const",
 		const=EArgs.printAST.value,
 		default=0,
-		help="Wether tp print the AST to terminal",
+		help="Wether to print the AST to terminal",
 		dest="printAST",
+	)
+	argparser.add_argument(
+		"-d", "--debug",
+		required=False,
+		action="store_const",
+		const=Log.logAll.value,
+		default=0,
+		help="Wether to print debug messages on what the interpreter is doing",
+		dest="debug",
 	)
 
 	argparser.parse_args(namespace=args)
