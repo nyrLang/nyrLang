@@ -16,6 +16,13 @@ class Parser:
 	def __init__(self):
 		self.tokenizer = Tokenizer()
 
+	def __reset(self):
+		self.string = ""
+		self.lookahead = None
+		self.tokens = ()
+		self.tkIndex = 0
+		self.fns = {}
+
 	@staticmethod
 	def _isLiteral(tokenType) -> bool:
 		return tokenType in ("INTEGER", "FLOAT", "STRING", "true", "false", "null")
@@ -40,6 +47,7 @@ class Parser:
 		return self.tkIndex == len(self.tokens) and self.tokens[self.tkIndex - 1].type == "EOF"
 
 	def parse(self, string: str) -> Node.Program:
+		self.__reset()
 		self.string = string.strip()
 		self.tokenizer.init(self.string)
 
