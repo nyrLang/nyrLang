@@ -6,7 +6,7 @@ from Nyr.Parser.Parser import Parser
 
 def testUninitializedVariable():
 	ast = Parser().parse("let x;")
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == {'x': None}
 
@@ -19,7 +19,7 @@ def testUninitializedVariable():
 )
 def testMultipleUninitializedVariables(code: str, expected):
 	ast = Parser().parse(code)
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == expected
 
@@ -35,14 +35,14 @@ def testMultipleUninitializedVariables(code: str, expected):
 )
 def testTypeAssignments(code: str, expected):
 	ast = Parser().parse(code)
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == expected
 
 
 def testMixedInitialize():
 	ast = Parser().parse("let x, y = 7, z;")
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == {
 		'x': None,
@@ -58,7 +58,7 @@ def testAssignWithBinaryExpr():
 		let z = x + y;
 	""")
 
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == {
 		"x": 4,
@@ -78,11 +78,11 @@ def testVarExists(code: str):
 
 	# FIXME: Wrong error returned from code
 	with pytest.raises(Exception, match='Unknown variable "None"'):
-		Interpreter(ast).interpret()
+		Interpreter().interpret(ast)
 
 
 def testVarNotExists():
 	ast = Parser().parse("x = 4;")
 
 	with pytest.raises(Exception, match='Variable "x" does not exist in available scope'):
-		Interpreter(ast).interpret()
+		Interpreter().interpret(ast)

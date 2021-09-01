@@ -13,7 +13,7 @@ def testWhileLoop():
 		}
 	""")
 
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == {"x": 5}
 
@@ -29,7 +29,7 @@ def testWhileLoopBreak():
 		}
 	""")
 
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == {"x": 2}
 
@@ -42,7 +42,7 @@ def testDoWhile():
 		} while (false);
 	""")
 
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == {"x": 7}
 
@@ -58,7 +58,7 @@ def testDoWhileBreak():
 		} while (true);
 	""")
 
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == {"x": 9}
 
@@ -77,7 +77,7 @@ def testForLoop():
 		}
 	""")
 
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == {"i": 10, "x": 20, "y": 20}
 
@@ -99,7 +99,7 @@ def testForLoopBreak():
 		}
 	""")
 
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == {"i": 10, "x": 12, "y": 20}
 
@@ -116,4 +116,4 @@ def testIterationOverflow(loop: str, type_: str):
 	ast = Parser().parse(loop)
 
 	with pytest.raises(Exception, match=f"Exceeded {MAXITERATIONS} iterations in {type_} statement"):
-		Interpreter(ast).interpret()
+		Interpreter().interpret(ast)

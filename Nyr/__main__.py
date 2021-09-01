@@ -5,6 +5,7 @@ from enum import Enum
 from pprint import pp
 
 from Nyr.Interpreter.Interpreter import Interpreter
+from Nyr.Interpreter.Interpreter import Log
 from Nyr.Parser.Node import ComplexEncoder
 from Nyr.Parser.Node import Program
 from Nyr.Parser.Parser import Parser
@@ -34,7 +35,7 @@ def printAst(ast_: Program):
 
 def interpret(ast_: Program):
 	if args.interpret & EArgs.interpret.value == EArgs.interpret.value:
-		_env = Interpreter(ast_).interpret()
+		_env = Interpreter().interpret(ast_)
 		print(f"Env = ", end="")
 		pp(_env)
 

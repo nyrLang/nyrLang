@@ -4,6 +4,6 @@ from Nyr.Parser.Parser import Parser
 
 def testEmptyStatement():
 	ast = Parser().parse(";;")
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == dict()

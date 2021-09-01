@@ -20,6 +20,6 @@ def testExample(examplesDir: str, fileName: str, expectedEnv: dict):
 		code = f.read()
 
 	ast = Parser().parse(code)
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == expectedEnv

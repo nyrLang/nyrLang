@@ -17,7 +17,7 @@ def testUnaryNone(operator: str):
 	ast = Parser().parse(f"let x = {operator}null;")
 
 	with pytest.raises(Exception, match=re.escape(f'Cannot use {operator} on "null"')):
-		Interpreter(ast).interpret()
+		Interpreter().interpret(ast)
 
 
 @pytest.mark.parametrize(
@@ -28,7 +28,7 @@ def testUnaryNone(operator: str):
 )
 def testUnaryInteger(operator: str):
 	ast = Parser().parse(f"let x = {operator}5;")
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	if operator == "+":
 		assert env == {"x": 5}
@@ -44,6 +44,6 @@ def testUnaryInteger(operator: str):
 )
 def testUnaryNotBool(boolValue: str):
 	ast = Parser().parse(f"let x = !{boolValue};")
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == {"x": boolValue != "true"}

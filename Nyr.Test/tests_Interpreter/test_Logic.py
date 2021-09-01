@@ -24,7 +24,7 @@ def testIfElse(xVal: int, expectedY: str):
 		}
 	""".replace("__xval__", str(xVal))
 	ast = Parser().parse(code)
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == {"x": xVal, "y": expectedY}
 
@@ -45,7 +45,7 @@ def testLogicalOperatorsI(operator: str, expected: tuple[bool]):
 		d = false {operator} false;
 	""")
 
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == {
 		"a": expected[0],
@@ -72,7 +72,7 @@ def testBitwiseOperatorsI(operator: str, expected: tuple[bool]):
 		d = false {operator} false;
 	""")
 
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == {
 		"a": expected[0],

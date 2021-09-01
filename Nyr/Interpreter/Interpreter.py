@@ -34,10 +34,12 @@ class NodeVisitor:
 
 
 class Interpreter(NodeVisitor):
-	def __init__(self, ast: Node.Program, log: int = 0):
-		self.ast = ast
-		self.stack: Stack = Stack()
-		self.fns: list = []
+	ast: Node.Program
+	stack: Stack
+	fns: list = []
+	logging: int
+
+	def __init__(self, log: int = 0):
 		self.logging = log
 
 		hdlr = logging.StreamHandler(sys.stdout)
@@ -48,6 +50,10 @@ class Interpreter(NodeVisitor):
 
 		# FIXME: Hacky way to break loops
 		self.breakLoop = False
+
+	def __reset(self):
+		self.stack = Stack()
+		self.fns = []
 
 	def logVisit(self, msg):  # pragma: no cover
 		if (self.logging & Log.logVisit.value) == Log.logVisit.value:
@@ -61,8 +67,9 @@ class Interpreter(NodeVisitor):
 		if (self.logging & Log.logFinal.value) == Log.logFinal.value:
 			self.logger.debug(str(self.stack))
 
-	def interpret(self):
-		return self.visit(self.ast)
+	def interpret(self, ast: Node.Program):
+		self.__reset()
+		return self.visit(ast)
 
 	def visitProgram(self, node: Node.Program):
 		self.logVisit("ENTER: Node.Program")

@@ -20,7 +20,7 @@ def testFunction():
 		z = add(x, y);
 	""")
 
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == {
 		"x": 42,
@@ -43,7 +43,7 @@ def testFunctionWithIncorrectArguments():
 	""")
 
 	with pytest.raises(Exception, match=r'Incorrect amount of arguments given. Expected 2, got 1'):
-		Interpreter(ast).interpret()
+		Interpreter().interpret(ast)
 
 
 def testFunctionNotExists():
@@ -56,7 +56,7 @@ def testFunctionNotExists():
 	""")
 
 	with pytest.raises(Exception, match=r'Function "add" does not exist in available scope'):
-		Interpreter(ast).interpret()
+		Interpreter().interpret(ast)
 
 
 def testFunctionAlreadyExists():
@@ -77,7 +77,7 @@ def testFunctionAlreadyExists():
 	""")
 
 	with pytest.raises(Exception, match=r'Function "add" already exists in available scope'):
-		Interpreter(ast).interpret()
+		Interpreter().interpret(ast)
 
 
 def testFunctionReturnValue():
@@ -93,7 +93,7 @@ def testFunctionReturnValue():
 		let s = returnString();
 	""")
 
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == {"s": "Hello, World!"}
 
@@ -111,7 +111,7 @@ def testRecursion():
 		let fac = factorial(5);
 	""")
 
-	env = Interpreter(ast).interpret()
+	env = Interpreter().interpret(ast)
 
 	assert env == {
 		"fac": 120,
@@ -128,4 +128,4 @@ def testRecursionOverflow():
 	""")
 
 	with pytest.raises(Exception, match=re.escape(f'Exceeded recursion depth of {MAXRECURSIONDEPTH} in function "recursiveFunction"')):
-		Interpreter(ast).interpret()
+		Interpreter().interpret(ast)
