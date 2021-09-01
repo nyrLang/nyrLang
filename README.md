@@ -21,8 +21,8 @@
 - - -
 
 ## Features
-- CLI
-	- When using the CLI the trailing semicolon is optional (so it won't crash just because of that)
+- Interactive mode
+	- When using the Interactive mode the trailing semicolon is optional (so it won't crash just because of that)
 - File input (must end with `.nyr`)
 
 ### How to run
@@ -30,13 +30,13 @@
 - To run tests run `pytest` or `python3 -m pytest` in the project root
 
 ### Flags
-- `-f [path/to/file].nyr`, `--file [Path].nyr` reads from file
-	- If no input file is given it will enter CLI mode
-- `-i`, `--interpret` wether to interpret the input
-	- Note: Adding this flag will turn off interpreting
-	- Note: Classes are not yet supported, and will raise a `NotImplementedError` if encountered
-- `-o`, `--output` wether to dump the generated AST into an `ast.json` file (located at `./ast.json`)
-- `-p`, `--print` wether to print the generated AST to terminal
+| Short Flag | Long Flag     | Description | Note |
+|------------|---------------|-------------|------|
+| `-h`       | `--help`      | print a short help message |
+| `-f`       | `--file`      | read from file (must end with `.nyr`); not providing one will enter Interactive mode mode |
+| `-i`       | `--interpret` | turn off interpretation | Classes are not yet supported, and will raise a `NotImplementedError` if encountered
+| `-o`       | `--output`    | dump generated AST to `ast.json` (located at project rood) |
+| `-p`       | `--print`     | print generated AST to terminal |
 
 - - -
 
