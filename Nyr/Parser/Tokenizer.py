@@ -101,6 +101,9 @@ class TokenPos(NamedTuple):
 	endPos: int
 	line: int
 
+	def __str__(self) -> str:
+		return f"{self.line}, {self.startPos}:{self.endPos}"
+
 
 class Token:
 	def __init__(self, type_: str, value: Union[None, int, float, bool, str], pos: TokenPos = None):

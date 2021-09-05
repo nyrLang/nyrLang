@@ -72,9 +72,9 @@ class Parser:
 			return token
 
 		if not self.hasMoreTokens() is True or token.type == "EOF":
-			raise SyntaxError(f'Unexpected end of input, expected "{tokenType}"')
+			raise SyntaxError(f'Unexpected end of input, expected "{tokenType}" (at {token.pos})')
 
-		raise SyntaxError(f'Unexpected token: "{token}", expected: "{tokenType}"')  # pragma: no cover
+		raise SyntaxError(f'Unexpected token: "{token}" (at {token.pos}), expected: "{tokenType}"')  # pragma: no cover
 
 	def StatementList(self, stopLookahead: Any = None) -> list[Node.Node]:
 		statementList: list[Node.Node] = [self.Statement()]
