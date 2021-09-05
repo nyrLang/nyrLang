@@ -3,6 +3,9 @@
 
 # nyr: A programming language
 
+## IMPORTANT NOTE
+Since I've got a working bytecode interpreter now, I'll stop working on the python script monster. Don't know if I will ever pick it back up. If not I'll move the bytecode one into it's own repo (and maybe archive this one? or leave open for PRs of others that want to work on this one)
+
 ## TOC
 - [Features]
 - [Flags]
