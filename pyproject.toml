@@ -11,6 +11,7 @@ branch = true
 include = [
 	"Nyr/*",
 	"Nyr.Test/*",
+	"Nyr/Bytecode Interpreter/",
 ]
 omit = [
 	"Nyr/__main__.py",
@@ -27,6 +28,7 @@ include = [
 omit = [
 	"Nyr/__main__.py",
 	"Nyr/Interpreter/Stack.py",
+	"Nyr/Bytecode Interpreter/",
 ]
 
 [tool.coverage.html]
