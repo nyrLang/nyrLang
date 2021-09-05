@@ -24,6 +24,7 @@
 - Interactive mode
 	- When using the Interactive mode the trailing semicolon is optional (so it won't crash just because of that)
 - File input (must end with `.nyr`)
+- A Bytecode Interpreter can be found in `Nyr/Bytecode Interpreter/`
 
 ### How to run
 - From the project root run `python3 -m Nyr` and then add some flags
