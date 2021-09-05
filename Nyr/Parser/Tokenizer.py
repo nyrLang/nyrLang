@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import re
 from typing import AnyStr
+from typing import NamedTuple
 from typing import Optional
 from typing import Union
 
-spec: tuple[tuple[re.Pattern[AnyStr], Optional[str]]] = (
+spec: list[tuple[re.Pattern[AnyStr], Optional[str]]] = [
 	# -------------------------
 	# Whitespace
 	(re.compile(r"^\n"), "NEWLINE"),
@@ -90,16 +91,27 @@ spec: tuple[tuple[re.Pattern[AnyStr], Optional[str]]] = (
 	# -------------------------
 	# Strings
 	(re.compile(r'^"[^"]*"'), "STRING"),
-)
+]
+
+
+class TokenPos(NamedTuple):
+	absStartPos: int
+	absEndPos: int
+	startPos: int
+	endPos: int
+	line: int
 
 
 class Token:
-	def __init__(self, type_: str, value: Union[None, int, float, bool, str]):
+	def __init__(self, type_: str, value: Union[None, int, float, bool, str], pos: TokenPos = None):
 		self.type = type_
 		self.value = value
+		self.pos = pos
 
 	def __repr__(self):
-		return f"{self.__module__}.{self.__class__.__name__}({self.type!r}{f', {self.value}' if self.value is not None else ''})"
+		val = f", {self.value}" if self.value is not None else ""
+		pos = f"\n   at: {self.pos!r}" if self.pos is not None else ""
+		return f"{self.__module__}.{self.__class__.__name__}({self.type!r}{val}){pos}"
 
 
 class Tokenizer:
@@ -133,6 +145,9 @@ class Tokenizer:
 
 		string: str = self.string[self.pos.cursor:]
 
+		startPos = self.pos.col
+		absStartPos = self.pos.cursor
+
 		for (regex, tokenType) in spec:
 			tokenValue = self._match(regex, string)
 
@@ -151,7 +166,17 @@ class Tokenizer:
 				self.pos.col = 0
 				return self._getNextToken()
 
-			return Token(tokenType, tokenValue)
+			return Token(
+				tokenType,
+				tokenValue,
+				TokenPos(
+					absStartPos=absStartPos,
+					absEndPos=self.pos.cursor,
+					startPos=startPos,
+					endPos=self.pos.col,
+					line=self.pos.line,
+				),
+			)
 
 		string = string.replace("\n", " ")
 
