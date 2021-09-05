@@ -124,7 +124,7 @@ class Interpreter(NodeVisitor):
 	def visitIfStatement(self, node: Node.IfStatement):
 		self.logVisit("ENTER: Node.IfStatement")
 		test = self.visit(node.test)
-		assert isinstance(test, bool), f'Expected bool, got {type(test).__name__} instead'
+		assert isinstance(test, bool), f"Expected bool, got {type(test).__name__} instead"
 		if test is True:
 			ret = self.visit(node.consequent)
 		else:
@@ -267,8 +267,8 @@ class Interpreter(NodeVisitor):
 		_res = None
 		if node.type == "BinaryExpression":
 			if node.operator == "/":
-				assert left is not None, f"Expected value, got None instead"
-				assert right is not None, f"Expected value, got None instead"
+				assert lVal is not None, f"Expected value, got None instead"
+				assert rVal is not None, f"Expected value, got None instead"
 				try:
 					res = eval(f"{lVal} / {rVal}")
 				except ZeroDivisionError:
@@ -279,8 +279,8 @@ class Interpreter(NodeVisitor):
 				else:
 					_res = float(res)
 			else:
-				assert left is not None, f"Expected value, got None instead"
-				assert right is not None, f"Expected value, got None instead"
+				assert lVal is not None, f"Expected value, got None instead"
+				assert rVal is not None, f"Expected value, got None instead"
 				if type(lVal) == str: lVal = f'"{lVal}"'
 				if type(rVal) == str: rVal = f'"{rVal}"'
 				_res = eval(f"{lVal} {node.operator} {rVal}")

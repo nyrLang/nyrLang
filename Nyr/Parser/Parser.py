@@ -19,7 +19,7 @@ class Parser:
 	def __reset(self):
 		self.string = ""
 		self.lookahead = None
-		self.tokens = ()
+		self.tokens = tuple()
 		self.tkIndex = 0
 		self.fns = {}
 
@@ -60,9 +60,7 @@ class Parser:
 		return self.Program()
 
 	def Program(self) -> Node.Program:
-		prog = Node.Program(self.StatementList())
-
-		return prog
+		return Node.Program(self.StatementList())
 
 	def _eat(self, tokenType: str) -> Token:
 		token = self.lookahead
@@ -123,6 +121,7 @@ class Parser:
 			: 'super'
 			;
 		"""
+
 		self._eat("super")
 
 		return Node.SuperExpression()
@@ -132,6 +131,7 @@ class Parser:
 			: 'this'
 			;
 		"""
+
 		self._eat("this")
 
 		return Node.ThisExpression()
@@ -155,6 +155,7 @@ class Parser:
 			: ':' Identifier
 			;
 		"""
+
 		self._eat(":")
 
 		name = self.Identifier()
@@ -166,6 +167,7 @@ class Parser:
 			: 'def' Identifier '(' OptFormalParameterList ')' BlockStatement
 			;
 		"""
+
 		self._eat("def")
 		name = self.Identifier()
 		self.fns.update({name.name: {}})
@@ -186,6 +188,7 @@ class Parser:
 			| FormalParameterList ',' Identifier
 			;
 		"""
+
 		params: list[Node.Node] = [
 			self.Identifier(),
 		]
@@ -201,6 +204,7 @@ class Parser:
 			: 'return' OptExpression ';'
 			;
 		"""
+
 		self._eat("return")
 
 		argument = self.Expression() if self.lookahead.type != ";" else None
@@ -593,21 +597,23 @@ class Parser:
 	def Literal(self) -> Node.Literal:
 		if self.lookahead.type == "INTEGER":
 			token = self._eat("INTEGER")
-			return Node.Literal("IntegerLiteral", int(token.value))
+			node = Node.Literal("IntegerLiteral", int(token.value))
 		elif self.lookahead.type == "FLOAT":
 			token = self._eat("FLOAT")
-			return Node.Literal("FloatLiteral", float(token.value))
+			node = Node.Literal("FloatLiteral", float(token.value))
 		elif self.lookahead.type == "STRING":
 			token = self._eat("STRING")
-			return Node.Literal("StringLiteral", str(token.value)[1: -1])
+			node = Node.Literal("StringLiteral", str(token.value)[1: -1])
 		elif self.lookahead.type == "true":
 			self._eat("true")
-			return Node.Literal("BooleanLiteral", True)
+			node = Node.Literal("BooleanLiteral", True)
 		elif self.lookahead.type == "false":
 			self._eat("false")
-			return Node.Literal("BooleanLiteral", False)
+			node = Node.Literal("BooleanLiteral", False)
 		elif self.lookahead.type == "null":
 			self._eat("null")
-			return Node.Literal("NullLiteral", None)
+			node = Node.Literal("NullLiteral", None)
 		else:  # pragma: no cover
 			raise SyntaxError("Literal: unexpected literal production")
+
+		return node
