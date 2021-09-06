@@ -50,7 +50,7 @@ def main() -> int:
 		"-f", "--file",
 		default="<stdin>",
 		type=str,
-		help="Input file (ending with ._nyr)",
+		help="Input file (ending with .nyr)",
 		dest="inputFile",
 	)
 	argparser.add_argument(
@@ -85,7 +85,7 @@ def main() -> int:
 	# CLI mode (read from stdin)
 	if args.inputFile == "<stdin>":
 		while True:
-			cmd = input("_nyr> ")
+			cmd = input("nyr> ")
 			if cmd == "exit": return 0
 			elif cmd == "clear":
 				print("\033c", end="")
@@ -101,7 +101,7 @@ def main() -> int:
 			interpret(ast)
 
 	# File mode (read from file given via -f flag)
-	elif args.inputFile.endswith("._nyr"):
+	elif args.inputFile.endswith(".nyr"):
 		with open(args.inputFile, "r") as f:
 			text = f.read()
 
