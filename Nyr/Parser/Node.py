@@ -40,7 +40,7 @@ class Program(Node):
 		return f"{self.__module__}.{self.__class__.__name__}({self.body!r})"
 
 	def toJSON(self):
-		return dict(type=self.type, body=self.body)
+		return {"type": self.type, "body": self.body}
 
 
 class VariableDeclaration(Node):
@@ -53,7 +53,7 @@ class VariableDeclaration(Node):
 		return f"{self.__module__}.{self.__class__.__name__}({self.id!r}, {self.init!r})"
 
 	def toJSON(self):
-		return dict(type=self.type, id=self.id, init=self.init)
+		return {"type": self.type, "id": self.id, "init": self.init}
 
 
 class Identifier(Node):
@@ -65,7 +65,7 @@ class Identifier(Node):
 		return f"{self.__module__}.{self.__class__.__name__}('{self.name}')"
 
 	def toJSON(self):
-		return dict(type=self.type, name=self.name)
+		return {"type": self.type, "name": self.name}
 
 
 # Statements
@@ -78,7 +78,7 @@ class ExpressionStatement(Node):
 		return f"{self.__module__}.{self.__class__.__name__}({self.expression!r})"
 
 	def toJSON(self):
-		return dict(type=self.type, expression=self.expression)
+		return {"type": self.type, "expression": self.expression}
 
 
 class EmptyStatement(Node):
@@ -86,7 +86,7 @@ class EmptyStatement(Node):
 		super().__init__(self.__class__.__name__)
 
 	def toJSON(self):
-		return dict(type=self.type)
+		return {"type": self.type}
 
 
 class BlockStatement(Node):
@@ -98,7 +98,7 @@ class BlockStatement(Node):
 		return f"{self.__module__}.{self.__class__.__name__}({self.body!r})"
 
 	def toJSON(self):
-		return dict(type=self.type, body=self.body)
+		return {"type": self.type, "body": self.body}
 
 
 class IfStatement(Node):
@@ -112,7 +112,7 @@ class IfStatement(Node):
 		return f"{self.__module__}.{self.__class__.__name__}({self.test!r}, {self.consequent!r}, {self.alternative!r})"
 
 	def toJSON(self):
-		return dict(type=self.type, test=self.test, consequent=self.consequent, alternative=self.alternative)
+		return {"type": self.type, "test": self.test, "consequent": self.consequent, "alternative": self.alternative}
 
 
 class VariableStatement(Node):
@@ -124,7 +124,7 @@ class VariableStatement(Node):
 		return f"{self.__module__}.{self.__class__.__name__}({self.declarations!r})"
 
 	def toJSON(self):
-		return dict(type=self.type, declarations=self.declarations)
+		return {"type": self.type, "declarations": self.declarations}
 
 
 class WhileStatement(Node):
@@ -137,7 +137,7 @@ class WhileStatement(Node):
 		return f"{self.__module__}.{self.__class__.__name__}({self.test!r}, {self.body!r})"
 
 	def toJSON(self):
-		return dict(type=self.type, test=self.test, body=self.body)
+		return {"type": self.type, "test": self.test, "body": self.body}
 
 
 class DoWhileStatement(Node):
@@ -150,7 +150,7 @@ class DoWhileStatement(Node):
 		return f"{self.__module__}.{self.__class__.__name__}({self.body!r}, {self.test!r})"
 
 	def toJSON(self):
-		return dict(type=self.type, body=self.body, test=self.test)
+		return {"type": self.type, "body": self.body, "test": self.test}
 
 
 class ForStatement(Node):
@@ -165,7 +165,7 @@ class ForStatement(Node):
 		return f"{self.__module__}.{self.__class__.__name__}({self.init!r}, {self.test!r}, {self.update!r}, {self.body!r})"
 
 	def toJSON(self):
-		return dict(type=self.type, init=self.init, test=self.test, update=self.update, body=self.body)
+		return {"type": self.type, "init": self.init, "test": self.test, "update": self.update, "body": self.body}
 
 
 # Expressions
@@ -185,7 +185,7 @@ class ComplexExpression(Node):
 		return f"{self.__module__}.{self.__class__.__name__}({self.type}, {self.operator}, {self.left!r}, {self.right!r})"
 
 	def toJSON(self):
-		return dict(type=self.type, operator=self.operator, left=self.left, right=self.right)
+		return {"type": self.type, "operator": self.operator, "left": self.left, "right": self.right}
 
 
 class UnaryExpression(Node):
@@ -198,7 +198,7 @@ class UnaryExpression(Node):
 		return f"{self.__module__}.{self.__class__.__name__}({self.operator}, {self.argument!r})"
 
 	def toJSON(self):
-		return dict(type=self.type, operator=self.operator, argument=self.argument)
+		return {"type": self.type, "operator": self.operator, "argument": self.argument}
 
 
 class MemberExpression(Node):
@@ -216,7 +216,7 @@ class MemberExpression(Node):
 		return f"{self.__module__}.{self.__class__.__name__}({self.computed}, {self.object!r}, {self.property!r})"
 
 	def toJSON(self):
-		return dict(type=self.type, computed=self.computed, object=self.object, property=self.property)
+		return {"type": self.type, "computed": self.computed, "object": self.object, "property": self.property}
 
 
 # Functions
@@ -235,7 +235,7 @@ class FunctionDeclaration(Node):
 		return f"{self.__module__}.{self.__class__.__name__}({self.name!r}, {self.params!r}, {self.body!r})"
 
 	def toJSON(self):
-		return dict(type=self.type, name=self.name, params=self.params, body=self.body)
+		return {"type": self.type, "name": self.name, "params": self.params, "body": self.body}
 
 
 class ReturnStatement(Node):
@@ -247,7 +247,7 @@ class ReturnStatement(Node):
 		return f"{self.__module__}.{self.__class__.__name__}({self.argument!r})"
 
 	def toJSON(self):
-		return dict(type=self.type, argument=self.argument)
+		return {"type": self.type, "argument": self.argument}
 
 
 class CallExpression(Node):
@@ -264,7 +264,7 @@ class CallExpression(Node):
 		return f"{self.__module__}.{self.__class__.__name__}({self.callee!r}, {self.arguments!r}, {self.fn!r})"
 
 	def toJSON(self):
-		return dict(type=self.type, callee=self.callee, arguments=self.arguments)
+		return {"type": self.type, "callee": self.callee, "arguments": self.arguments}
 
 
 # Classes
@@ -283,7 +283,7 @@ class ClassDeclaration(Node):
 		return f"{self.__module__}.{self.__class__.__name__}({self.id!r}, {self.superClass!r}, {self.body!r})"
 
 	def toJSON(self):
-		return dict(type=self.type, id=self.id, superClass=self.superClass, body=self.body)
+		return {"type": self.type, "id": self.id, "superClass": self.superClass, "body": self.body}
 
 
 class SuperExpression(Node):
@@ -291,7 +291,7 @@ class SuperExpression(Node):
 		super().__init__(self.__class__.__name__)
 
 	def toJSON(self):
-		return dict(type=self.type)
+		return {"type": self.type}
 
 
 class ThisExpression(Node):
@@ -299,7 +299,7 @@ class ThisExpression(Node):
 		super().__init__(self.__class__.__name__)
 
 	def toJSON(self):
-		return dict(type=self.type)
+		return {"type": self.type}
 
 
 # Literals
@@ -314,4 +314,4 @@ class Literal(Node):
 		return f"{self.__module__}.{self.__class__.__name__}({self.type}, {self.value})"
 
 	def toJSON(self):
-		return dict(type=self.type, value=self.value)
+		return {"type": self.type, "value": self.value}

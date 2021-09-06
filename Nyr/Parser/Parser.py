@@ -1,8 +1,8 @@
 from typing import Any
 
-from Nyr.Parser import Node
-from Nyr.Parser.Tokenizer import Token
-from Nyr.Parser.Tokenizer import Tokenizer
+from nyr.parser import node
+from nyr.parser.tokenizer import Token
+from nyr.parser.tokenizer import Tokenizer
 
 
 class Parser:
@@ -32,7 +32,7 @@ class Parser:
 		return tokenType in ("SIMPLE_ASSIGN", "COMPLEX_ASSIGN")
 
 	@staticmethod
-	def _checkValidAssignmentTarget(node: Node.Node) -> Node.Node:
+	def _checkValidAssignmentTarget(node: node.Node) -> node.Node:
 		if node.type in ("Identifier", "MemberExpression"):
 			return node
 		else:
@@ -46,7 +46,7 @@ class Parser:
 	def hasMoreTokens(self) -> bool:
 		return self.tkIndex == len(self.tokens) and self.tokens[self.tkIndex - 1].type == "EOF"
 
-	def parse(self, string: str) -> Node.Program:
+	def parse(self, string: str) -> node.Program:
 		self.__reset()
 		self.string = string.strip()
 		self.tokenizer.init(self.string)
@@ -55,12 +55,12 @@ class Parser:
 		self.lookahead = self.getNextToken()
 
 		if self.lookahead.type == "EOF":
-			return Node.Program([])
+			return node.Program([])
 
 		return self.Program()
 
-	def Program(self) -> Node.Program:
-		return Node.Program(self.StatementList())
+	def Program(self) -> node.Program:
+		return node.Program(self.StatementList())
 
 	def _eat(self, tokenType: str) -> Token:
 		token = self.lookahead
@@ -74,15 +74,15 @@ class Parser:
 
 		raise SyntaxError(f'Unexpected token: "{token}", expected: "{tokenType}"')  # pragma: no cover
 
-	def StatementList(self, stopLookahead: Any = None) -> list[Node.Node]:
-		statementList: list[Node.Node] = [self.Statement()]
+	def StatementList(self, stopLookahead: Any = None) -> list[node.Node]:
+		statementList: list[node.Node] = [self.Statement()]
 
 		while self.lookahead.type not in [stopLookahead, "EOF"]:
 			statementList.append(self.Statement())
 
 		return statementList
 
-	def Statement(self) -> Node.Node:
+	def Statement(self) -> node.Node:
 		""" Statement
 			: ExpressionStatement
 			| BlockStatement
@@ -116,7 +116,7 @@ class Parser:
 		else:
 			return self.ExpressionStatement()
 
-	def SuperExpression(self) -> Node.SuperExpression:
+	def SuperExpression(self) -> node.SuperExpression:
 		""" Super
 			: 'super'
 			;
@@ -124,9 +124,9 @@ class Parser:
 
 		self._eat("super")
 
-		return Node.SuperExpression()
+		return node.SuperExpression()
 
-	def ThisExpression(self) -> Node.ThisExpression:
+	def ThisExpression(self) -> node.ThisExpression:
 		""" ThisExpression
 			: 'this'
 			;
@@ -134,9 +134,9 @@ class Parser:
 
 		self._eat("this")
 
-		return Node.ThisExpression()
+		return node.ThisExpression()
 
-	def ClassDeclaration(self) -> Node.ClassDeclaration:
+	def ClassDeclaration(self) -> node.ClassDeclaration:
 		""" ClassDeclaration
 			: 'class' Identifier OptClassExtends BlockStatement
 		"""
@@ -148,9 +148,9 @@ class Parser:
 
 		body = self.BlockStatement()
 
-		return Node.ClassDeclaration(id_, superClass, body)
+		return node.ClassDeclaration(id_, superClass, body)
 
-	def ClassExtends(self) -> Node.Identifier:
+	def ClassExtends(self) -> node.Identifier:
 		""" ClassExtends
 			: ':' Identifier
 			;
@@ -162,7 +162,7 @@ class Parser:
 
 		return name
 
-	def FunctionDeclaration(self) -> Node.FunctionDeclaration:
+	def FunctionDeclaration(self) -> node.FunctionDeclaration:
 		""" FunctionDeclaration
 			: 'def' Identifier '(' OptFormalParameterList ')' BlockStatement
 			;
@@ -173,23 +173,23 @@ class Parser:
 		self.fns.update({name.name: {}})
 
 		self._eat("(")
-		params: list[Node.Node] = self.FormalParameterList() if self.lookahead.type != ")" else []
+		params: list[node.Node] = self.FormalParameterList() if self.lookahead.type != ")" else []
 		self._eat(")")
 		self.fns[name.name].update({"args": params})
 
 		body = self.BlockStatement()
 		self.fns[name.name].update({"body": body})
 
-		return Node.FunctionDeclaration(name, params, body)
+		return node.FunctionDeclaration(name, params, body)
 
-	def FormalParameterList(self) -> list[Node.Node]:
+	def FormalParameterList(self) -> list[node.Node]:
 		""" FormalParameterList
 			: Identifier
 			| FormalParameterList ',' Identifier
 			;
 		"""
 
-		params: list[Node.Node] = [
+		params: list[node.Node] = [
 			self.Identifier(),
 		]
 
@@ -199,7 +199,7 @@ class Parser:
 
 		return params
 
-	def ReturnStatement(self) -> Node.ReturnStatement:
+	def ReturnStatement(self) -> node.ReturnStatement:
 		""" ReturnStatement
 			: 'return' OptExpression ';'
 			;
@@ -211,16 +211,16 @@ class Parser:
 
 		self._eat(";")
 
-		return Node.ReturnStatement(argument)
+		return node.ReturnStatement(argument)
 
-	def IterationStatement(self) -> Node.Node:
+	def IterationStatement(self) -> node.Node:
 		if self.lookahead.type == "while": return self.WhileStatement()
 		elif self.lookahead.type == "do": return self.DoWhileStatement()
 		elif self.lookahead.type == "for": return self.ForStatement()
 		else:  # pragma: no cover
 			raise Exception(f"Unknown IterationStatement {self.lookahead.type}")
 
-	def WhileStatement(self) -> Node.WhileStatement:
+	def WhileStatement(self) -> node.WhileStatement:
 		self._eat("while")
 
 		self._eat("(")
@@ -229,9 +229,9 @@ class Parser:
 
 		body = self.Statement()
 
-		return Node.WhileStatement(test=test, body=body)
+		return node.WhileStatement(test=test, body=body)
 
-	def DoWhileStatement(self) -> Node.DoWhileStatement:
+	def DoWhileStatement(self) -> node.DoWhileStatement:
 		self._eat("do")
 
 		body = self.Statement()
@@ -242,9 +242,9 @@ class Parser:
 		self._eat(")")
 		self._eat(";")
 
-		return Node.DoWhileStatement(body=body, test=test)
+		return node.DoWhileStatement(body=body, test=test)
 
-	def ForStatement(self) -> Node.ForStatement:
+	def ForStatement(self) -> node.ForStatement:
 		self._eat("for")
 		self._eat("(")
 
@@ -259,14 +259,14 @@ class Parser:
 
 		body = self.Statement()
 
-		return Node.ForStatement(init, test, update, body)
+		return node.ForStatement(init, test, update, body)
 
-	def ForStatementInit(self) -> Node.Node:
+	def ForStatementInit(self) -> node.Node:
 		if self.lookahead.type == "let":
 			return self.VariableStatementInit()
 		return self.Expression()
 
-	def IfStatement(self) -> Node.IfStatement:
+	def IfStatement(self) -> node.IfStatement:
 		self._eat("if")
 		self._eat("(")
 
@@ -282,21 +282,21 @@ class Parser:
 		else:
 			alternative = None
 
-		return Node.IfStatement(test, consequent, alternative)
+		return node.IfStatement(test, consequent, alternative)
 
-	def VariableStatementInit(self) -> Node.VariableStatement:
+	def VariableStatementInit(self) -> node.VariableStatement:
 		self._eat("let")
 		declarations = self.VariableDeclarationList()
 
-		return Node.VariableStatement(declarations)
+		return node.VariableStatement(declarations)
 
-	def VariableStatement(self) -> Node.VariableStatement:
+	def VariableStatement(self) -> node.VariableStatement:
 		variableStatement = self.VariableStatementInit()
 		self._eat(";")
 		return variableStatement
 
-	def VariableDeclarationList(self) -> list[Node.Node]:
-		declarations: list[Node.Node] = [
+	def VariableDeclarationList(self) -> list[node.Node]:
+		declarations: list[node.Node] = [
 			self.VariableDeclaration(),
 		]
 
@@ -306,7 +306,7 @@ class Parser:
 
 		return declarations
 
-	def VariableDeclaration(self) -> Node.VariableDeclaration:
+	def VariableDeclaration(self) -> node.VariableDeclaration:
 		id_ = self.Identifier()
 
 		if self.lookahead.type != ";" and self.lookahead.type != ",":
@@ -314,41 +314,41 @@ class Parser:
 		else:
 			init = None
 
-		return Node.VariableDeclaration(id_, init)
+		return node.VariableDeclaration(id_, init)
 
-	def VariableInitializer(self) -> Node.Node:
+	def VariableInitializer(self) -> node.Node:
 		self._eat("SIMPLE_ASSIGN")
 		return self.AssignmentExpression()
 
-	def EmptyStatement(self) -> Node.EmptyStatement:
+	def EmptyStatement(self) -> node.EmptyStatement:
 		self._eat(";")
-		return Node.EmptyStatement()
+		return node.EmptyStatement()
 
-	def BlockStatement(self) -> Node.BlockStatement:
+	def BlockStatement(self) -> node.BlockStatement:
 		self._eat("{")
 
-		body: list[Node.Node] = self.StatementList("}") if self.lookahead.type != "}" else []
+		body: list[node.Node] = self.StatementList("}") if self.lookahead.type != "}" else []
 
 		self._eat("}")
 
-		return Node.BlockStatement(body)
+		return node.BlockStatement(body)
 
-	def ExpressionStatement(self) -> Node.ExpressionStatement:
+	def ExpressionStatement(self) -> node.ExpressionStatement:
 		expression = self.Expression()
 		self._eat(";")
 
-		return Node.ExpressionStatement(expression)
+		return node.ExpressionStatement(expression)
 
-	def Expression(self) -> Node.Node:
+	def Expression(self) -> node.Node:
 		return self.AssignmentExpression()
 
-	def AssignmentExpression(self) -> Node.Node:
+	def AssignmentExpression(self) -> node.Node:
 		left = self.LogicalORExpression()
 
 		if not self._isAssignmentOperator(self.lookahead.type):
 			return left
 
-		return Node.ComplexExpression(
+		return node.ComplexExpression(
 			"AssignmentExpression",
 			self.AssignmentOperator().value,
 			self._checkValidAssignmentTarget(left),
@@ -365,7 +365,7 @@ class Parser:
 			return self._eat("SIMPLE_ASSIGN")
 		return self._eat("COMPLEX_ASSIGN")
 
-	def LogicalExpression(self, builderName, operatorToken) -> Node.Node:
+	def LogicalExpression(self, builderName, operatorToken) -> node.Node:
 		builder = getattr(self, builderName)
 
 		left = builder()
@@ -375,7 +375,7 @@ class Parser:
 
 			right = builder()
 
-			left = Node.ComplexExpression(
+			left = node.ComplexExpression(
 				"LogicalExpression",
 				operator,
 				left,
@@ -384,13 +384,13 @@ class Parser:
 
 		return left
 
-	def LogicalORExpression(self) -> Node.Node:
+	def LogicalORExpression(self) -> node.Node:
 		return self.LogicalExpression("LogicalANDExpression", "LOGICAL_OR")
 
-	def LogicalANDExpression(self) -> Node.Node:
+	def LogicalANDExpression(self) -> node.Node:
 		return self.LogicalExpression("BitwiseORExpression", "LOGICAL_AND")
 
-	def BitwiseExpression(self, builderName, operatorToken) -> Node.Node:
+	def BitwiseExpression(self, builderName, operatorToken) -> node.Node:
 		builder = getattr(self, builderName)
 
 		left = builder()
@@ -400,7 +400,7 @@ class Parser:
 
 			right = builder()
 
-			left = Node.ComplexExpression(
+			left = node.ComplexExpression(
 				"BitwiseExpression",
 				operator,
 				left,
@@ -409,23 +409,23 @@ class Parser:
 
 		return left
 
-	def BitwiseORExpression(self) -> Node.Node:
+	def BitwiseORExpression(self) -> node.Node:
 		return self.BitwiseExpression("BitwiseXORExpression", "BITWISE_OR")
 
-	def BitwiseXORExpression(self) -> Node.Node:
+	def BitwiseXORExpression(self) -> node.Node:
 		return self.BitwiseExpression("BitwiseANDExpression", "BITWISE_XOR")
 
-	def BitwiseANDExpression(self) -> Node.Node:
+	def BitwiseANDExpression(self) -> node.Node:
 		return self.BitwiseExpression("EqualityExpression", "BITWISE_AND")
 
-	def LeftHandSideExpression(self) -> Node.Node:
+	def LeftHandSideExpression(self) -> node.Node:
 		""" LeftHandSideExpression
 			: CallMemberExpression
 			;
 		"""
 		return self.CallMemberExpression()
 
-	def CallMemberExpression(self) -> Node.Node:
+	def CallMemberExpression(self) -> node.Node:
 		""" CallMemberExpression
 			: MemberExpression
 			| CallExpression
@@ -442,7 +442,7 @@ class Parser:
 
 		return member
 
-	def CallExpression(self, callee: Node.Node) -> Node.Node:
+	def CallExpression(self, callee: node.Node) -> node.Node:
 		""" CallExpression
 			: Callee Arguments
 			;
@@ -454,34 +454,34 @@ class Parser:
 		"""
 
 		fn = None
-		if isinstance(callee, Node.Identifier):
+		if isinstance(callee, node.Identifier):
 			fn = self.fns.get(callee.name, None)
-		callExpression = Node.CallExpression(callee, self.Arguments(), fn)
+		callExpression = node.CallExpression(callee, self.Arguments(), fn)
 
 		if self.lookahead.type == "(":
 			callExpression = self.CallExpression(callExpression)
 
 		return callExpression
 
-	def Arguments(self) -> list[Node.Node]:
+	def Arguments(self) -> list[node.Node]:
 		""" Arguments
 			: '(' OptArgumentList ')'
 			;
 		"""
 
 		self._eat("(")
-		argumentList: list[Node.Node] = self.ArgumentList() if self.lookahead.type != ")" else []
+		argumentList: list[node.Node] = self.ArgumentList() if self.lookahead.type != ")" else []
 		self._eat(")")
 
 		return argumentList
 
-	def ArgumentList(self) -> list[Node.Node]:
+	def ArgumentList(self) -> list[node.Node]:
 		""" ArgumentList
 			: AssignmentExpression
 			| ArgumentList ',' AssignmentExpression
 			;
 		"""
-		argumentList: list[Node.Node] = [
+		argumentList: list[node.Node] = [
 			self.AssignmentExpression(),
 		]
 
@@ -491,7 +491,7 @@ class Parser:
 
 		return argumentList
 
-	def MemberExpression(self) -> Node.Node:
+	def MemberExpression(self) -> node.Node:
 		""" MemberExpression
 			: PrimaryExpression
 			| MemberExpresssion '.' Identifier
@@ -506,7 +506,7 @@ class Parser:
 				self._eat(".")
 				property_ = self.Identifier()
 
-				object_ = Node.MemberExpression(False, object_, property_)
+				object_ = node.MemberExpression(False, object_, property_)
 
 			# MemberExpression '[' Expression ']'
 			if self.lookahead.type == "[":
@@ -514,28 +514,28 @@ class Parser:
 				property_ = self.Expression()
 				self._eat("]")
 
-				object_ = Node.MemberExpression(True, object_, property_)
+				object_ = node.MemberExpression(True, object_, property_)
 
 		return object_
 
-	def Identifier(self) -> Node.Identifier:
+	def Identifier(self) -> node.Identifier:
 		name = self._eat("IDENTIFIER").value
 
-		return Node.Identifier(name)
+		return node.Identifier(name)
 
-	def EqualityExpression(self) -> Node.Node:
+	def EqualityExpression(self) -> node.Node:
 		return self.BinaryExpression("RelationalExpression", "EQUALITY_OPERATOR")
 
-	def RelationalExpression(self) -> Node.Node:
+	def RelationalExpression(self) -> node.Node:
 		return self.BinaryExpression("AdditiveExpression", "RELATIONAL_OPERATOR")
 
-	def AdditiveExpression(self) -> Node.Node:
+	def AdditiveExpression(self) -> node.Node:
 		return self.BinaryExpression("MultiplicativeExpression", "ADDITIVE_OPERATOR")
 
-	def MultiplicativeExpression(self) -> Node.Node:
+	def MultiplicativeExpression(self) -> node.Node:
 		return self.BinaryExpression("UnaryExpression", "MULTIPLICATIVE_OPERATOR")
 
-	def BinaryExpression(self, builderName, operatorToken) -> Node.Node:
+	def BinaryExpression(self, builderName, operatorToken) -> node.Node:
 		builder = getattr(self, builderName)
 
 		left = builder()
@@ -545,7 +545,7 @@ class Parser:
 
 			right = builder()
 
-			left = Node.ComplexExpression(
+			left = node.ComplexExpression(
 				"BinaryExpression",
 				operator,
 				left,
@@ -554,7 +554,7 @@ class Parser:
 
 		return left
 
-	def UnaryExpression(self) -> Node.Node:
+	def UnaryExpression(self) -> node.Node:
 		if self.lookahead.type == "ADDITIVE_OPERATOR":
 			operator = self._eat("ADDITIVE_OPERATOR").value
 		elif self.lookahead.type == "LOGICAL_NOT":
@@ -563,11 +563,11 @@ class Parser:
 			operator = None
 
 		if operator is not None:
-			return Node.UnaryExpression(operator, self.UnaryExpression())
+			return node.UnaryExpression(operator, self.UnaryExpression())
 
 		return self.LeftHandSideExpression()
 
-	def PrimaryExpression(self) -> Node.Node:
+	def PrimaryExpression(self) -> node.Node:
 		""" PromaryExpression
 			: Literal
 			| ParenthesizedExpression
@@ -587,32 +587,32 @@ class Parser:
 		else:
 			return self.LeftHandSideExpression()
 
-	def ParenthesizedExpression(self) -> Node.Node:
+	def ParenthesizedExpression(self) -> node.Node:
 		self._eat("(")
 		expression = self.Expression()
 		self._eat(")")
 
 		return expression
 
-	def Literal(self) -> Node.Literal:
+	def Literal(self) -> node.Literal:
 		if self.lookahead.type == "INTEGER":
 			token = self._eat("INTEGER")
-			node = Node.Literal("IntegerLiteral", int(token.value))
+			node = node.Literal("IntegerLiteral", int(token.value))
 		elif self.lookahead.type == "FLOAT":
 			token = self._eat("FLOAT")
-			node = Node.Literal("FloatLiteral", float(token.value))
+			node = node.Literal("FloatLiteral", float(token.value))
 		elif self.lookahead.type == "STRING":
 			token = self._eat("STRING")
-			node = Node.Literal("StringLiteral", str(token.value)[1: -1])
+			node = node.Literal("StringLiteral", str(token.value)[1: -1])
 		elif self.lookahead.type == "true":
 			self._eat("true")
-			node = Node.Literal("BooleanLiteral", True)
+			node = node.Literal("BooleanLiteral", True)
 		elif self.lookahead.type == "false":
 			self._eat("false")
-			node = Node.Literal("BooleanLiteral", False)
+			node = node.Literal("BooleanLiteral", False)
 		elif self.lookahead.type == "null":
 			self._eat("null")
-			node = Node.Literal("NullLiteral", None)
+			node = node.Literal("NullLiteral", None)
 		else:  # pragma: no cover
 			raise SyntaxError("Literal: unexpected literal production")
 

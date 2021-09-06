@@ -4,25 +4,25 @@ import sys
 from collections.abc import Callable
 from enum import Enum
 
-from Nyr.Interpreter.Stack import ActivationRecord
-from Nyr.Interpreter.Stack import ARType
-from Nyr.Interpreter.Stack import Stack
-from Nyr.Parser import Node
+from nyr.interpreter.stack import ActivationRecord
+from nyr.interpreter.stack import ARType
+from nyr.interpreter.stack import Stack
+from nyr.parser import node
 
 MAXITERATIONS = 2 ** 16
 MAXRECURSIONDEPTH = 128
 
 
 class Log(Enum):
-	logVisit = 0b001
-	logStack = 0b010
-	logFinal = 0b100
+	logVisit = 0b1 << 0
+	logStack = 0b1 << 1
+	logFinal = 0b1 << 2
 
 	logAll = logVisit | logStack | logFinal
 
 
 class NodeVisitor:
-	def visit(self, node: Node.Node):
+	def visit(self, node: node.Node):
 		if node is None:
 			return None
 		vName = f"visit{type(node).__name__}"
@@ -34,7 +34,7 @@ class NodeVisitor:
 
 
 class Interpreter(NodeVisitor):
-	ast: Node.Program
+	ast: node.Program
 	stack: Stack
 	fns: list = []
 	logging: int
@@ -67,11 +67,11 @@ class Interpreter(NodeVisitor):
 		if (self.logging & Log.logFinal.value) == Log.logFinal.value:
 			self.logger.debug(str(self.stack))
 
-	def interpret(self, ast: Node.Program):
+	def interpret(self, ast: node.Program):
 		self.__reset()
 		return self.visit(ast)
 
-	def visitProgram(self, node: Node.Program):
+	def visitProgram(self, node: node.Program):
 		self.logVisit("ENTER: Node.Program")
 
 		ar = ActivationRecord(
@@ -93,17 +93,17 @@ class Interpreter(NodeVisitor):
 
 	# STATEMENTS
 
-	def visitExpressionStatement(self, node: Node.ExpressionStatement):
+	def visitExpressionStatement(self, node: node.ExpressionStatement):
 		self.logVisit("ENTER: Node.ExpressionStatement")
 		r = self.visit(node.expression)
 		if r == "break":
 			self.breakLoop = True
 		self.logVisit("LEAVE: Node.ExpressionStatement")
 
-	def visitEmptyStatement(self, _: Node.EmptyStatement):
+	def visitEmptyStatement(self, _: node.EmptyStatement):
 		pass
 
-	def visitBlockStatement(self, node: Node.BlockStatement):
+	def visitBlockStatement(self, node: node.BlockStatement):
 		self.logVisit("ENTER: Node.BlockStatement")
 
 		returns = []
@@ -121,7 +121,7 @@ class Interpreter(NodeVisitor):
 		else:  # pragma: no cover
 			return returns
 
-	def visitIfStatement(self, node: Node.IfStatement):
+	def visitIfStatement(self, node: node.IfStatement):
 		self.logVisit("ENTER: Node.IfStatement")
 		test = self.visit(node.test)
 		assert isinstance(test, bool), f"Expected bool, got {type(test).__name__} instead"
@@ -132,13 +132,13 @@ class Interpreter(NodeVisitor):
 		self.logVisit("LEAVE: Node.IfStatement")
 		return ret
 
-	def visitVariableStatement(self, node: Node.VariableStatement):
+	def visitVariableStatement(self, node: node.VariableStatement):
 		self.logVisit("ENTER: Node.VariableStatement")
 		for decl in node.declarations:
 			self.visit(decl)
 		self.logVisit("LEAVE: Node.VariableStatement")
 
-	def visitWhileStatement(self, node: Node.WhileStatement):
+	def visitWhileStatement(self, node: node.WhileStatement):
 		self.logVisit("ENTER: Node.WhileStatement")
 		test = self.visit(node.test)
 		assert isinstance(test, bool), f"Interpreter::Node.WhileStatement: Expected bool, got {type(test)} instead"
@@ -161,7 +161,7 @@ class Interpreter(NodeVisitor):
 
 		self.logVisit("LEAVE: Node.WhileStatement")
 
-	def visitDoWhileStatement(self, node: Node.DoWhileStatement):
+	def visitDoWhileStatement(self, node: node.DoWhileStatement):
 		self.logVisit("ENTER: Node.DoWhileStatement")
 		self.visit(node.body)
 		test = self.visit(node.test)
@@ -185,11 +185,11 @@ class Interpreter(NodeVisitor):
 
 		self.logVisit("LEAVE: Node.DoWhileStatement")
 
-	def visitForStatement(self, node: Node.ForStatement):
+	def visitForStatement(self, node: node.ForStatement):
 		self.logVisit("ENTER: Node.ForStatement")
 		tempDecls = []
 		if node.init is not None:
-			if isinstance(node.init, Node.VariableStatement):
+			if isinstance(node.init, node.VariableStatement):
 				for decl in node.init.declarations:
 					tempDecls.append(decl.id.name)
 			self.visit(node.init)
@@ -222,7 +222,7 @@ class Interpreter(NodeVisitor):
 
 		self.logVisit("LEAVE: Node.ForStatement")
 
-	def visitReturnStatement(self, node: Node.ReturnStatement):
+	def visitReturnStatement(self, node: node.ReturnStatement):
 		self.logVisit("ENTER: Node.ReturnStatement")
 		ret = self.visit(node.argument)
 		self.logVisit("LEAVE: Node.ReturnStatement")
@@ -230,15 +230,15 @@ class Interpreter(NodeVisitor):
 
 	# EXPRESSIONS
 
-	def visitComplexExpression(self, node: Node.ComplexExpression):
+	def visitComplexExpression(self, node: node.ComplexExpression):
 		self.logVisit("ENTER: Node.ComplexExpression")
 
-		if isinstance(node.left, Node.Identifier):
+		if isinstance(node.left, node.Identifier):
 			left = node.left.name
 		else:
 			left = self.visit(node.left)
 
-		if isinstance(node.right, Node.Identifier):
+		if isinstance(node.right, node.Identifier):
 			right = node.right.name
 		else:
 			right = self.visit(node.right)
@@ -316,7 +316,7 @@ class Interpreter(NodeVisitor):
 		self.logVisit("LEAVE: Node.ComplexExpression")
 		return _res
 
-	def visitUnaryExpression(self, node: Node.UnaryExpression):
+	def visitUnaryExpression(self, node: node.UnaryExpression):
 		self.logVisit("ENTER: Node.UnaryExpression")
 		val = self.visit(node.argument)
 		if val is None:
@@ -329,7 +329,7 @@ class Interpreter(NodeVisitor):
 		self.logVisit("LEAVE: Node.UnaryExpression")
 		return val
 
-	def visitCallExpression(self, node: Node.CallExpression):
+	def visitCallExpression(self, node: node.CallExpression):
 		if node.callee.name not in self.fns:
 			raise Exception(f'Function "{node.callee.name}" does not exist in available scope')
 		if node.fn is None:  # pragma: no cover
@@ -344,7 +344,7 @@ class Interpreter(NodeVisitor):
 		if ar.nestingLevel > MAXRECURSIONDEPTH:
 			raise Exception(f'Exceeded recursion depth of {MAXRECURSIONDEPTH} in function "{node.callee.name}"')
 		for argName, argValue in zip(node.fn.get("args", {}), node.arguments):
-			if isinstance(argName, Node.Identifier):
+			if isinstance(argName, node.Identifier):
 				ar[argName.name] = self.visit(argValue)
 			else:
 				ar[argName] = self.visit(argValue)
@@ -377,7 +377,7 @@ class Interpreter(NodeVisitor):
 
 	# DECLARATIONS
 
-	def visitVariableDeclaration(self, node: Node.VariableDeclaration):
+	def visitVariableDeclaration(self, node: node.VariableDeclaration):
 		varName = self.visit(node.id)
 		varValue = self.visit(node.init)
 		_vv = f'"{varValue}"' if type(varValue) == str else varValue
@@ -392,7 +392,7 @@ class Interpreter(NodeVisitor):
 		self.logVisit(f"LEAVE: Node.VariableDeclaration({varName}, {_vv})")
 		del _vv
 
-	def visitFunctionDeclaration(self, node: Node.FunctionDeclaration):
+	def visitFunctionDeclaration(self, node: node.FunctionDeclaration):
 		self.logVisit(f"ENTER: Node.FunctionDeclaration({node.name.name})")
 		if node.name.name in self.fns:
 			raise Exception(f'Function "{node.name.name}" already exists in available scope')
@@ -405,7 +405,7 @@ class Interpreter(NodeVisitor):
 
 	# OTHER
 
-	def visitIdentifier(self, node: Node.Identifier):
+	def visitIdentifier(self, node: node.Identifier):
 		self.logVisit("ENTER: Node.Identifier")
 		if self.stack.peek().varExists(node.name):
 			val = self.stack.peek().members.get(node.name)
@@ -414,7 +414,7 @@ class Interpreter(NodeVisitor):
 		self.logVisit("LEAVE: Node.Identifier")
 		return val
 
-	def visitLiteral(self, node: Node.Literal):
+	def visitLiteral(self, node: node.Literal):
 		self.logVisit("ENTER: Node.Literal")
 		self.logVisit("LEAVE: Node.Literal")
 		return node.value

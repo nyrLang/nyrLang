@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from typing import AnyStr
 from typing import Optional
 from typing import Union
 
-spec: tuple[tuple[re.Pattern[AnyStr], Optional[str]]] = (
+spec: Iterable[tuple[re.Pattern[AnyStr], Optional[str]]] = (
 	# -------------------------
 	# Whitespace
 	(re.compile(r"^\n"), "NEWLINE"),
