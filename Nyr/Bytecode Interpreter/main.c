@@ -25,7 +25,7 @@ static void repl() {
 static char* readFile(const char* path) {
 	FILE* f = fopen(path, "rb");
 	if (f == NULL) {
-		fprintf(stderr, "Could not open file \"%s\".\n", path);
+		fprintf(stderr, "Could not open file '%s'.\n", path);
 		exit(74);
 	}
 
@@ -35,13 +35,13 @@ static char* readFile(const char* path) {
 
 	char* buf = (char*)malloc(fSize + 1);
 	if (buf == NULL) {
-		fprintf(stderr, "Not enough memory to read \"%s\".\n", path);
+		fprintf(stderr, "Not enough memory to read '%s'.\n", path);
 		exit(74);
 	}
 
 	size_t bytesRead = fread(buf, sizeof(char), fSize, f);
 	if (bytesRead < fSize) {
-		fprintf(stderr, "Could not read file \"%s\".\n", path);
+		fprintf(stderr, "Could not read file '%s'.\n", path);
 		exit(74);
 	}
 

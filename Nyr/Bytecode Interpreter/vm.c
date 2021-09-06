@@ -327,7 +327,7 @@ static InterpretResult run() {
 				ObjString* name = READ_STRING();
 				Value value;
 				if (!tableGet(&vm.globals, name, &value)) {
-					runtimeError("Undefined variable \"%s\"", name->chars);
+					runtimeError("Undefined variable '%s'", name->chars);
 					return INTERPRET_RUNTIME_ERROR;
 				}
 				push(value);
@@ -337,7 +337,7 @@ static InterpretResult run() {
 				ObjString* name = READ_STRING();
 				if (tableSet(&vm.globals, name, peek(0))) {
 					tableDelete(&vm.globals, name);
-					runtimeError("Undefined variable \"%s\"", name->chars);
+					runtimeError("Undefined variable '%s'", name->chars);
 					return INTERPRET_RUNTIME_ERROR;
 				}
 				break;
@@ -382,6 +382,15 @@ static InterpretResult run() {
 				Value value = pop();
 				pop();
 				push(value);
+				break;
+			}
+			case OP_GET_SUPER: {
+				ObjString* name = READ_STRING();
+				ObjClass* superclass = AS_CLASS(pop());
+
+				if (!bindMethod(superclass, name)) {
+					return INTERPRET_RUNTIME_ERROR;
+				}
 				break;
 			}
 			case OP_EQUAL: {
@@ -474,6 +483,16 @@ static InterpretResult run() {
 				frame = &vm.frames[vm.frameCount - 1];
 				break;
 			}
+			case OP_SUPER_INVOKE: {
+				ObjString* method = READ_STRING();
+				int argCount = READ_BYTE();
+				ObjClass* superclass = AS_CLASS(pop());
+				if (!invokeFromClass(superclass, method, argCount)) {
+					return INTERPRET_RUNTIME_ERROR;
+				}
+				frame = &vm.frames[vm.frameCount - 1];
+				break;
+			}
 			case OP_CLOSURE: {
 				ObjFunction* function = AS_FUNCTION(READ_CONSTANT());
 				ObjClosure* closure = newClosure(function);
@@ -511,6 +530,17 @@ static InterpretResult run() {
 			}
 			case OP_CLASS: {
 				push(OBJ_VAL(newClass(READ_STRING())));
+				break;
+			}
+			case OP_INHERIT: {
+				Value superClass = peek(1);
+				if (!IS_CLASS(superClass)) {
+					runtimeError("Superclass must be a class");
+					return INTERPRET_RUNTIME_ERROR;
+				}
+				ObjClass* subClass = AS_CLASS(peek(0));
+				tableAddAll(&AS_CLASS(superClass)->methods, &subClass->methods);
+				pop();
 				break;
 			}
 			case OP_METHOD: {

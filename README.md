@@ -241,15 +241,13 @@ class Point {
 // Point3D inherits from Point
 class Point3D : Point {
 	def init(x, y, z) {
-		// super call to initialize x and y
-		super(x, y);
+		super.init(x, y);
 		this.z = z;
 	}
 
 	// override calc
 	def calc() {
-		// call super().calc()
-		return super() + this.z;
+		return super.calc() + this.z;
 	}
 }
 
