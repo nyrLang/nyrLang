@@ -1,8 +1,8 @@
-.idea/
-.pytest_cache/
-__pycache__/
-venv/
-.vscode/
-debug/
+/venv/
+/debug/
+/reports/coverage/htmlreport/
+/.idea/
+/.vscode/
+/.pytest_cache/
 .coverage
-reports/coverage/htmlreport/
+__pycache__/

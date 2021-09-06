@@ -6,4 +6,4 @@ coverage:
       default:
         threshold: 3%
         branches:
-          - senpai
+          - main

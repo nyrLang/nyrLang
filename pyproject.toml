@@ -9,12 +9,12 @@ xfail_strict = true
 cover_pylib = false
 branch = true
 include = [
-	"Nyr/*",
-	"Nyr.Test/*",
-	"Nyr/Bytecode Interpreter/",
+	"nyr/*",
+	"tests/*",
+	"nyr/Bytecode Interpreter/",
 ]
 omit = [
-	"Nyr/__main__.py",
+	"nyr/__main__.py",
 ]
 
 [tool.coverage.report]
@@ -22,13 +22,13 @@ show_missing = true
 skip_covered = true
 precision = 3
 include = [
-	"Nyr/*",
-	"Nyr.Test/*",
+	"nyr/*",
+	"tests/*",
 ]
 omit = [
-	"Nyr/__main__.py",
-	"Nyr/Interpreter/Stack.py",
-	"Nyr/Bytecode Interpreter/",
+	"nyr/__main__.py",
+	"nyr/Interpreter/Stack.py",
+	"nyr/Bytecode Interpreter/",
 ]
 
 [tool.coverage.html]
