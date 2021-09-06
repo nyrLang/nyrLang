@@ -1,28 +1,20 @@
 import argparse
 import json
 import sys
-from enum import Enum
 from pprint import pp
 
-from Nyr.Interpreter.Interpreter import Interpreter
-from Nyr.Interpreter.Interpreter import Log
-from Nyr.Parser.Node import ComplexEncoder
-from Nyr.Parser.Node import Program
-from Nyr.Parser.Parser import Parser
+from nyr.interpreter.interpreter import Interpreter
+from nyr.parser.node import ComplexEncoder
+from nyr.parser.node import Program
+from nyr.parser.parser import Parser
 
 
 class Args:
 	inputFile: str
-	output: int
-	interpret: int
-	printAST: int
-	debug: int
-
-
-class EArgs(Enum):
-	output = 0b0001
-	interpret = 0b0010
-	printAST = 0b0100
+	output: bool
+	interpret: bool
+	printAST: bool
+	debug: bool
 
 
 def getAst(string: str) -> Program:
@@ -30,33 +22,32 @@ def getAst(string: str) -> Program:
 
 
 def printAst(ast_: Program):
-	if args.printAST & EArgs.printAST.value == EArgs.printAST.value:
+	if args.printAST:
 		print(json.dumps(ast_, cls=ComplexEncoder, indent=2))
 
 
 def interpret(ast_: Program):
-	if args.interpret & EArgs.interpret.value == EArgs.interpret.value:
+	if args.interpret:
 		_env = Interpreter(args.debug).interpret(ast_)
 		print(f"Env = ", end="")
 		pp(_env)
 
 
 def outputAST(ast_: Program):
-	if args.output & EArgs.output.value == EArgs.output.value:
+	if args.output:
 		with open("./ast.json", "w") as o:
 			o.write(json.dumps(ast_, cls=ComplexEncoder, indent=2) + "\n")
 
 
 args = Args()
 
-if __name__ == "__main__":
+def main() -> int:
 	if (sys.version_info.major, sys.version_info.minor) < (3, 9):
 		print(f"At least python 3.9 is required to run this code. Your version is: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
-		exit(1)
+		return 1
 	argparser = argparse.ArgumentParser()
 	argparser.add_argument(
 		"-f", "--file",
-		required=False,
 		default="<stdin>",
 		type=str,
 		help="Input file (ending with .nyr)",
@@ -64,37 +55,25 @@ if __name__ == "__main__":
 	)
 	argparser.add_argument(
 		"-i", "--interpret",
-		required=False,
-		action="store_const",
-		const=0,
-		default=EArgs.interpret.value,
-		help="Enable interpreter",
+		action="store_false",
+		help="Disable interpreter",
 		dest="interpret",
 	)
 	argparser.add_argument(
 		"-o", "--output",
-		required=False,
-		action="store_const",
-		const=EArgs.output.value,
-		default=0,
+		action="store_true",
 		help="Output AST to ast.json",
 		dest="output",
 	)
 	argparser.add_argument(
 		"-p", "--print",
-		required=False,
-		action="store_const",
-		const=EArgs.printAST.value,
-		default=0,
+		action="store_true",
 		help="Wether to print the AST to terminal",
 		dest="printAST",
 	)
 	argparser.add_argument(
 		"-d", "--debug",
-		required=False,
-		action="store_const",
-		const=Log.logAll.value,
-		default=0,
+		action="store_true",
 		help="Wether to print debug messages on what the interpreter is doing",
 		dest="debug",
 	)
@@ -107,7 +86,7 @@ if __name__ == "__main__":
 	if args.inputFile == "<stdin>":
 		while True:
 			cmd = input("nyr> ")
-			if cmd == "exit": exit(0)
+			if cmd == "exit": return 0
 			elif cmd == "clear":
 				print("\033c", end="")
 				continue
@@ -139,4 +118,7 @@ if __name__ == "__main__":
 	# Unknown mode
 	else:
 		argparser.print_help()
-		exit(-1)
+		return -1
+
+if __name__ == "__main__":
+	raise SystemExit(main())
