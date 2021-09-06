@@ -41,6 +41,7 @@ def outputAST(ast_: Program):
 
 args = Args()
 
+
 def main() -> int:
 	if (sys.version_info.major, sys.version_info.minor) < (3, 9):
 		print(f"At least python 3.9 is required to run this code. Your version is: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
@@ -80,12 +81,18 @@ def main() -> int:
 
 	argparser.parse_args(namespace=args)
 
-	parser = Parser()
-
 	# CLI mode (read from stdin)
 	if args.inputFile == "<stdin>":
 		while True:
-			cmd = input("nyr> ")
+			try:
+				cmd = input("nyr> ")
+			except KeyboardInterrupt:
+				return 0
+			except EOFError:
+				return 0
+			except Exception:
+				raise
+
 			if cmd == "exit": return 0
 			elif cmd == "clear":
 				print("\033c", end="")
@@ -119,6 +126,7 @@ def main() -> int:
 	else:
 		argparser.print_help()
 		return -1
+
 
 if __name__ == "__main__":
 	raise SystemExit(main())
