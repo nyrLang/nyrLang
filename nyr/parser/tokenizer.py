@@ -107,12 +107,12 @@ class Tokenizer:
 	string: str = ""
 	pos: Position
 
-	def __reset(self):
+	def _reset(self):
 		self.string = ""
 		self.pos = Position()
 
 	def init(self, string: str):
-		self.__reset()
+		self._reset()
 		self.string = string
 
 	def hasMoreTokens(self) -> bool: return self.pos.cursor < len(self.string)

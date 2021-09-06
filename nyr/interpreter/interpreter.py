@@ -51,7 +51,7 @@ class Interpreter(NodeVisitor):
 		# FIXME: Hacky way to break loops
 		self.breakLoop = False
 
-	def __reset(self):
+	def _reset(self):
 		self.stack = Stack()
 		self.fns = []
 
@@ -68,7 +68,7 @@ class Interpreter(NodeVisitor):
 			self.logger.debug(str(self.stack))
 
 	def interpret(self, ast: node.Program):
-		self.__reset()
+		self._reset()
 		return self.visit(ast)
 
 	def visitProgram(self, node: node.Program):

@@ -16,7 +16,7 @@ class Parser:
 	def __init__(self):
 		self.tokenizer = Tokenizer()
 
-	def __reset(self):
+	def _reset(self):
 		self.string = ""
 		self.lookahead = None
 		self.tokens = tuple()
@@ -47,7 +47,7 @@ class Parser:
 		return self.tkIndex == len(self.tokens) and self.tokens[self.tkIndex - 1].type == "EOF"
 
 	def parse(self, string: str) -> node.Program:
-		self.__reset()
+		self._reset()
 		self.string = string.strip()
 		self.tokenizer.init(self.string)
 
