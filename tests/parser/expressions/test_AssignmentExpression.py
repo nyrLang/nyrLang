@@ -112,5 +112,5 @@ def testComplexAssignment():
 
 
 def testInvalidAssignment():
-	with pytest.raises(Exception, match=re.escape("Invalid left-hand side in assignment expression: nyr.parser.Node.Literal(IntegerLiteral, 1); expected: Identifier, MemberExpression")):
+	with pytest.raises(Exception, match=re.escape("Invalid left-hand side in assignment expression: nyr.parser.node.Literal(IntegerLiteral, 1); expected: Identifier, MemberExpression")):
 		Parser().parse("1 = 2;")
