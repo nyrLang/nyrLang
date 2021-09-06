@@ -1,7 +1,7 @@
 def fibonacci(n) {
 	if (n < 0) {
 		return "Input must be 1 or greater";
-	} else if (n <= 2) {
+	} else if (n < 2) {
 		return n;
 	} else {
 		return fibonacci(n - 1) + fibonacci(n - 2);
@@ -10,3 +10,6 @@ def fibonacci(n) {
 
 let fib1 = fibonacci(1);
 let fib10 = fibonacci(10);
+
+print(fib1);
+print(fib10);

@@ -260,6 +260,7 @@ static void endScope() {
 
 static ParseRule* getRule(TokenType type);
 static uint8_t identifierConstant(Token *name);
+static uint8_t argumentList();
 static int resolveLocal(Compiler* compiler, Token* name);
 static int resolveUpvalue(Compiler* compiler, Token* name);
 static void parsePrecedence(Precedence precedence);
