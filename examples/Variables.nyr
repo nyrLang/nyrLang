@@ -13,4 +13,5 @@ b = a + ", World!";
 x = 3;
 
 // x is now 10
+// Not working in bytecode interpreter
 x += y;

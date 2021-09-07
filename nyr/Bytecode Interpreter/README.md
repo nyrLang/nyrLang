@@ -1,15 +1,11 @@
 # nyr: bytecode interpreter
 
 ## Restrictions
-The bytecode interpreter works (_partially better than my monstrosity_), with the exception of some things..
-- Multiple variable definitions with one `let`
-	- example: `let x, y = 3, z;` does not work
+The bytecode interpreter works, with the exception of some things..
 - Logical and Bitwise operators
 	- `!` (not/inverse/negate) works
 - Compound assignment operators
 	- `+=`, `-=`, etc.
-- Superclasses / Class Inheritance
-	- Normal classes work just fine
 
 ## How to run
 1. Run `make` in this directory (with the `Makefile`)
