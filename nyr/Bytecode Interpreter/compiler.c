@@ -748,13 +748,18 @@ static void functionDeclaration() {
 }
 
 static void variableDeclaration() {
-	uint8_t global = parseVariable("Expected variable name");
+	do {
+		uint8_t global = parseVariable("Expected variable name");
 
-	if (match(TOKEN_EQUAL)) expression();
-	else emitByte(OP_NULL);
+		if (match(TOKEN_EQUAL)) {
+			expression();
+		}
+		else {
+			emitByte(OP_NULL);
+		}
+		defineVariable(global);
+	} while (match(TOKEN_COMMA));
 	consume(TOKEN_SEMICOLON, "Expected ';' after variable declaration");
-
-	defineVariable(global);
 }
 
 static void printStatement() {
