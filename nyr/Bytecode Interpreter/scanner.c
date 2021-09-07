@@ -83,18 +83,22 @@ static void skipWhitespace() {
 			case '/': {
 				// Handle single-line comments
 				if (peekNext() == '/') {
-					while (peek() != '\n' && !isAtEnd()) advance();
+					while (peek() != '\n' && !isAtEnd())
+						advance();
 				}
 				// Handle multi-line comments
 				else if (peekNext() == '*') {
-					do {
+					while (peek() != '*' && peekNext() != '/' && !isAtEnd()) {
 						advance();
-						if (peek() == '\n') scanner.line++;
-					} while (peek() != '*' && peekNext() != '/');
+						if (peek() == '\n') {
+							scanner.line++;
+						}
+					}
 				}
 				else {
 					return;
 				}
+				break;
 			}
 			default: return;
 		}
