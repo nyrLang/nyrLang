@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Iterable
-from typing import AnyStr
 from typing import Optional
 from typing import Union
 
-spec: Iterable[tuple[re.Pattern[AnyStr], Optional[str]]] = (
+spec: tuple[tuple[re.Pattern[str], Optional[str]], ...] = (
 	# -------------------------
 	# Whitespace
 	(re.compile(r"^\n"), "NEWLINE"),
@@ -158,7 +156,7 @@ class Tokenizer:
 
 		raise Exception(f"Could not parse input correctly. starting here ({self.pos.line}:{self.pos.col}):\n\t{string}")
 
-	def getTokens(self) -> tuple[Token]:
+	def getTokens(self) -> tuple[Token, ...]:
 		tokens = []
 		tk = self._getNextToken()
 		while tk.type != "EOF":

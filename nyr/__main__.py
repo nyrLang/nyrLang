@@ -43,8 +43,8 @@ args = Args()
 
 
 def main() -> int:
-	if (sys.version_info.major, sys.version_info.minor) < (3, 9):
-		print(f"At least python 3.9 is required to run this code. Your version is: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+	if sys.version_info < (3, 9):
+		print(f"At least python 3.9 is required to run this code. Your version is: {sys.version_info}")
 		return 1
 	argparser = argparse.ArgumentParser()
 	argparser.add_argument(
@@ -81,7 +81,7 @@ def main() -> int:
 
 	argparser.parse_args(namespace=args)
 
-	# CLI mode (read from stdin)
+	# REPL (read from stdin)
 	if args.inputFile == "<stdin>":
 		while True:
 			try:
