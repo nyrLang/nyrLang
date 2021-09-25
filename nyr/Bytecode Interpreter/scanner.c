@@ -88,12 +88,13 @@ static void skipWhitespace() {
 				}
 				// Handle multi-line comments
 				else if (peekNext() == '*') {
-					while (peek() != '*' && peekNext() != '/' && !isAtEnd()) {
+					advance();
+					do {
 						advance();
 						if (peek() == '\n') {
 							scanner.line++;
 						}
-					}
+					} while (peek() != '*' && peekNext() != '/' && !isAtEnd());
 				}
 				else {
 					return;
