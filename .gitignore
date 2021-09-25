@@ -4,5 +4,7 @@
 /.idea/
 /.vscode/
 /.pytest_cache/
+/.tox/
+/*.egg-info/
 .coverage
 __pycache__/
