@@ -2,7 +2,6 @@
 CC = gcc
 
 LINKERFLAG = -lm
-COMPILERFLAGS = -Wincompatible-pointer-types
 
 SRCS := $(wildcard *.c)
 OBJS := $(SRCS:%c=build/%o)
@@ -22,7 +21,7 @@ include build/.dep
 
 build/%.o: %.c ${build/.dep} common.h
 	@echo "Creating object: $@"
-	@${CC} -o "$@" -c $< ${COMPILERFLAGS}
+	@${CC} -o "$@" -c $<
 
 clean:
 	@echo "Cleaning up..."
