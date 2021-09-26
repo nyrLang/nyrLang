@@ -93,7 +93,8 @@ def main() -> int:
 			except Exception:
 				raise
 
-			if cmd == "exit": return 0
+			if cmd == "exit":
+				return 0
 			elif cmd == "clear":
 				print("\033c", end="")
 				continue
@@ -125,7 +126,7 @@ def main() -> int:
 	# Unknown mode
 	else:
 		argparser.print_help()
-		return -1
+		return 1
 
 
 if __name__ == "__main__":

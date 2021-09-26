@@ -49,7 +49,7 @@ Since some spec has changed with the addition of the bytecode interpreter, pleas
 - - -
 
 ## Requirements
-- Python 3.9
+- Python 3.9+
 
 - - -
 
