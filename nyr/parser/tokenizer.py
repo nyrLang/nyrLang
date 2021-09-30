@@ -7,88 +7,88 @@ from typing import Union
 spec: tuple[tuple[re.Pattern[str], Optional[str]], ...] = (
 	# -------------------------
 	# Whitespace
-	(re.compile(r"^\n"), "NEWLINE"),
-	(re.compile(r"^\s+"), None),
+	(re.compile(r"\n"), "NEWLINE"),
+	(re.compile(r"\s+"), None),
 
 	# -------------------------
 	# Comments
 	# Single-line
-	(re.compile(r"^//.*"), None),
+	(re.compile(r"//.*"), None),
 	# Multi-line
-	(re.compile(r"^/\*[\s\S]*?\*/.*"), "BLOCK_COMMENT"),
+	(re.compile(r"/\*[\s\S]*?\*/.*"), "BLOCK_COMMENT"),
 
 	# -------------------------
 	# Symbols, Delimiters
-	(re.compile(r"^;"), ";"),
-	(re.compile(r"^,"), ","),
-	(re.compile(r"^:"), ":"),
-	(re.compile(r"^\."), "."),
-	(re.compile(r"^{"), "{"),
-	(re.compile(r"^}"), "}"),
-	(re.compile(r"^\("), "("),
-	(re.compile(r"^\)"), ")"),
-	(re.compile(r"^\["), "["),
-	(re.compile(r"^\]"), "]"),
+	(re.compile(r";"), ";"),
+	(re.compile(r","), ","),
+	(re.compile(r":"), ":"),
+	(re.compile(r"\."), "."),
+	(re.compile(r"{"), "{"),
+	(re.compile(r"}"), "}"),
+	(re.compile(r"\("), "("),
+	(re.compile(r"\)"), ")"),
+	(re.compile(r"\["), "["),
+	(re.compile(r"\]"), "]"),
 
 	# -------------------------
 	# Keywords
-	(re.compile(r"^\blet\b"), "let"),
-	(re.compile(r"^\bif\b"), "if"),
-	(re.compile(r"^\belse\b"), "else"),
-	(re.compile(r"^\btrue\b"), "true"),
-	(re.compile(r"^\bfalse\b"), "false"),
-	(re.compile(r"^\bnull\b"), "null"),
-	(re.compile(r"^\bwhile\b"), "while"),
-	(re.compile(r"^\bdo\b"), "do"),
-	(re.compile(r"^\bfor\b"), "for"),
-	(re.compile(r"^\bdef\b"), "def"),
-	(re.compile(r"^\breturn\b"), "return"),
-	(re.compile(r"^\bclass\b"), "class"),
-	(re.compile(r"^\bthis\b"), "this"),
-	(re.compile(r"^\bsuper\b"), "super"),
+	(re.compile(r"\blet\b"), "let"),
+	(re.compile(r"\bif\b"), "if"),
+	(re.compile(r"\belse\b"), "else"),
+	(re.compile(r"\btrue\b"), "true"),
+	(re.compile(r"\bfalse\b"), "false"),
+	(re.compile(r"\bnull\b"), "null"),
+	(re.compile(r"\bwhile\b"), "while"),
+	(re.compile(r"\bdo\b"), "do"),
+	(re.compile(r"\bfor\b"), "for"),
+	(re.compile(r"\bdef\b"), "def"),
+	(re.compile(r"\breturn\b"), "return"),
+	(re.compile(r"\bclass\b"), "class"),
+	(re.compile(r"\bthis\b"), "this"),
+	(re.compile(r"\bsuper\b"), "super"),
 
 	# -------------------------
 	# Numbers
-	(re.compile(r"^\d+\.\d+"), "FLOAT"),
-	(re.compile(r"^\d+"), "INTEGER"),
+	(re.compile(r"\d+\.\d+"), "FLOAT"),
+	(re.compile(r"\d+"), "INTEGER"),
 
 	# -------------------------
 	# Identifiers
-	(re.compile(r"^\w+"), "IDENTIFIER"),
+	(re.compile(r"\w+"), "IDENTIFIER"),
 
 	# -------------------------
 	# Equality Operators: ==, !=
-	(re.compile(r"^[=!]="), "EQUALITY_OPERATOR"),
+	(re.compile(r"[=!]="), "EQUALITY_OPERATOR"),
 
 	# -------------------------
 	# Assignment Operators: =, +=, -=, *=, /=
-	(re.compile(r"^="), "SIMPLE_ASSIGN"),
-	(re.compile(r"^[+\-*/%]="), "COMPLEX_ASSIGN"),
+	(re.compile(r"="), "SIMPLE_ASSIGN"),
+	(re.compile(r"[+\-*/%]="), "COMPLEX_ASSIGN"),
 
 	# -------------------------
 	# Math Operators: +, -, *, /
-	(re.compile(r"^[+\-]"), "ADDITIVE_OPERATOR"),
-	(re.compile(r"^[*/%]"), "MULTIPLICATIVE_OPERATOR"),
+	(re.compile(r"[+\-]"), "ADDITIVE_OPERATOR"),
+	(re.compile(r"[*/%]"), "MULTIPLICATIVE_OPERATOR"),
 
 	# -------------------------
 	# Logical Operators: &&, ||, !
-	(re.compile(r"^&&"), "LOGICAL_AND"),
-	(re.compile(r"^\|\|"), "LOGICAL_OR"),
-	(re.compile(r"^!"), "LOGICAL_NOT"),
+	(re.compile(r"&&"), "LOGICAL_AND"),
+	(re.compile(r"\|\|"), "LOGICAL_OR"),
+	(re.compile(r"!"), "LOGICAL_NOT"),
 
 	# -------------------------
 	# Bitwise Operators
-	(re.compile(r"^\&"), "BITWISE_AND"),
-	(re.compile(r"^\^"), "BITWISE_XOR"),
-	(re.compile(r"^\|"), "BITWISE_OR"),
+	(re.compile(r"\&"), "BITWISE_AND"),
+	(re.compile(r"\^"), "BITWISE_XOR"),
+	(re.compile(r"\|"), "BITWISE_OR"),
 
 	# -------------------------
 	# Relational Operators: >, >=, <, <=
-	(re.compile(r"^[><]=?"), "RELATIONAL_OPERATOR"),
+	(re.compile(r"[><]=?"), "RELATIONAL_OPERATOR"),
 
 	# -------------------------
 	# Strings
-	(re.compile(r'^"[^"]*"'), "STRING"),
+	(re.compile(r'"[^"]*"'), "STRING"),
 )
 
 
@@ -102,8 +102,9 @@ class Token:
 
 
 class Tokenizer:
-	string: str = ""
-	pos: Position
+	def __init__(self) -> None:
+		self.string = ""
+		self.pos: Position
 
 	def _reset(self):
 		self.string = ""
@@ -115,8 +116,8 @@ class Tokenizer:
 
 	def hasMoreTokens(self) -> bool: return self.pos.cursor < len(self.string)
 
-	def _match(self, regex: re.Pattern, string: str):
-		matched = regex.match(string)
+	def _match(self, regex: re.Pattern):
+		matched = regex.match(self.string, self.pos.cursor)
 
 		if not matched:
 			return None
@@ -130,10 +131,8 @@ class Tokenizer:
 		if not self.hasMoreTokens():
 			return Token("EOF", None)
 
-		string: str = self.string[self.pos.cursor:]
-
 		for (regex, tokenType) in spec:
-			tokenValue = self._match(regex, string)
+			tokenValue = self._match(regex)
 
 			if not tokenValue:
 				continue
@@ -152,7 +151,7 @@ class Tokenizer:
 
 			return Token(tokenType, tokenValue)
 
-		string = string.replace("\n", " ")
+		string = self.string.replace("\n", " ")
 
 		raise Exception(f"Could not parse input correctly. starting here ({self.pos.line}:{self.pos.col}):\n\t{string}")
 
