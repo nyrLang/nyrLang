@@ -15,7 +15,7 @@ from nyr.parser.parser import Parser
 	),
 )
 @pytest.mark.usefixtures("examplesDir")
-@pytest.mark.xfail(reason="Something is wrong with BinaryExpression", strict=False)
+@pytest.mark.xfail(reason="print function not available in python interpreter")
 def testExample(examplesDir: str, fileName: str, expectedEnv: dict):
 	with open(os.path.join(examplesDir, fileName), "r") as f:
 		code = f.read()

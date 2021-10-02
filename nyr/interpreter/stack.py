@@ -13,9 +13,6 @@ class Stack:
 		s = '\n'.join(repr(ar) for ar in self._records[::-1])
 		return f"CALL STACK\n{s}\n"
 
-	def __repr__(self) -> str:
-		return str(self)
-
 	def push(self, record: ActivationRecord):
 		self._records.append(record)
 
@@ -41,8 +38,7 @@ class ActivationRecord:
 	def __str__(self) -> str:
 		lines: list = [f"{self.nestingLevel}: {self.type} {self.name}"]
 
-		if "__builtins__" in self.members.keys():
-			del self.members["__builtins__"]
+		self.cleanBuiltins()
 
 		for key, val in self.members.items():
 			if key is None: continue
@@ -53,24 +49,24 @@ class ActivationRecord:
 		return '\n'.join(lines)
 
 	def __repr__(self) -> str:
-		if "__builtins__" in self.members.keys():
-			del self.members["__builtins__"]
+		self.cleanBuiltins()
 		return str(self)
 
 	def __setitem__(self, key, value):
 		self.members.update({key: value})
-		if "__builtins__" in self.members.keys():
-			del self.members["__builtins__"]
+		self.cleanBuiltins()
 
 	def __getitem__(self, key):
+		self.cleanBuiltins()
+		return self.members[key]
+
+	def cleanBuiltins(self):
 		if "__builtins__" in self.members.keys():
 			del self.members["__builtins__"]
-		return self.members[key]
 
 	def varExists(self, varName):
 		return varName in self.members.keys()
 
 	def get(self, key):
-		if "__builtins__" in self.members.keys():
-			del self.members["__builtins__"]
+		self.cleanBuiltins()
 		return self.members.get(key, None)

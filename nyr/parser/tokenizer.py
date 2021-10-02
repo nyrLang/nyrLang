@@ -138,18 +138,18 @@ class Tokenizer:
 				continue
 
 			if tokenType is None:
-				return self._getNextToken()
+				pass
 			elif tokenType == "NEWLINE":
 				self.pos.line += 1
 				self.pos.col = 0
-				return self._getNextToken()
 			elif tokenType == "BLOCK_COMMENT":
 				tokenValue = tokenValue.replace(r"\\n", "_")
 				self.pos.line += tokenValue.count("\n")
 				self.pos.col = 0
-				return self._getNextToken()
+			else:
+				return Token(tokenType, tokenValue)
 
-			return Token(tokenType, tokenValue)
+			return self._getNextToken()
 
 		string = self.string.replace("\n", " ")
 

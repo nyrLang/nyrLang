@@ -98,23 +98,25 @@ class Parser:
 		assert self.lookahead is not None
 
 		if self.lookahead.type == ";":
-			return self.EmptyStatement()
+			node = self.EmptyStatement
 		elif self.lookahead.type == "{":
-			return self.BlockStatement()
+			node = self.BlockStatement
 		elif self.lookahead.type == "let":
-			return self.VariableStatement()
+			node = self.VariableStatement
 		elif self.lookahead.type == "if":
-			return self.IfStatement()
+			node = self.IfStatement
 		elif self.lookahead.type in ("while", "do", "for"):
-			return self.IterationStatement()
+			node = self.IterationStatement
 		elif self.lookahead.type == "def":
-			return self.FunctionDeclaration()
+			node = self.FunctionDeclaration
 		elif self.lookahead.type == "return":
-			return self.ReturnStatement()
+			node = self.ReturnStatement
 		elif self.lookahead.type == "class":
-			return self.ClassDeclaration()
+			node = self.ClassDeclaration
 		else:
-			return self.ExpressionStatement()
+			node = self.ExpressionStatement
+
+		return node()
 
 	def SuperExpression(self) -> Node.SuperExpression:
 		""" Super
@@ -214,11 +216,16 @@ class Parser:
 		return Node.ReturnStatement(argument)
 
 	def IterationStatement(self) -> Node.Node:
-		if self.lookahead.type == "while": return self.WhileStatement()
-		elif self.lookahead.type == "do": return self.DoWhileStatement()
-		elif self.lookahead.type == "for": return self.ForStatement()
+		if self.lookahead.type == "while":
+			node =self.WhileStatement
+		elif self.lookahead.type == "do":
+			node =self.DoWhileStatement
+		elif self.lookahead.type == "for":
+			node =self.ForStatement
 		else:  # pragma: no cover
 			raise Exception(f"Unknown IterationStatement {self.lookahead.type}")
+
+		return node()
 
 	def WhileStatement(self) -> Node.WhileStatement:
 		self._eat("while")
@@ -576,16 +583,17 @@ class Parser:
 			;
 		"""
 		if self._isLiteral(self.lookahead.type):
-			return self.Literal()
-
-		if self.lookahead.type == "(":
-			return self.ParenthesizedExpression()
+			node = self.Literal
+		elif self.lookahead.type == "(":
+			node = self.ParenthesizedExpression
 		elif self.lookahead.type == "IDENTIFIER":
-			return self.Identifier()
+			node = self.Identifier
 		elif self.lookahead.type == "this":
-			return self.ThisExpression()
+			node = self.ThisExpression
 		else:
-			return self.LeftHandSideExpression()
+			node = self.LeftHandSideExpression
+
+		return node()
 
 	def ParenthesizedExpression(self) -> Node.Node:
 		self._eat("(")

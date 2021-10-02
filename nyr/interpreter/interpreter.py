@@ -125,10 +125,7 @@ class Interpreter(NodeVisitor):
 		self.logVisit("ENTER: Node.IfStatement")
 		test = self.visit(node.test)
 		assert isinstance(test, bool), f"Expected bool, got {type(test).__name__} instead"
-		if test is True:
-			ret = self.visit(node.consequent)
-		else:
-			ret = self.visit(node.alternative)
+		ret = self.visit(node.consequent if test else node.alternative)
 		self.logVisit("LEAVE: Node.IfStatement")
 		return ret
 
@@ -244,16 +241,18 @@ class Interpreter(NodeVisitor):
 			right = self.visit(node.right)
 
 		if type(left) == str:
-			if self.stack.peek().varExists(left):
-				lVal = self.stack.peek().get(left)
+			peek = self.stack.peek()
+			if peek.varExists(left):
+				lVal = peek.get(left)
 			else:
 				lVal = f'{left}'
 		else:
 			lVal = left
 
 		if type(right) == str:
-			if self.stack.peek().varExists(right):
-				rVal = self.stack.peek().get(right)
+			peek = self.stack.peek()
+			if peek.varExists(right):
+				rVal = peek.get(right)
 			else:
 				rVal = f'{right}'
 		else:
@@ -265,6 +264,7 @@ class Interpreter(NodeVisitor):
 			raise Exception(f"Unknown right-hand side of ComplexExpression: {node.right}")
 
 		_res = None
+
 		if node.type == "BinaryExpression":
 			if node.operator == "/":
 				assert lVal is not None, f"Expected value, got None instead"
@@ -299,11 +299,9 @@ class Interpreter(NodeVisitor):
 
 			ar[left] = rVal
 		elif node.type == "LogicalExpression":
-			if node.operator == "&&":
-				operator = "and"
-			elif node.operator == "||":
-				operator = "or"
-			else:  # pragma: no cover
+			try:
+				operator = {"&&": "and", "||": "or"}[node.operator]
+			except KeyError:  # pragma: no cover
 				# **should** not happen
 				raise Exception(f"Unknown operator in Logical Expression: {node.operator}")
 			_res = eval(f"{lVal} {operator} {rVal}")
