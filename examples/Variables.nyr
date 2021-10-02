@@ -15,3 +15,9 @@ x = 3;
 // x is now 10
 // Not working in bytecode interpreter
 x += y;
+
+print(a);
+print(b);
+print(x);
+print(y);
+print(z);

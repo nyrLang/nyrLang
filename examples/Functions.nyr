@@ -9,3 +9,7 @@ def cube(x) {
 let twoSquared = square(2);
 let tenSquared = square(10);
 let fourCubed = cube(4);
+
+print(twoSquared);
+print(tenSquared);
+print(fourCubed);

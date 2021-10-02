@@ -8,3 +8,6 @@ def factorial(x) {
 
 let fac1 = factorial(1);
 let fac10 = factorial(10);
+
+print(fac1);
+print(fac10);
