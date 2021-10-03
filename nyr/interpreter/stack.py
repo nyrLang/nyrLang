@@ -5,29 +5,6 @@ from enum import Enum
 from typing import Optional
 
 
-class Stack:
-	def __init__(self):
-		self._records: list[ActivationRecord] = list()
-
-	def __str__(self) -> str:
-		s = '\n'.join(repr(ar) for ar in self._records[::-1])
-		return f"CALL STACK\n{s}\n"
-
-	def push(self, record: ActivationRecord):
-		self._records.append(record)
-
-	def pop(self) -> Optional[ActivationRecord]:
-		return self._records.pop()
-
-	def peek(self) -> Optional[ActivationRecord]:
-		return self._records[-1]
-
-
-class ARType(Enum):
-	PROGRAM = auto()
-	FUNCTION = auto()
-
-
 class ActivationRecord:
 	def __init__(self, name: str, type_: ARType, nestingLevel: int):
 		self.name: str = name
@@ -70,3 +47,25 @@ class ActivationRecord:
 	def get(self, key):
 		self.cleanBuiltins()
 		return self.members.get(key, None)
+
+
+class Stack(list[ActivationRecord]):
+	def __str__(self) -> str:
+		s = '\n'.join(repr(ar) for ar in self[::-1])
+		return f"CALL STACK\n{s}\n"
+
+	def push(self, record: ActivationRecord):
+		self.append(record)
+
+	def peek(self) -> Optional[ActivationRecord]:
+		try:
+			return self[-1]
+		except IndexError:
+			return None
+		except Exception:
+			raise
+
+
+class ARType(Enum):
+	PROGRAM = auto()
+	FUNCTION = auto()
