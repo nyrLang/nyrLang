@@ -227,6 +227,72 @@ class Interpreter(NodeVisitor):
 
 	# EXPRESSIONS
 
+	def _binaryExpression(self, **kwargs):
+		lVal = kwargs.get("lVal")
+		rVal = kwargs.get("rVal")
+		op = kwargs.get("op")
+
+		assert lVal is not None, f"Expected value, got None instead"
+		assert rVal is not None, f"Expected value, got None instead"
+
+		if op == "/":
+			try:
+				res = eval(f"{lVal} / {rVal}")
+			except ZeroDivisionError:
+				raise ZeroDivisionError(f"Cannot divide by 0")
+
+			if math.floor(res) == math.ceil(res):
+				_res = int(res)
+			else:
+				_res = float(res)
+		else:
+			if type(lVal) == str: lVal = f'"{lVal}"'
+			if type(rVal) == str: rVal = f'"{rVal}"'
+			_res = eval(f"{lVal} {op} {rVal}")
+
+		return _res
+
+	def _assignmentExpression(self, **kwargs):
+		left = kwargs.get("left")
+		lVal = kwargs.get("lVal")
+		rVal = kwargs.get("rVal")
+		op = kwargs.get("op")
+
+		ar = self.stack.peek()
+		if not ar.varExists(left):
+			raise Exception(f'Variable "{left}" does not exist in available scope')
+
+		if op != "=":
+			op = op[0]
+			assert lVal is not None, f"Expected value, got None instead"
+			assert rVal is not None, f"Expected value, got None instead"
+			if type(lVal) == str: lVal = f'"{lVal}"'
+			if type(rVal) == str: rVal = f'"{rVal}"'
+			rVal = eval(f"{lVal} {op} {rVal}")
+
+		ar[left] = rVal
+
+	def _logicalExpression(self, **kwargs):
+		lVal = kwargs.get("lVal")
+		rVal = kwargs.get("rVal")
+		op = kwargs.get("op")
+
+		try:
+			operator = {"&&": "and", "||": "or"}[op]
+		except KeyError:  # pragma: no cover
+			# **should** not happen
+			raise Exception(f"Unknown operator in Logical Expression: {op}")
+		return eval(f"{lVal} {operator} {rVal}")
+
+	def _bitwiseExpression(self, **kwargs):
+		lVal = kwargs.get("lVal")
+		rVal = kwargs.get("rVal")
+		op = kwargs.get("op")
+
+		assert lVal is not None, f"Expected value, got None instead"
+		assert rVal is not None, f"Expected value, got None instead"
+		return eval(f"{lVal} {op} {rVal}")
+
 	def visitComplexExpression(self, node: Node.ComplexExpression):
 		self.logVisit("ENTER: Node.ComplexExpression")
 
@@ -265,52 +331,23 @@ class Interpreter(NodeVisitor):
 
 		_res = None
 
-		if node.type == "BinaryExpression":
-			if node.operator == "/":
-				assert lVal is not None, f"Expected value, got None instead"
-				assert rVal is not None, f"Expected value, got None instead"
-				try:
-					res = eval(f"{lVal} / {rVal}")
-				except ZeroDivisionError:
-					raise ZeroDivisionError(f"Cannot divide by 0")
-
-				if math.floor(res) == math.ceil(res):
-					_res = int(res)
-				else:
-					_res = float(res)
-			else:
-				assert lVal is not None, f"Expected value, got None instead"
-				assert rVal is not None, f"Expected value, got None instead"
-				if type(lVal) == str: lVal = f'"{lVal}"'
-				if type(rVal) == str: rVal = f'"{rVal}"'
-				_res = eval(f"{lVal} {node.operator} {rVal}")
-		elif node.type == "AssignmentExpression":
-			ar = self.stack.peek()
-			if not ar.varExists(left):
-				raise Exception(f'Variable "{left}" does not exist in available scope')
-
-			if node.operator != "=":
-				op = node.operator[0]
-				assert lVal is not None, f"Expected value, got None instead"
-				assert rVal is not None, f"Expected value, got None instead"
-				if type(lVal) == str: lVal = f'"{lVal}"'
-				if type(rVal) == str: rVal = f'"{rVal}"'
-				rVal = eval(f"{lVal} {op} {rVal}")
-
-			ar[left] = rVal
-		elif node.type == "LogicalExpression":
-			try:
-				operator = {"&&": "and", "||": "or"}[node.operator]
-			except KeyError:  # pragma: no cover
-				# **should** not happen
-				raise Exception(f"Unknown operator in Logical Expression: {node.operator}")
-			_res = eval(f"{lVal} {operator} {rVal}")
-		elif node.type == "BitwiseExpression":
-			assert lVal is not None, f"Expected value, got None instead"
-			assert rVal is not None, f"Expected value, got None instead"
-			_res = eval(f"{lVal} {node.operator} {rVal}")
-		else:  # pragma: no cover
+		try:
+			_res = {
+				"BinaryExpression": self._binaryExpression,
+				"AssignmentExpression": self._assignmentExpression,
+				"LogicalExpression": self._logicalExpression,
+				"BitwiseExpression": self._bitwiseExpression,
+			}[node.type](
+				op=node.operator,
+				left=left,
+				lVal=lVal,
+				rVal=rVal,
+			)
+		except KeyError:  # pragma: no cover
 			raise Exception(f"Unknown ComplexExpression: {node}")
+		except Exception:
+			raise
+
 		self.logVisit("LEAVE: Node.ComplexExpression")
 		return _res
 
