@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import auto
-from enum import Enum
+from enum import IntEnum
 from typing import Optional
 
 
@@ -66,6 +66,6 @@ class Stack(list[ActivationRecord]):
 			raise
 
 
-class ARType(Enum):
+class ARType(IntEnum):
 	PROGRAM = auto()
 	FUNCTION = auto()

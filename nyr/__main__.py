@@ -28,7 +28,7 @@ def printAst(ast_: Program):
 
 def interpret(ast_: Program):
 	if args.interpret:
-		_env = Interpreter(args.debug).interpret(ast_)
+		_env = Interpreter(args.debug, args.debug, args.debug).interpret(ast_)
 		print(f"Env = ", end="")
 		pp(_env)
 

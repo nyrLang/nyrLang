@@ -2,7 +2,6 @@ import logging
 import math
 import sys
 from collections.abc import Callable
-from enum import Enum
 
 from nyr.interpreter.stack import ActivationRecord
 from nyr.interpreter.stack import ARType
@@ -11,14 +10,6 @@ from nyr.parser import node as Node
 
 MAXITERATIONS = 2 ** 16
 MAXRECURSIONDEPTH = 128
-
-
-class Log(Enum):
-	logVisit = 0b1 << 0
-	logStack = 0b1 << 1
-	logFinal = 0b1 << 2
-
-	logAll = logVisit | logStack | logFinal
 
 
 class NodeVisitor:
@@ -39,8 +30,10 @@ class Interpreter(NodeVisitor):
 	fns: list = []
 	logging: int
 
-	def __init__(self, log: int = 0):
-		self.logging = log
+	def __init__(self, logVisit: bool = False, logStack: bool = False, logFinal: bool = False):
+		self._logVisit = logVisit
+		self._logStack = logStack
+		self._logFinal = logFinal
 
 		hdlr = logging.StreamHandler(sys.stdout)
 		hdlr.setFormatter(logging.Formatter("[ %(name)s ] | %(levelname)s | %(message)s"))
@@ -56,15 +49,15 @@ class Interpreter(NodeVisitor):
 		self.fns = []
 
 	def logVisit(self, msg):  # pragma: no cover
-		if (self.logging & Log.logVisit.value) == Log.logVisit.value:
+		if self._logVisit:
 			self.logger.info(msg)
 
 	def logStack(self, msg):  # pragma: no cover
-		if (self.logging & Log.logStack.value) == Log.logStack.value:
+		if self._logStack:
 			self.logger.debug(msg)
 
 	def logFinal(self):  # pragma: no cover
-		if (self.logging & Log.logFinal.value) == Log.logFinal.value:
+		if self._logFinal:
 			self.logger.debug(str(self.stack))
 
 	def interpret(self, ast: Node.Program):

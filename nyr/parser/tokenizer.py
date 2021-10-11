@@ -123,8 +123,7 @@ class Tokenizer:
 			return None
 		else:
 			lm = len(matched[0])
-			self.pos.cursor += lm
-			self.pos.col += lm
+			self.pos.advance(lm, lm)
 			return matched[0]
 
 	def _getNextToken(self) -> Token:
@@ -140,8 +139,7 @@ class Tokenizer:
 			if tokenType is None:
 				pass
 			elif tokenType == "NEWLINE":
-				self.pos.line += 1
-				self.pos.col = 0
+				self.pos.newLine()
 			elif tokenType == "BLOCK_COMMENT":
 				tokenValue = tokenValue.replace(r"\\n", "_")
 				self.pos.line += tokenValue.count("\n")
@@ -166,11 +164,16 @@ class Tokenizer:
 
 
 class Position:
-	cursor: int
-	line: int
-	col: int
-
 	def __init__(self):
 		self.cursor = 0
 		self.line = 1
 		self.col = 0
+
+	def advance(self, cursor: int = 1, col: int = 1) -> None:
+		self.cursor += cursor
+		self.col += col
+
+	def newLine(self) -> None:
+		self.cursor += 1
+		self.col = 0
+		self.line += 1
