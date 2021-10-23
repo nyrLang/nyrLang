@@ -62,8 +62,6 @@ class Stack(list[ActivationRecord]):
 			return self[-1]
 		except IndexError:
 			return None
-		except Exception:
-			raise
 
 
 class ARType(IntEnum):

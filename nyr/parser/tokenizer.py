@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from typing import NamedTuple
 from typing import Optional
 from typing import Union
 
@@ -141,7 +142,6 @@ class Tokenizer:
 			elif tokenType == "NEWLINE":
 				self.pos.newLine()
 			elif tokenType == "BLOCK_COMMENT":
-				tokenValue = tokenValue.replace(r"\\n", "_")
 				self.pos.line += tokenValue.count("\n")
 				self.pos.col = 0
 			else:
@@ -151,7 +151,7 @@ class Tokenizer:
 
 		string = self.string.replace("\n", " ")
 
-		raise Exception(f"Could not parse input correctly. starting here ({self.pos.line}:{self.pos.col}):\n\t{string}")
+		raise SyntaxError(f"Could not parse input correctly. starting here ({self.pos.line}:{self.pos.col}):\n  {string}")
 
 	def getTokens(self) -> tuple[Token, ...]:
 		tokens = []

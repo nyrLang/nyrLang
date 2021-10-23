@@ -112,8 +112,6 @@ class Parser:
 			}[self.lookahead.type]()
 		except KeyError:
 			return self.ExpressionStatement()
-		except Exception:
-			raise
 
 	def SuperExpression(self) -> Node.SuperExpression:
 		""" Super
@@ -588,8 +586,6 @@ class Parser:
 				}[self.lookahead.type]()
 			except KeyError:
 				return self.LeftHandSideExpression()
-			except Exception:
-				raise
 
 	def ParenthesizedExpression(self) -> Node.Node:
 		self._eat("(")

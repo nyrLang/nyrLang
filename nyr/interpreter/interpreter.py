@@ -102,7 +102,7 @@ class Interpreter(NodeVisitor):
 		returns = []
 		for n in node.body:
 			r = self.visit(n)
-			if r:
+			if r is not None:
 				returns.append(r)
 
 		self.logVisit("LEAVE: Node.BlockStatement")
@@ -142,7 +142,7 @@ class Interpreter(NodeVisitor):
 			iterations += 1
 
 			if iterations > MAXITERATIONS:
-				raise Exception(f"Exceeded {MAXITERATIONS} iterations in while statement")
+				raise RecursionError(f"Exceeded {MAXITERATIONS} iterations in while statement")
 
 			# FIXME: hacky way to break loops
 			if self.breakLoop is True:
@@ -166,7 +166,7 @@ class Interpreter(NodeVisitor):
 			iterations += 1
 
 			if iterations > MAXITERATIONS:
-				raise Exception(f"Exceeded {MAXITERATIONS} iterations in do-while statement")
+				raise RecursionError(f"Exceeded {MAXITERATIONS} iterations in do-while statement")
 
 			# FIXME: hacky way to break loops
 			if self.breakLoop is True:
@@ -199,7 +199,7 @@ class Interpreter(NodeVisitor):
 			iterations += 1
 
 			if iterations > MAXITERATIONS:
-				raise Exception(f"Exceeded {MAXITERATIONS} iterations in for statement")
+				raise RecursionError(f"Exceeded {MAXITERATIONS} iterations in for statement")
 
 			# FIXME: hacky way to break loops
 			if self.breakLoop is True:
@@ -253,7 +253,7 @@ class Interpreter(NodeVisitor):
 
 		ar = self.stack.peek()
 		if not ar.varExists(left):
-			raise Exception(f'Variable "{left}" does not exist in available scope')
+			raise NameError(f'Variable "{left}" does not exist in available scope')
 
 		if op != "=":
 			op = op[0]
@@ -274,7 +274,7 @@ class Interpreter(NodeVisitor):
 			operator = {"&&": "and", "||": "or"}[op]
 		except KeyError:  # pragma: no cover
 			# **should** not happen
-			raise Exception(f"Unknown operator in Logical Expression: {op}")
+			raise SyntaxError(f"Unknown operator in Logical Expression: {op}")
 		return eval(f"{lVal} {operator} {rVal}")
 
 	def _bitwiseExpression(self, **kwargs):
@@ -338,8 +338,6 @@ class Interpreter(NodeVisitor):
 			)
 		except KeyError:  # pragma: no cover
 			raise Exception(f"Unknown ComplexExpression: {node}")
-		except Exception:
-			raise
 
 		self.logVisit("LEAVE: Node.ComplexExpression")
 		return _res
@@ -348,7 +346,7 @@ class Interpreter(NodeVisitor):
 		self.logVisit("ENTER: Node.UnaryExpression")
 		val = self.visit(node.argument)
 		if val is None:
-			raise Exception(f'Cannot use {node.operator} on "null"')
+			raise SyntaxError(f'Cannot use {node.operator} on "null"')
 		else:
 			if node.operator == "!":
 				val = eval(f"not {val}", self.stack.peek().members)
@@ -359,10 +357,11 @@ class Interpreter(NodeVisitor):
 
 	def visitCallExpression(self, node: Node.CallExpression):
 		if node.callee.name not in self.fns:
-			raise Exception(f'Function "{node.callee.name}" does not exist in available scope')
+			raise NameError(f'Function "{node.callee.name}" does not exist in available scope')
 		if node.fn is None:  # pragma: no cover
 			raise Exception(f'Failed to aquire function for "{node.callee.name}"')
-		assert len(node.arguments) == len(node.fn.get("args")), f"Incorrect amount of arguments given. Expected {len(node.fn.get('args'))}, got {len(node.arguments)}"
+		if len(node.arguments) != len(node.fn.get("args")):
+			raise Exception(f"Incorrect amount of arguments given. Expected {len(node.fn.get('args'))}, got {len(node.arguments)}")
 
 		ar = ActivationRecord(
 			node.type,
@@ -370,7 +369,7 @@ class Interpreter(NodeVisitor):
 			self.stack.peek().nestingLevel + 1,
 		)
 		if ar.nestingLevel > MAXRECURSIONDEPTH:
-			raise Exception(f'Exceeded recursion depth of {MAXRECURSIONDEPTH} in function "{node.callee.name}"')
+			raise RecursionError(f'Exceeded recursion depth of {MAXRECURSIONDEPTH} in function "{node.callee.name}"')
 		for argName, argValue in zip(node.fn.get("args", {}), node.arguments):
 			if isinstance(argName, Node.Identifier):
 				ar[argName.name] = self.visit(argValue)
@@ -413,19 +412,20 @@ class Interpreter(NodeVisitor):
 		ar = self.stack.peek()
 		if ar.varExists(varName):
 			# FIXME: Does not happen for some reason
-			raise Exception(f'Variable "{varName}" already exists in available scope')
+			raise NameError(f'Variable "{varName}" already exists in available scope')
 		elif type(varName) != str:
-			raise Exception(f'Unknown variable "{varName}"')
+			raise NameError(f'Unknown variable "{varName}"')
 		ar[varName] = varValue
 		self.logVisit(f"LEAVE: Node.VariableDeclaration({varName}, {_vv})")
 		del _vv
 
 	def visitFunctionDeclaration(self, node: Node.FunctionDeclaration):
-		self.logVisit(f"ENTER: Node.FunctionDeclaration({node.name.name})")
-		if node.name.name in self.fns:
-			raise Exception(f'Function "{node.name.name}" already exists in available scope')
-		self.fns.append(node.name.name)
-		self.logVisit(f"LEAVE: Node.FunctionDeclaration({node.name.name})")
+		nodeName = node.name.name
+		self.logVisit(f"ENTER: Node.FunctionDeclaration({nodeName})")
+		if nodeName in self.fns:
+			raise NameError(f'Function "{nodeName}" already exists in available scope')
+		self.fns.append(nodeName)
+		self.logVisit(f"LEAVE: Node.FunctionDeclaration({nodeName})")
 
 	# def visitClassDeclaration(self, node: Node.ClassDeclaration):
 	# 	self.lVisit("ENTER: Node.ClassDeclaration")
@@ -435,8 +435,9 @@ class Interpreter(NodeVisitor):
 
 	def visitIdentifier(self, node: Node.Identifier):
 		self.logVisit("ENTER: Node.Identifier")
-		if self.stack.peek().varExists(node.name):
-			val = self.stack.peek().members.get(node.name)
+		peek = self.stack.peek()
+		if peek.varExists(node.name):
+			val = peek.members.get(node.name)
 		else:
 			val = node.name
 		self.logVisit("LEAVE: Node.Identifier")
