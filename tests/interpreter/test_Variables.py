@@ -12,25 +12,25 @@ def testUninitializedVariable():
 
 
 @pytest.mark.parametrize(
-	("code", "expected"), (
-		("let x; let y;", {'x': None, 'y': None}),
-		("let x, y;", {'x': None, 'y': None}),
+	("code"), (
+		pytest.param("let x; let y;", id="seperate"),
+		pytest.param("let x, y;", id="merged"),
 	),
 )
-def testMultipleUninitializedVariables(code: str, expected):
+def testMultipleUninitializedVariables(code: str):
 	ast = Parser().parse(code)
 	env = Interpreter().interpret(ast)
 
-	assert env == expected
+	assert env == {"x": None, "y": None}
 
 
 @pytest.mark.parametrize(
 	("code", "expected"), (
-		('let string = "I am a string!";', {"string": "I am a string!"}),
-		("let int = 42;", {"int": 42}),
-		("let float = 3.14159;", {"float": 3.14159}),
-		("let bool = false;", {"bool": False}),
-		("let none = null;", {"none": None}),
+		pytest.param('let string = "I am a string!";', {"string": "I am a string!"}, id="string"),
+		pytest.param("let int = 42;", {"int": 42}, id="int"),
+		pytest.param("let float = 3.14159;", {"float": 3.14159}, id="float"),
+		pytest.param("let bool = false;", {"bool": False}, id="bool"),
+		pytest.param("let none = null;", {"none": None}, id="none"),
 	),
 )
 def testTypeAssignments(code: str, expected):
@@ -69,8 +69,8 @@ def testAssignWithBinaryExpr():
 
 @pytest.mark.parametrize(
 	("code"), (
-		("let x; let x;"),
-		("let x, x;"),
+		pytest.param("let x; let x;", id="seperate"),
+		pytest.param("let x, x;", id="merged"),
 	),
 )
 def testVarExists(code: str):

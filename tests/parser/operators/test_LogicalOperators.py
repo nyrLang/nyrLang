@@ -8,8 +8,8 @@ from nyr.parser.parser import Parser
 
 @pytest.mark.parametrize(
 	("operator"), (
-		("&&"),
-		("||"),
+		pytest.param("&&", id="logical and"),
+		pytest.param("||", id="logical or"),
 	),
 )
 def testLogicalOperatorsP(operator: str):

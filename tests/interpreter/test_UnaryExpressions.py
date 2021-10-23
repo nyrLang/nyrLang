@@ -8,9 +8,9 @@ from nyr.parser.parser import Parser
 
 @pytest.mark.parametrize(
 	("operator"), (
-		("-"),
-		("+"),
-		("!"),
+		pytest.param("-", id="negative"),
+		pytest.param("+", id="positive"),
+		pytest.param("!", id="not"),
 	),
 )
 def testUnaryNone(operator: str):
@@ -22,24 +22,24 @@ def testUnaryNone(operator: str):
 
 @pytest.mark.parametrize(
 	("operator"), (
-		("-"),
-		("+"),
+		pytest.param("-", id="negative"),
+		pytest.param("+", id="positive"),
 	),
 )
 def testUnaryInteger(operator: str):
 	ast = Parser().parse(f"let x = {operator}5;")
 	env = Interpreter().interpret(ast)
 
-	if operator == "+":
-		assert env == {"x": 5}
-	else:
-		assert env == {"x": -5}
+	assert env == {
+		"+": {"x": 5},
+		"-": {"x": -5},
+	}[operator]
 
 
 @pytest.mark.parametrize(
 	("boolValue"), (
-		("true"),
-		("false"),
+		pytest.param("true", id="true -> false"),
+		pytest.param("false", id="false -> true"),
 	),
 )
 def testUnaryNotBool(boolValue: str):

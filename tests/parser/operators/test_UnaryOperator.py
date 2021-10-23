@@ -8,9 +8,9 @@ from nyr.parser.parser import Parser
 
 @pytest.mark.parametrize(
 	("operator"), (
-		("+"),
-		("-"),
-		("!"),
+		pytest.param("+", id="plus"),
+		pytest.param("-", id="minus"),
+		pytest.param("!", id="not"),
 	),
 )
 def testUnary(operator: str):

@@ -7,13 +7,13 @@ from nyr.parser.parser import Parser
 
 
 @pytest.mark.parametrize(
-	("code", "expectedBody"), (
-		(";", [{"type": "EmptyStatement"}]),
-		(";;", [{"type": "EmptyStatement"}, {"type": "EmptyStatement"}]),
-		(";;;", [{"type": "EmptyStatement"}, {"type": "EmptyStatement"}, {"type": "EmptyStatement"}]),
+	("code", "expectedCount"), (
+		pytest.param(";", 1, id="1"),
+		pytest.param(";;", 2, id="2"),
+		pytest.param(";;;", 3, id="3"),
 	),
 )
-def testEmptyStatement(code: str, expectedBody):
+def testEmptyStatement(code: str, expectedCount: int):
 	ast = json.loads(
 		json.dumps(
 			Parser().parse(code),
@@ -23,7 +23,7 @@ def testEmptyStatement(code: str, expectedBody):
 
 	expected = {
 		"type": "Program",
-		"body": expectedBody,
+		"body": [{"type": "EmptyStatement"} for _ in range(expectedCount)],
 	}
 
 	assert ast == expected

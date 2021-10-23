@@ -106,9 +106,9 @@ def testForLoopBreak():
 
 @pytest.mark.parametrize(
 	("loop", "type_"), (
-		("for (;;) { }", "for"),
-		("while (true) { }", "while"),
-		("do { } while (true);", "do-while"),
+		pytest.param("for (;;) { }", "for", id="for loop"),
+		pytest.param("while (true) { }", "while", id="while loop"),
+		pytest.param("do { } while (true);", "do-while", id="do-while loop"),
 	),
 )
 def testIterationOverflow(loop: str, type_: str):

@@ -5,9 +5,9 @@ from nyr.parser.parser import Parser
 
 @pytest.mark.parametrize(
 	("code"), (
-		("42"),
-		("3.141"),
-		(r'"Hello, World"'),
+		pytest.param("42", id="int"),
+		pytest.param("3.141", id="float"),
+		pytest.param(r'"Hello, World"', id="string"),
 	),
 )
 def testMissingSemicolon(code: str):

@@ -33,9 +33,9 @@ def testEmptyString():
 
 @pytest.mark.parametrize(
 	("test"), (
-		(r'"Hello";'),
-		(r'    "Hello";    '),
-		(r'"Hello"  ;'),
+		pytest.param(r'"Hello";', id="no space"),
+		pytest.param(r'    "Hello";    ', id="space around"),
+		pytest.param(r'"Hello"  ;', id="space before semicolon"),
 	),
 )
 def testSimpleString(test: str):
@@ -64,9 +64,9 @@ def testSimpleString(test: str):
 
 @pytest.mark.parametrize(
 	("test"), (
-		(r'"Hello, World";'),
-		(r'    "Hello, World";    '),
-		(r'"Hello, World"  ;'),
+		pytest.param(r'"Hello, World";', id="no space"),
+		pytest.param(r'    "Hello, World";    ', id="space around"),
+		pytest.param(r'"Hello, World"  ;', id="space before semicolon"),
 	),
 )
 def testComplexString(test):
@@ -94,5 +94,5 @@ def testComplexString(test):
 
 
 def testUnclosedString():
-	with pytest.raises(Exception, match=re.escape('Could not parse input correctly. starting here (1:0):\n\t"Unclosed string ahead!')):
+	with pytest.raises(SyntaxError):
 		Parser().parse(r'"Unclosed string ahead!')

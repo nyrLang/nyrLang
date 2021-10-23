@@ -6,11 +6,11 @@ from nyr.parser.parser import Parser
 
 @pytest.mark.parametrize(
 	("xVal", "expectedY"), (
-		(-4, "x is 2 or less"),
-		(0, "x is 2 or less"),
-		(2, "x is 2 or less"),
-		(3, "x is greater than 2"),
-		(99999999999999999, "x is greater than 2"),
+		pytest.param(-4, "x is 2 or less"),
+		pytest.param(0, "x is 2 or less"),
+		pytest.param(2, "x is 2 or less"),
+		pytest.param(3, "x is greater than 2"),
+		pytest.param(99999999999999999, "x is greater than 2"),
 	),
 )
 def testIfElse(xVal: int, expectedY: str):
@@ -31,8 +31,8 @@ def testIfElse(xVal: int, expectedY: str):
 
 @pytest.mark.parametrize(
 	("operator", "expected"), (
-		("&&", (True, False, False, False)),
-		("||", (True, True, True, False)),
+		pytest.param("&&", (True, False, False, False), id="and"),
+		pytest.param("||", (True, True, True, False), id="or"),
 	),
 )
 def testLogicalOperatorsI(operator: str, expected: tuple[bool]):
@@ -57,9 +57,9 @@ def testLogicalOperatorsI(operator: str, expected: tuple[bool]):
 
 @pytest.mark.parametrize(
 	("operator", "expected"), (
-		(r"^", (False, True, True, False)),
-		(r"|", (True, True, True, False)),
-		(r"&", (True, False, False, False)),
+		pytest.param(r"^", (False, True, True, False), id="bitwise xor"),
+		pytest.param(r"|", (True, True, True, False), id="bitwise or"),
+		pytest.param(r"&", (True, False, False, False), id="bitwise and"),
 	),
 )
 def testBitwiseOperatorsI(operator: str, expected: tuple[bool]):

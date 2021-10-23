@@ -15,14 +15,20 @@ def testEmptyInput():
 
 @pytest.mark.parametrize(
 	("code"), (
-		("// This is a comment"),
-		("""
+		pytest.param(
+			"// This is a comment",
+			id="single-line comment",
+		),
+		pytest.param(
+			"""
 			/*
 				This is a
 				multiline
 				comment
 			*/
-		"""),
+			""",
+			id="multi-line comment",
+		),
 	),
 )
 def testCommentInput(code: str):

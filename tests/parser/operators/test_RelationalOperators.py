@@ -8,10 +8,10 @@ from nyr.parser.parser import Parser
 
 @pytest.mark.parametrize(
 	("operator"), (
-		(">"),
-		(">="),
-		("<"),
-		("<="),
+		pytest.param(">", id="greater"),
+		pytest.param(">=", id="greater or equal"),
+		pytest.param("<", id="less"),
+		pytest.param("<=", id="less or equal"),
 	),
 )
 def testRelationalOperators(operator: str):

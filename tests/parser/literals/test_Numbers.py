@@ -8,9 +8,9 @@ from nyr.parser.parser import Parser
 
 @pytest.mark.parametrize(
 	("test"), (
-		("42;"),
-		("   42;   "),
-		("42  ;"),
+		pytest.param("42;", id="no space"),
+		pytest.param("   42;   ", id="space around"),
+		pytest.param("42  ;", id="space before semicolon"),
 	),
 )
 def testInteger(test: str):
@@ -39,9 +39,9 @@ def testInteger(test: str):
 
 @pytest.mark.parametrize(
 	("test"), (
-		("3.141;"),
-		("   3.141;   "),
-		("3.141  ;"),
+		pytest.param("3.141;", id="no space"),
+		pytest.param("   3.141;   ", id="space around"),
+		pytest.param("3.141  ;", id="space before semicolon"),
 	),
 )
 def testFloat(test: str):
