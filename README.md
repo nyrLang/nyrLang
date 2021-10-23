@@ -29,11 +29,12 @@ Since some spec has changed with the addition of the bytecode interpreter, pleas
 ## Features
 - Interactive mode
 	- When using the Interactive mode the trailing semicolon is optional (so it won't crash just because of that)
-- File input (must end with `.nyr`)
-- A Bytecode Interpreter can be found in `Nyr/Bytecode Interpreter/`
+- File input
+- A Bytecode Interpreter can be found in `nyr/Bytecode Interpreter/`
 
 ### How to run
-- From the project root run `python3 -m Nyr` and then add some flags
+- From the project root run `python3 -m nyr` and then add some flags
+- Install: `pip install .`
 - To run tests run `pytest` or `python3 -m pytest` in the project root
 
 ### Flags

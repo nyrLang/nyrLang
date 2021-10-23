@@ -1,10 +1,15 @@
 /venv/
+/build/
 /debug/
+
 /reports/coverage/htmlreport/
+
 /.idea/
 /.vscode/
+
 /.pytest_cache/
 /.tox/
 /*.egg-info/
-.coverage
 __pycache__/
+
+.coverage
