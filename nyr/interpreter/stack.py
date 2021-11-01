@@ -18,7 +18,8 @@ class ActivationRecord:
 		self.cleanBuiltins()
 
 		for key, val in self.members.items():
-			if key is None: continue
+			if key is None:
+				continue
 			if type(val) == str:
 				val = f'"{val}"'
 			lines.append(f"  {key:<16} ({type(val).__name__:<6}): {val}")

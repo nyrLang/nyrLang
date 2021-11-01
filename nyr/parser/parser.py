@@ -6,15 +6,14 @@ from nyr.parser.tokenizer import Tokenizer
 
 
 class Parser:
-	string: str
-	tokenizer: Tokenizer
-	lookahead: Token
-	tokens: tuple[Token]
-	tkIndex: int = 0
-	fns: dict[str, dict[str, Any]] = dict()
-
 	def __init__(self):
 		self.tokenizer = Tokenizer()
+		self.string = ""
+		self.lookahead = None
+		self.tokens = tuple()
+		self.tkIndex = 0
+		self.fns = {}
+		self.lastPos = (1, 1)
 
 	def _reset(self):
 		self.string = ""
@@ -367,7 +366,7 @@ class Parser:
 			return self._eat("SIMPLE_ASSIGN")
 		return self._eat("COMPLEX_ASSIGN")
 
-	def LogicalExpression(self, builderName, operatorToken) -> Node.Node:
+	def LogicalExpression(self, builderName: str, operatorToken: str) -> Node.Node:
 		builder = getattr(self, builderName)
 
 		left = builder()
@@ -392,7 +391,7 @@ class Parser:
 	def LogicalANDExpression(self) -> Node.Node:
 		return self.LogicalExpression("BitwiseORExpression", "LOGICAL_AND")
 
-	def BitwiseExpression(self, builderName, operatorToken) -> Node.Node:
+	def BitwiseExpression(self, builderName: str, operatorToken: str) -> Node.Node:
 		builder = getattr(self, builderName)
 
 		left = builder()
@@ -537,7 +536,7 @@ class Parser:
 	def MultiplicativeExpression(self) -> Node.Node:
 		return self.BinaryExpression("UnaryExpression", "MULTIPLICATIVE_OPERATOR")
 
-	def BinaryExpression(self, builderName, operatorToken) -> Node.Node:
+	def BinaryExpression(self, builderName: str, operatorToken: str) -> Node.Node:
 		builder = getattr(self, builderName)
 
 		left = builder()
@@ -568,7 +567,7 @@ class Parser:
 		return self.LeftHandSideExpression()
 
 	def PrimaryExpression(self) -> Node.Node:
-		""" PromaryExpression
+		""" PrimaryExpression
 			: Literal
 			| ParenthesizedExpression
 			| Identifier

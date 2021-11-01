@@ -1,5 +1,4 @@
 import json
-import re
 
 import pytest
 
@@ -33,9 +32,9 @@ def testEmptyString():
 
 @pytest.mark.parametrize(
 	("test"), (
-		pytest.param(r'"Hello";', id="no space"),
-		pytest.param(r'    "Hello";    ', id="space around"),
-		pytest.param(r'"Hello"  ;', id="space before semicolon"),
+		pytest.param('"Hello";', id="no space"),
+		pytest.param('    "Hello";    ', id="space around"),
+		pytest.param('"Hello"  ;', id="space before semicolon"),
 	),
 )
 def testSimpleString(test: str):
@@ -64,9 +63,9 @@ def testSimpleString(test: str):
 
 @pytest.mark.parametrize(
 	("test"), (
-		pytest.param(r'"Hello, World";', id="no space"),
-		pytest.param(r'    "Hello, World";    ', id="space around"),
-		pytest.param(r'"Hello, World"  ;', id="space before semicolon"),
+		pytest.param('"Hello, World";', id="no space"),
+		pytest.param('    "Hello, World";    ', id="space around"),
+		pytest.param('"Hello, World"  ;', id="space before semicolon"),
 	),
 )
 def testComplexString(test):

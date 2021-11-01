@@ -63,4 +63,4 @@ def testInput():
 
 
 def testTokenRepr():
-	assert repr(Token("EOF", None)) == f"nyr.parser.tokenizer.Token('EOF')"
+	assert repr(Token("EOF", None)) == "nyr.parser.tokenizer.Token('EOF')"

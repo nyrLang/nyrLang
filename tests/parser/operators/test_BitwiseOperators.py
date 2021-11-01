@@ -8,9 +8,9 @@ from nyr.parser.parser import Parser
 
 @pytest.mark.parametrize(
 	("operator"), (
-		pytest.param(r"^", id="bitwise xor"),
-		pytest.param(r"|", id="bitwise or"),
-		pytest.param(r"&", id="bitwise and"),
+		pytest.param("^", id="bitwise xor"),
+		pytest.param("|", id="bitwise or"),
+		pytest.param("&", id="bitwise and"),
 	),
 )
 def testBitwiseOperatorP(operator: str):

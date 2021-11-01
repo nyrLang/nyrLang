@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from typing import NamedTuple
 from typing import Optional
 from typing import Union
@@ -93,10 +94,12 @@ spec: tuple[tuple[re.Pattern[str], Optional[str]], ...] = (
 )
 
 
-class Token:
-	def __init__(self, type_: str, value: Union[None, int, float, bool, str]):
-		self.type = type_
-		self.value = value
+class Token(NamedTuple):
+	type: str
+	value: Union[None, int, float, bool, str]
+
+	def __str__(self) -> str:
+		return f"{self.type:<12} | {self.value:<16}"
 
 	def __repr__(self):
 		return f"{self.__module__}.{self.__class__.__name__}({self.type!r}{f', {self.value}' if self.value is not None else ''})"
@@ -107,6 +110,15 @@ class Tokenizer:
 		self.string = ""
 		self.pos: Position
 
+	def _advance(self, cursor: int = 1, col: int = 1) -> None:
+		self.pos.cursor += cursor
+		self.pos.col += col
+
+	def _newLine(self) -> None:
+		self.pos.cursor += 1
+		self.pos.col = 0
+		self.pos.line += 1
+
 	def _reset(self):
 		self.string = ""
 		self.pos = Position()
@@ -115,7 +127,8 @@ class Tokenizer:
 		self._reset()
 		self.string = string
 
-	def hasMoreTokens(self) -> bool: return self.pos.cursor < len(self.string)
+	def hasMoreTokens(self) -> bool:
+		return self.pos.cursor < len(self.string)
 
 	def _match(self, regex: re.Pattern):
 		matched = regex.match(self.string, self.pos.cursor)
@@ -124,7 +137,7 @@ class Tokenizer:
 			return None
 		else:
 			lm = len(matched[0])
-			self.pos.advance(lm, lm)
+			self._advance(lm, lm)
 			return matched[0]
 
 	def _getNextToken(self) -> Token:
@@ -140,7 +153,7 @@ class Tokenizer:
 			if tokenType is None:
 				pass
 			elif tokenType == "NEWLINE":
-				self.pos.newLine()
+				self._newLine()
 			elif tokenType == "BLOCK_COMMENT":
 				self.pos.line += tokenValue.count("\n")
 				self.pos.col = 0
@@ -149,9 +162,16 @@ class Tokenizer:
 
 			return self._getNextToken()
 
-		string = self.string.replace("\n", " ")
+		string = self.string[self.pos.cursor:].replace("\n", " ")
 
 		raise SyntaxError(f"Could not parse input correctly. starting here ({self.pos.line}:{self.pos.col}):\n  {string}")
+
+	def tokenize(self, string: str) -> Iterable[Token]:
+		tk = self._getNextToken()
+		while tk.type != "EOF":
+			yield tk
+			tk = self._getNextToken()
+		yield tk
 
 	def getTokens(self) -> tuple[Token, ...]:
 		tokens = []
@@ -169,11 +189,5 @@ class Position:
 		self.line = 1
 		self.col = 0
 
-	def advance(self, cursor: int = 1, col: int = 1) -> None:
-		self.cursor += cursor
-		self.col += col
-
-	def newLine(self) -> None:
-		self.cursor += 1
-		self.col = 0
-		self.line += 1
+	def __str__(self) -> str:
+		return f"{self.line}:{self.col}"

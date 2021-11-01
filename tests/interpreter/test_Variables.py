@@ -26,11 +26,31 @@ def testMultipleUninitializedVariables(code: str):
 
 @pytest.mark.parametrize(
 	("code", "expected"), (
-		pytest.param('let string = "I am a string!";', {"string": "I am a string!"}, id="string"),
-		pytest.param("let int = 42;", {"int": 42}, id="int"),
-		pytest.param("let float = 3.14159;", {"float": 3.14159}, id="float"),
-		pytest.param("let bool = false;", {"bool": False}, id="bool"),
-		pytest.param("let none = null;", {"none": None}, id="none"),
+		pytest.param(
+			'let string = "I am a string!";',
+			{"string": "I am a string!"},
+			id="string",
+		),
+		pytest.param(
+			"let int = 42;",
+			{"int": 42},
+			id="int",
+		),
+		pytest.param(
+			"let float = 3.14159;",
+			{"float": 3.14159},
+			id="float",
+		),
+		pytest.param(
+			"let bool = false;",
+			{"bool": False},
+			id="bool",
+		),
+		pytest.param(
+			"let none = null;",
+			{"none": None},
+			id="none",
+		),
 	),
 )
 def testTypeAssignments(code: str, expected):

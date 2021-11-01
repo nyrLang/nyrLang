@@ -28,7 +28,7 @@ def printAst(ast_: Program):
 
 def interpret(ast_: Program):
 	_env = Interpreter(args.debug, args.debug, args.debug).interpret(ast_)
-	print(f"Env = ", end="")
+	print("Env = ", end="")
 	pp(_env)
 
 
@@ -36,7 +36,9 @@ def outputAST(ast_: Program):
 	with open("./ast.json", "w") as o:
 		o.write(json.dumps(ast_, cls=ComplexEncoder, indent=2) + "\n")
 
+
 args = Args()
+
 
 def main(arguments: Sequence[str] = None) -> int:
 	if sys.version_info < (3, 9):
@@ -78,10 +80,9 @@ def main(arguments: Sequence[str] = None) -> int:
 	argparser.parse_args(arguments, namespace=args)
 
 	# just ignore
-	void = lambda _: _
-	_printAst = printAst if args.printAST else void
-	_outputAst = outputAST if args.output else void
-	_interpret = interpret if args.interpret else void
+	_printAst = printAst if args.printAST else lambda _: _
+	_outputAst = outputAST if args.output else lambda _: _
+	_interpret = interpret if args.interpret else lambda _: _
 
 	# REPL (read from stdin)
 	if args.inputFile == "<stdin>":

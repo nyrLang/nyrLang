@@ -225,22 +225,25 @@ class Interpreter(NodeVisitor):
 		rVal = kwargs.get("rVal")
 		op = kwargs.get("op")
 
-		assert lVal is not None, f"Expected value, got None instead"
-		assert rVal is not None, f"Expected value, got None instead"
+		assert lVal is not None, "Expected value, got None instead"
+		assert rVal is not None, "Expected value, got None instead"
 
 		if op == "/":
 			try:
 				res = eval(f"{lVal} / {rVal}")
 			except ZeroDivisionError:
-				raise ZeroDivisionError(f"Cannot divide by 0")
+				raise ZeroDivisionError("Cannot divide by 0")
 
 			if math.floor(res) == math.ceil(res):
 				_res = int(res)
 			else:
 				_res = float(res)
 		else:
-			if type(lVal) == str: lVal = f'"{lVal}"'
-			if type(rVal) == str: rVal = f'"{rVal}"'
+			if type(lVal) == str:
+				lVal = f'"{lVal}"'
+			if type(rVal) == str:
+				rVal = f'"{rVal}"'
+
 			_res = eval(f"{lVal} {op} {rVal}")
 
 		return _res
@@ -257,10 +260,14 @@ class Interpreter(NodeVisitor):
 
 		if op != "=":
 			op = op[0]
-			assert lVal is not None, f"Expected value, got None instead"
-			assert rVal is not None, f"Expected value, got None instead"
-			if type(lVal) == str: lVal = f'"{lVal}"'
-			if type(rVal) == str: rVal = f'"{rVal}"'
+			assert lVal is not None, "Expected value, got None instead"
+			assert rVal is not None, "Expected value, got None instead"
+
+			if type(lVal) == str:
+				lVal = f'"{lVal}"'
+			if type(rVal) == str:
+				rVal = f'"{rVal}"'
+
 			rVal = eval(f"{lVal} {op} {rVal}")
 
 		ar[left] = rVal
@@ -282,8 +289,8 @@ class Interpreter(NodeVisitor):
 		rVal = kwargs.get("rVal")
 		op = kwargs.get("op")
 
-		assert lVal is not None, f"Expected value, got None instead"
-		assert rVal is not None, f"Expected value, got None instead"
+		assert lVal is not None, "Expected value, got None instead"
+		assert rVal is not None, "Expected value, got None instead"
 		return eval(f"{lVal} {op} {rVal}")
 
 	def visitComplexExpression(self, node: Node.ComplexExpression):

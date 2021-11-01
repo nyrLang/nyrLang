@@ -31,8 +31,16 @@ def testIfElse(xVal: int, expectedY: str):
 
 @pytest.mark.parametrize(
 	("operator", "expected"), (
-		pytest.param("&&", (True, False, False, False), id="and"),
-		pytest.param("||", (True, True, True, False), id="or"),
+		pytest.param(
+			"&&",
+			(True, False, False, False),
+			id="and",
+		),
+		pytest.param(
+			"||",
+			(True, True, True, False),
+			id="or",
+		),
 	),
 )
 def testLogicalOperatorsI(operator: str, expected: tuple[bool]):
@@ -57,9 +65,21 @@ def testLogicalOperatorsI(operator: str, expected: tuple[bool]):
 
 @pytest.mark.parametrize(
 	("operator", "expected"), (
-		pytest.param(r"^", (False, True, True, False), id="bitwise xor"),
-		pytest.param(r"|", (True, True, True, False), id="bitwise or"),
-		pytest.param(r"&", (True, False, False, False), id="bitwise and"),
+		pytest.param(
+			"^",
+			(False, True, True, False),
+			id="bitwise xor",
+		),
+		pytest.param(
+			"|",
+			(True, True, True, False),
+			id="bitwise or",
+		),
+		pytest.param(
+			"&",
+			(True, False, False, False),
+			id="bitwise and",
+		),
 	),
 )
 def testBitwiseOperatorsI(operator: str, expected: tuple[bool]):
