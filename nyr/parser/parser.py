@@ -68,7 +68,7 @@ class Parser:
 			self.lookahead = self.getNextToken()
 			return token
 
-		if not self.hasMoreTokens() is True or token.type == "EOF":
+		if self.hasMoreTokens() is False or token.type == "EOF":
 			raise SyntaxError(f'Unexpected end of input, expected "{tokenType}"')
 
 		raise SyntaxError(f'Unexpected token: "{token}", expected: "{tokenType}"')  # pragma: no cover

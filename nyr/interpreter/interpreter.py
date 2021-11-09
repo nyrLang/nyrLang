@@ -28,7 +28,6 @@ class Interpreter(NodeVisitor):
 	ast: Node.Program
 	stack: Stack
 	fns: list = []
-	logging: int
 
 	def __init__(self, logVisit: bool = False, logStack: bool = False, logFinal: bool = False):
 		self._logVisit = logVisit
