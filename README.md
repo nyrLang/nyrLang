@@ -37,15 +37,15 @@ Since some spec has changed with the addition of the bytecode interpreter, pleas
 - Install: `pip install .`
 - To run tests run `pytest` or `python3 -m pytest` in the project root
 
-### Flags
-| Short Flag | Long Flag     | Description | Note |
-|------------|---------------|-------------|------|
-| `-h`       | `--help`      | print a short help message |
-| `-f`       | `--file`      | read from file (must end with `.nyr`); not providing one will enter Interactive mode mode |
-| `-i`       | `--interpret` | turn off interpretation | Classes are not yet supported, and will raise a `NotImplementedError` if encountered
-| `-o`       | `--output`    | dump generated AST to `ast.json` (located at project rood) |
-| `-p`       | `--print`     | print generated AST to terminal |
-| `-d`       | `--debug`     | print debug messages on what the interpreter is doing |
+## Flags
+| Short Flag | Long Flag     | Description |
+|------------|---------------|-------------|
+| `-h`       | `--help`      | print a short help message
+| `-f`       | `--file`      | read from file (must end with `.nyr`); not providing one will enter Interactive mode mode
+| `-i`       | `--interpret` | turn off interpretation <br> Classes are not yet supported, and will raise a `NotImplementedError` if encountered
+| `-o`       | `--output`    | dump generated AST to `ast.json` (located at project rood)
+| `-p`       | `--print`     | print generated AST to terminal
+| `-d`       | `--debug`     | print debug messages on what the interpreter is doing
 
 - - -
 
