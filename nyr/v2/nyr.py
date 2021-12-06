@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-# keeping thing in one file for now, since it will be easier to self host afterwards
+# keeping this in one file for now, since it will be easier to self host afterwards
 # because there's no support for importing files yet
 from __future__ import annotations
 
 import argparse
+import importlib.metadata
 import logging
 import math
 import string as strings
@@ -15,36 +16,9 @@ from enum import Enum
 from typing import Any
 from typing import NamedTuple
 from typing import Optional
-from typing import Union
 
 
-class _Result:
-	def __init__(self, isSuccess: bool) -> None:
-		self.isSuccess = isSuccess
-		self.value: Union[Any, tuple[str, Any]]
-
-
-class Success(_Result):
-	def __init__(self, value: Any) -> None:
-		super().__init__(True)
-		self.value: Any = value
-
-
-class Failure(_Result):
-	def __init__(self, value: Union[str, Any]) -> None:
-		super().__init__(False)
-		self.value: Union[str, tuple[str, Any]] = value
-
-	def __str__(self) -> str:
-		if isinstance(self.value, tuple):
-			errMsg: str = self.value[0]
-			errToken: Any = self.value[1]
-			return f"{errToken.pos.file}:{errToken.pos.line}:{errToken.pos.col}: ERROR: {errMsg}"
-		else:
-			return self.value
-
-
-Result = Union[Success, Failure]
+logging.basicConfig(level=logging.DEBUG, format="[ %(name)s ] | %(levelname)s | %(message)s")
 
 
 class TokenKind(Enum):
@@ -58,36 +32,22 @@ class TokenKind(Enum):
 	COLON = auto()
 	COMMA = auto()
 	SEMICOLON = auto()
-	UNDERSCORE = auto()      # discard/ignore
-	PLUS = auto()            # add
-	PLUS_PLUS = auto()       # increment
-	PLUS_EQUAL = auto()      # add + assign
-	MINUS = auto()           # subtract
-	MINUS_MINUS = auto()     # decrement
-	MINUS_EQUAL = auto()     # subtract + assign
-	ASTERISK = auto()        # multiply
-	ASTERISK_EQUAL = auto()  # multiply + assign
-	SLASH = auto()           # divide
-	SLASH_EQUAL = auto()     # divide + assign
+	UNDERSCORE = auto()
+	OPERATOR = auto()
+	BACKTICK = auto()
+	PLUS = auto()
+	MINUS = auto()
+	ASTERISK = auto()
+	SLASH = auto()
 
-	AMPERSAND = auto()            # bitwise and
-	AMPERSAND_AMPERSAND = auto()  # and
-	AMPERSAND_EQUAL = auto()      # bitwise and + assign
-	PIPE = auto()                 # bitwise or
-	PIPE_PIPE = auto()            # or
-	PIPE_EQUAL = auto()           # bitwise or + assign
-	BANG = auto()                 # not
-	BANG_EQUAL = auto()           # not equal
-	EQUAL = auto()                # assign
-	EQUAL_EQUAL = auto()          # equal
-	GREATER = auto()              # greater
-	GREATER_EQUAL = auto()        # greater or equal
-	LESSER = auto()               # lesser
-	LESSER_EQUAL = auto()         # lesser or equal
-	CARET = auto()                # xor
-	CARET_EQUAL = auto()          # xor + assign
-	PERCENT = auto()              # modulo
-	PERCENT_EQUAL = auto()        # modulo + assign
+	AMPERSAND = auto()
+	PIPE = auto()
+	BANG = auto()
+	EQUAL = auto()
+	GREATER = auto()
+	LESSER = auto()
+	CARET = auto()
+	PERCENT = auto()
 
 	# Literals
 	IDENTIFIER = auto()
@@ -119,6 +79,35 @@ class TokenKind(Enum):
 	def __str__(self) -> str:
 		return self._name_
 
+	@staticmethod
+	def _kindToOperatorStr() -> dict[TokenKind, str]:
+		return {
+			TokenKind.PLUS: "+",
+			TokenKind.MINUS: "-",
+			TokenKind.ASTERISK: "*",
+			TokenKind.SLASH: "/",
+			TokenKind.PERCENT: "%",
+			TokenKind.BANG: "!",
+			TokenKind.AMPERSAND: "&",
+			TokenKind.PIPE: "|",
+			TokenKind.CARET: "^",
+			TokenKind.EQUAL: "=",
+			TokenKind.LESSER: "<",
+			TokenKind.GREATER: ">",
+		}
+
+	@staticmethod
+	def _operatorStrToKind() -> dict[str, TokenKind]:
+		return {v: k for (k, v) in TokenKind._kindToOperatorStr().items()}
+
+	@staticmethod
+	def stringToOperator(op: str) -> TokenKind:
+		return TokenKind._operatorStrToKind()[op]
+
+	@staticmethod
+	def stringifyOperator(op: TokenKind) -> str:
+		return TokenKind._kindToOperatorStr()[op]
+
 
 class Position(NamedTuple):
 	file: str
@@ -148,21 +137,23 @@ class Token(NamedTuple):
 		if self.value is not None:
 			if self.kind == TokenKind.STRING:
 				s += f' | "{self.value}"'
+			elif self.kind == TokenKind.OPERATOR:
+				assert isinstance(self.value, tuple)
+				s += f" | {''.join(TokenKind.stringifyOperator(_op) for _op in self.value)}"
 			else:
 				s += f" | {self.value}"
 		return s
 
 
-logging.basicConfig(level=logging.DEBUG, format="[ %(name)s ] | %(levelname)s | %(message)s")
-
-
-def tokenize(filePath: str = "stdin") -> Generator[Token, None, None]:
+def tokenize(filePath: str) -> Generator[Token, bool]:
 	with open(filePath, "r") as f:
 		string = f.read()
 
 	pos = -1
 	line = 1
 	col = 0
+
+	success = True
 
 	current: Optional[str]
 
@@ -177,6 +168,7 @@ def tokenize(filePath: str = "stdin") -> Generator[Token, None, None]:
 		",": TokenKind.COMMA,
 		":": TokenKind.COLON,
 		";": TokenKind.SEMICOLON,
+		"`": TokenKind.BACKTICK,
 	}
 
 	def advance() -> Optional[str]:
@@ -243,134 +235,48 @@ def tokenize(filePath: str = "stdin") -> Generator[Token, None, None]:
 		tokenPos = Position(filePath, line, col)
 		if current is None:
 			yield Token(TokenKind.EOF, tokenPos)
-			return
+			return success
 		elif current == "\n":
 			line += 1
 			col = 0
 			continue
 		elif current in (" ", "\t"):
 			continue
-		elif current == "+":
-			try:
-				yield Token(
-					{
-						"=": TokenKind.PLUS_EQUAL,
-						"+": TokenKind.PLUS_PLUS,
-					}[pk],
-					tokenPos,
-				)
-				advance()
-			except KeyError:
-				yield Token(TokenKind.PLUS, tokenPos)
-		elif current == "-":
-			try:
-				yield Token(
-					{
-						"=": TokenKind.MINUS_EQUAL,
-						"-": TokenKind.MINUS_MINUS,
-					}[pk],
-					tokenPos,
-				)
-				advance()
-			except KeyError:
-				yield Token(TokenKind.MINUS, tokenPos)
-		elif current == "*":
-			if pk == "=":
-				yield Token(TokenKind.ASTERISK_EQUAL, tokenPos)
-				advance()
-			else:
-				yield Token(TokenKind.ASTERISK, tokenPos)
-		elif current == "/":
-			if pk == "=":
-				yield Token(TokenKind.SLASH_EQUAL, tokenPos)
-				advance()
-			elif pk == "/":
-				# single-line comment
-				advance()
-				while True:
-					current = advance()
-					if current == "\n":
-						line += 1
-						col = 0
-						break
-					elif current is None:
-						break
-			elif pk == "*":
-				# multi-line comment
-				advance()
-				while True:
-					current = advance()
-					if current is None:
-						tokenPos.error("unclosed multiline comment")
-						return
-					elif current == "*" and peek() == "/":
-						advance()
-						break
-					elif current == "\n":
-						line += 1
-						col = 0
-			else:
-				yield Token(TokenKind.SLASH, tokenPos)
-		elif current == "%":
-			if pk == "=":
-				yield Token(TokenKind.PERCENT_EQUAL, tokenPos)
-				advance()
-			else:
-				yield Token(TokenKind.PERCENT, tokenPos)
-		elif current == "&":
-			try:
-				yield Token(
-					{
-						"&": TokenKind.AMPERSAND_AMPERSAND,
-						"=": TokenKind.AMPERSAND_EQUAL,
-					}[pk],
-					tokenPos,
-				)
-				advance()
-			except KeyError:
-				yield Token(TokenKind.AMPERSAND, tokenPos)
-		elif current == "|":
-			try:
-				yield Token(
-					{
-						"|": TokenKind.PIPE_PIPE,
-						"=": TokenKind.PIPE_EQUAL,
-					}[pk],
-					tokenPos,
-				)
-				advance()
-			except KeyError:
-				yield Token(TokenKind.PIPE, tokenPos)
-		elif current == "!":
-			if pk == "=":
-				yield Token(TokenKind.BANG_EQUAL, tokenPos)
-				advance()
-			else:
-				yield Token(TokenKind.BANG, tokenPos)
-		elif current == "=":
-			if pk == "=":
-				yield Token(TokenKind.EQUAL_EQUAL, tokenPos)
-				advance()
-			else:
-				yield Token(TokenKind.EQUAL, tokenPos)
-		elif current == ">":
-			if pk == "=":
-				yield Token(TokenKind.GREATER_EQUAL, tokenPos)
-				advance()
-			else:
-				yield Token(TokenKind.GREATER, tokenPos)
-		elif current == "<":
-			if pk == "=":
-				yield Token(TokenKind.LESSER_EQUAL, tokenPos)
-				advance()
-			else:
-				yield Token(TokenKind.LESSER, tokenPos)
-		elif current == "^":
-			if pk == "=":
-				yield Token(TokenKind.CARET_EQUAL, tokenPos)
-				advance()
-			else:
-				yield Token(TokenKind.CARET, tokenPos)
+		# special handling for single-/multi-line comments
+		elif current == "/" and peek() == "/":
+			# single-line comment
+			advance()
+			while True:
+				current = advance()
+				if current == "\n":
+					line += 1
+					col = 0
+					break
+				elif current is None:
+					break
+		elif current == "/" and peek() == "*":
+			# multi-line comment
+			advance()
+			while True:
+				current = advance()
+				if current is None:
+					tokenPos.error("unclosed multiline comment")
+					return False
+				elif current == "*" and peek() == "/":
+					advance()
+					break
+				elif current == "\n":
+					line += 1
+					col = 0
+		elif current in TokenKind._operatorStrToKind().keys():
+			# dynamically generate operators
+			ops: list[TokenKind] = []
+
+			while current in TokenKind._operatorStrToKind().keys():
+				ops.append(TokenKind.stringToOperator(current))
+				current = advance()
+
+			yield Token(TokenKind.OPERATOR, tokenPos, tuple(ops))
 		elif current == '"':
 			literal = ""
 
@@ -408,7 +314,7 @@ def tokenize(filePath: str = "stdin") -> Generator[Token, None, None]:
 				s = advance()
 				if s is None:
 					tokenPos.error("unlosed string")
-					return
+					return False
 				else:
 					literal += s
 
@@ -430,6 +336,7 @@ def tokenize(filePath: str = "stdin") -> Generator[Token, None, None]:
 					dotCount += 1
 					if dotCount > 1:
 						tokenPos.error("number contains multiple dots (`.`)")
+						success = False
 						break
 					numStr += advance()
 
@@ -443,9 +350,10 @@ def tokenize(filePath: str = "stdin") -> Generator[Token, None, None]:
 					0: (TokenKind.INTEGER, int),
 					1: (TokenKind.FLOAT, float),
 				}[dotCount]
-				yield Token(_k, tokenPos, _f(numStr))
 			except KeyError:
 				continue
+			else:
+				yield Token(_k, tokenPos, _f(numStr))
 		elif current in strings.ascii_letters:
 			yield makeLiteralOrKeyword(current, tokenPos)
 		else:
@@ -457,16 +365,13 @@ def tokenize(filePath: str = "stdin") -> Generator[Token, None, None]:
 				unknown += advance()
 
 			tokenPos.error(f"Unknown sequence of characters: `{unknown}`")
+			success = False
 
 
-def _checkToken(tokens: Sequence[Token], idx: int, token: Token) -> tuple[bool, int]:
+def _checkToken(tokens: Sequence[Token], idx: int) -> tuple[bool, int]:
 	success = True
 	i = idx
-
-	def err(msg: str) -> None:
-		nonlocal i
-		nonlocal tokens
-		print(f"{tokens[i].pos}: ERROR: {msg}", file=sys.stderr)
+	token = tokens[idx]
 
 	if token.kind == TokenKind.LET:
 		# maybe only check until end of line?
@@ -478,7 +383,7 @@ def _checkToken(tokens: Sequence[Token], idx: int, token: Token) -> tuple[bool, 
 			varName = tokens[i]
 			sccss = True
 			if varName.kind != TokenKind.IDENTIFIER:
-				err(f"Expected variable name, got {varName.kind}")
+				varName.pos.error(f"Expected variable name, got {varName.kind}")
 				success = False
 				i += 1
 				if tokens[i].kind == TokenKind.SEMICOLON:
@@ -487,7 +392,7 @@ def _checkToken(tokens: Sequence[Token], idx: int, token: Token) -> tuple[bool, 
 				elif tokens[i].kind == TokenKind.EQUAL:
 					i += 1
 					if tokens[i].kind not in (TokenKind.NULL, TokenKind.TRUE, TokenKind.FALSE, TokenKind.INTEGER, TokenKind.FLOAT, TokenKind.STRING):
-						err(
+						tokens[i].pos.error(
 							f"expected one of: "
 							f"{', '.join(str(k) for k in (TokenKind.NULL, TokenKind.TRUE, TokenKind.FALSE, TokenKind.INTEGER, TokenKind.FLOAT, TokenKind.STRING))}; "
 							f"got {tokens[i].kind}",
@@ -500,12 +405,12 @@ def _checkToken(tokens: Sequence[Token], idx: int, token: Token) -> tuple[bool, 
 					i += 1
 					continue
 				else:
-					err(
+					i += 1
+					tokens[i].pos.error(
 						f"expected one of: "
 						f"{', '.join(str(k) for k in (TokenKind.SEMICOLON, TokenKind.EQUAL, TokenKind.COMMA))}; "
-						f"got {tokens[i + 1].kind}",
+						f"got {tokens[i].kind}",
 					)
-					i += 1
 					continue
 
 			if sccss is False or success is False:
@@ -519,7 +424,24 @@ def _checkToken(tokens: Sequence[Token], idx: int, token: Token) -> tuple[bool, 
 			elif tokens[i].kind == TokenKind.COMMA:
 				# no value but more declarations
 				continue
-			elif tokens[i].kind == TokenKind.EQUAL:
+			elif tokens[i].kind == TokenKind.OPERATOR:
+				# expect `=`
+				t = tokens[i]
+				assert isinstance(t.value, tuple)
+
+				if t.value != (TokenKind.EQUAL,):
+					_op = ""
+					success = False
+					for _t in t.value:
+						assert isinstance(_t, TokenKind)
+						_op += TokenKind.stringifyOperator(_t)
+					if len(_op) == 0:
+						tokens[i].pos.error("expected `=`, got nothing")
+					else:
+						tokens[i].pos.error(f"expected `=`, got {_op}")
+					del _op
+				# still continue normally even if operator is wrong, to catch more errors
+
 				# expect value
 				i += 1
 				if tokens[i].kind not in (
@@ -529,7 +451,7 @@ def _checkToken(tokens: Sequence[Token], idx: int, token: Token) -> tuple[bool, 
 					TokenKind.STRING,
 					TokenKind.IDENTIFIER,
 				):
-					err(
+					tokens[i].pos.error(
 						f"expected one of: "
 						f"{', '.join(str(k) for k in (TokenKind.NULL, TokenKind.TRUE, TokenKind.FALSE, TokenKind.INTEGER, TokenKind.FLOAT, TokenKind.STRING, TokenKind.IDENTIFIER))}; "
 						f"got {tokens[i].kind}",
@@ -539,7 +461,7 @@ def _checkToken(tokens: Sequence[Token], idx: int, token: Token) -> tuple[bool, 
 					i += 1
 					continue
 			else:
-				err(
+				tokens[i].pos.error(
 					f"expected one of: "
 					f"{', '.join(str(k) for k in (TokenKind.SEMICOLON, TokenKind.COMMA, TokenKind.EQUAL))}; "
 					f"got {tokens[i].kind}",
@@ -548,14 +470,14 @@ def _checkToken(tokens: Sequence[Token], idx: int, token: Token) -> tuple[bool, 
 				continue
 
 		if i == len(tokens):
-			err("expected semicolon after variable declaration(s)")
+			tokens[i].pos.error("expected semicolon after variable declaration(s)")
 			success = False
 	elif token.kind == TokenKind.EOF:
 		if idx + 1 != len(tokens):
-			err("found more tokens after EOF")
+			tokens[i].pos.error("found more tokens after EOF")
 			success = False
 	else:
-		err(f"checking {token.kind} is not implemented")
+		tokens[i].pos.error(f"checking {token.kind} is not implemented")
 		success = False
 
 	return (success, i - idx)
@@ -571,9 +493,9 @@ def checkTokens(tokenStream: Sequence[Token]) -> bool:
 			continue
 
 		try:
-			passed, n = _checkToken(tokenStream, i, token)
+			passed, n = _checkToken(tokenStream, i)
 		except IndexError:
-			print(f"{token.pos}: ERROR: unexepected end of input", file=sys.stderr)
+			token.pos.error("unexpected end of input")
 			return False
 
 		if n < 0:
@@ -598,35 +520,61 @@ def main(args: Sequence[str] = None) -> int:
 		help="enable debug mode (not implemented)",
 	)
 	argParser.add_argument(
-		"-c", "--compile",
-		action="store_true",
-		dest="compile",
-		help="compile file instead of interpreting it (not implemented)",
+		"-c", "--compiler",
+		default="default",
+		dest="compiler",
+		help="choose a compiler (or interpreter) (badly implemented)",
 	)
 	# somewhat clashes with how checkTokens is implemented
 	argParser.add_argument(
 		"-u", "--unsafe",
-		action="store_true",
+		action="store_true",  # TODO: change to "store_false" when checking is implemented
 		dest="unsafe",
-		help="disable type checking code (not implemented; currently always skipped)",
+		help="disable checking code (very likely breaks things; currently always on, since checking is pretty much not implemented; can be turned off by using this flag)",
 	)
 
 	parsedArgs = argParser.parse_args(args)
 
 	if parsedArgs.debug is True:
-		print("debug mode is not implemented")
-	if parsedArgs.compile is True:
-		print("compile mode is not implemented")
-	if parsedArgs.unsafe is True:
-		print("unsafe mode is not implemented")
+		print("debug mode is not (fully) implemented")
 
-	tokens: list[Token] = [token for token in tokenize(parsedArgs.file)]
+	tokens: list[Token] = []
+	tks = tokenize(parsedArgs.file)
 
-	# for token in tokens:
-	# 	print(token)
+	while True:
+		try:
+			tokens.append(next(tks))
+		except StopIteration as stop:
+			if stop.value is False:
+				print(f"{parsedArgs.file}: ERROR: tokenization failed", file=sys.stderr)
+				return 1
+			else:
+				break
 
-	checkPassed = checkTokens(tokens)
-	print("checks " + ("passed" if checkPassed else "failed"))
+	if parsedArgs.debug is True:
+		print("\n".join(str(token) for token in tokens))
+
+	if parsedArgs.unsafe is False:
+		if checkTokens(tokens) is False:
+			print(f"{parsedArgs.file}: ERROR: checks failed", file=sys.stderr)
+			return 1
+
+	compilers = {
+		entrypoint.name: entrypoint
+		for entrypoint in importlib.metadata.entry_points()["nyr.compiler"]
+	}
+
+	try:
+		compiler = compilers[parsedArgs.compiler].load()
+	except KeyError:
+		print(
+			f"compiler {parsedArgs.compiler} does not exist\n"
+			f"available compilers: {', '.join(sorted(compilers))}",
+			file=sys.stderr,
+		)
+		return 1
+	else:
+		compiler(tokens)
 
 	return 0
 
